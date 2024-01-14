@@ -85,11 +85,11 @@ export default defineComponent({
     const basemapLayerData = [
       {
         title: 'Open Street Map',
-        imagePath: '/src/assets/layer-image/Openstreetmap_logo.png',
+        imagePath: new URL('/src/assets/layer-image/Openstreetmap_logo.png', import.meta.url),
       },
       {
         title: 'Google Map',
-        imagePath: '/src/assets/layer-image/googlemap.jpg',
+        imagePath: new URL('/src/assets/layer-image/googlemap.jpg', import.meta.url),
       },
       // {
       //   title: 'Water Color',
@@ -97,19 +97,19 @@ export default defineComponent({
       // },
       {
         title: 'Toner',
-        imagePath: '/src/assets/layer-image/toner.png',
+        imagePath: new URL('/src/assets/layer-image/toner.png', import.meta.url),
       },
       {
         title: 'Topo Map',
-        imagePath: '/src/assets/layer-image/topo.jpg',
+        imagePath: new URL('/src/assets/layer-image/topo.jpg', import.meta.url),
       },
       {
         title: 'Streets Map',
-        imagePath: '/src/assets/layer-image/streets.png',
+        imagePath: new URL('/src/assets/layer-image/streets.png', import.meta.url),
       },
       {
         title: 'No Basemap',
-        imagePath: '/src/assets/layer-image/nobasemap.png',
+        imagePath: new URL('/src/assets/layer-image/nobasemap.png', import.meta.url),
       },
     ];
 
