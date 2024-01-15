@@ -16,6 +16,9 @@ import {
   Divider,
   Tooltip,
   Popover,
+  Modal,
+  Select,
+  Switch,
 } from 'ant-design-vue';
 import App from './App.vue';
 import axios from 'axios';
@@ -51,6 +54,9 @@ app.use(Slider);
 app.use(Divider);
 app.use(Tooltip);
 app.use(Popover);
+app.use(Modal);
+app.use(Select);
+app.use(Switch);
 
 app.mount('#app');
 

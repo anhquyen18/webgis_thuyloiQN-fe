@@ -24,8 +24,8 @@ const runMap = () => {
   const map = new Map({
     target: 'map',
     view: new View({
-      // projection: 'EPSG:4326',
-      projection: customCRS.addCustomCrs('EPSG:5899'),
+      projection: 'EPSG:4326',
+      // projection: customCRS.addCustomCrs('EPSG:5899'),
 
       minZoom: 5,
       maxZoom: 22,
@@ -33,8 +33,8 @@ const runMap = () => {
   });
 
   var format = 'image/png';
-  var degreeBounds = [108.66931915300006, 11.769107818000062, 109.46916961700003, 12.86867141600004];
-  const meterBounds = [576281.1063905563, 1720086.1249637157, 580872.2309828001, 1724335.9856269273];
+  var degreeBounds = [107.667, 15.228, 108.804, 16.197];
+  // const meterBounds = [576281.1063905563, 1720086.1249637157, 580872.2309828001, 1724335.9856269273];
   const maxMeterBounds = [556421, 1702209, 604820, 1739026];
   // var TKmeterBounds = [548539.1168823242187500, 1719723.5018920898437500, 554086.7171020507812500, 1724261.0479125976562500];
   const maptilerKey = 'FaZvqSsyUcg9u0pnhR97';
@@ -120,11 +120,12 @@ const runMap = () => {
     title: 'Main layers',
     layers: [
       new VectorLayer({
-        title: 'Hồ chứa',
+        title: 'Hồ chứa layer',
         preview: '/src/assets/luffy-chilling-gear5-round.png',
         // preview: 'F:/Programming project/Personal/web-gis-dev/front-end/src/assets/luffy-chilling-gear5-round.png',
         source: new VectorSource({
           // url: 'http://localhost:8080/geoserver/webgis_dev/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=webgis_dev%3Aho_dieu_hoa&outputFormat=application%2Fjson',
+          url: 'http://localhost:8080/geoserver/webgis_dev/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=webgis_dev%3Aho_chua_quang_nam_EPSG4326&outputFormat=application%2Fjson',
           format: new GeoJSON(),
         }),
         style: new Style({
@@ -142,10 +143,20 @@ const runMap = () => {
 
   map.addLayer(baseLayerGroup);
   map.addLayer(mainLayerGroup);
-  map.getView().fit(meterBounds, map.getSize());
+  // map.getView().fit(meterBounds, map.getSize());
+  map.getView().fit(degreeBounds, map.getSize());
 
   var hover = new ol_interaction_Hover({ cursor: 'pointer' });
   map.addInteraction(hover);
+
+  const measureVector = new VectorLayer({
+    title: 'Measure layer',
+    // source: measureSource,
+    // style: function (feature) {
+    //   return measureStyleFunction(feature, true);
+    // },
+  });
+  map.addLayer(measureVector);
 
   return map;
 };

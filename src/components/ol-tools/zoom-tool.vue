@@ -1,0 +1,47 @@
+<template>
+  <a-button class="white-border-ant-button" type="primary" size="small" @click="zoomIn">
+    <i class="fa-solid fa-magnifying-glass-plus"></i>
+  </a-button>
+  <a-button class="white-border-ant-button" type="primary" size="small" @click="zoomOut">
+    <i class="fa-solid fa-magnifying-glass-minus"></i>
+  </a-button>
+</template>
+
+<script>
+import { defineComponent } from 'vue';
+import { mapState } from '../../stores/map-state.js';
+export default defineComponent({
+  setup() {
+    return {};
+  },
+  data() {
+    return {};
+  },
+  computed: {
+    map() {
+      return mapState().getMap;
+    },
+  },
+  methods: {
+    zoomIn() {
+      //   console.log(this.map.getView().getZoom());
+      //   this.map.getView().setZoom(this.map.getView().getZoom() + 1);
+      this.map.getView().animate({
+        center: this.map.getView().getCenter(),
+        zoom: this.map.getView().getZoom() + 1,
+        duration: 200,
+      });
+    },
+    zoomOut() {
+      this.map.getView().animate({
+        center: this.map.getView().getCenter(),
+        zoom: this.map.getView().getZoom() - 1,
+        duration: 200,
+      });
+    },
+  },
+  mounted() {},
+});
+</script>
+
+<style lang="scss"></style>

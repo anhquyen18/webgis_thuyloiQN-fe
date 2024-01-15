@@ -11,7 +11,7 @@
         <a-row class="main-layer" :gutter="[0, 8]">
           <a-col :xl="4" :xs="6" v-for="(layer, index) in mainLayerData">
             <a-tooltip>
-              <template #title> {{ layer.title }}</template>
+              <template #title> {{ layer.displayName }}</template>
               <div class="layer-image">
                 <a-button
                   @click="changeLayerVisible(layer.title, index)"

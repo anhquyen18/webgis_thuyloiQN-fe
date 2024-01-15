@@ -73,11 +73,11 @@
               <SiderLayerManager></SiderLayerManager>
             </a-layout-sider>
             <a-layout-content style="height: 100%">
-              <div class="content-container h-100" style="position: relative">
+              <div ref="mapContainer" id="map-container" class="content-container h-100" style="position: relative">
                 <div id="map" class="map h-100"></div>
-              </div>
-              <div class="bottom-right-nav align-items-center">
-                <LayerManager class="mt-5"></LayerManager>
+                <div class="bottom-right-nav align-items-center">
+                  <LayerManager class="mt-5"></LayerManager>
+                </div>
               </div>
             </a-layout-content>
           </a-layout>
@@ -146,8 +146,16 @@ export default defineComponent({
     const sliderValue = ref(100);
     const activeSiderTab = ref('layersTab');
     provide('activeSiderTab', activeSiderTab);
-    const mainLayerData = ref([]);
+    const mainLayerData = ref([
+      {
+        title: 'Hồ chứa layer',
+        displayName: 'Hồ chứa',
+        imagePath: '',
+        visible: true,
+      },
+    ]);
     provide('mainLayerData', mainLayerData);
+
     return {
       sliderValue,
       activeSiderTab,
@@ -210,10 +218,12 @@ export default defineComponent({
 .no-border-ant-button {
   border: none !important;
   background-color: transparent !important;
+  box-shadow: none !important;
 }
 
 .white-border-ant-button {
   border: 1px solid #fff !important;
+
   // background-color: transparent !important;
 }
 
@@ -231,9 +241,16 @@ export default defineComponent({
 
 .bottom-right-nav {
   position: absolute;
-  bottom: 3vw;
-  right: 2vh;
+  bottom: 2vh;
+  right: 1vw;
   display: flex;
   flex-direction: column;
+}
+
+.map .ol-zoom {
+  position: absolute;
+  top: 35vh;
+  left: auto;
+  right: 2vw;
 }
 </style>
