@@ -21,11 +21,12 @@ import ol_source_IDW from 'ol-ext/source/IDW.js';
 
 const runMap = () => {
   // var map;
+  const GEOSERVER_DOMAIN = 'http://aqtran.name.vn:8080';
   const map = new Map({
     target: 'map',
     view: new View({
-      projection: 'EPSG:4326',
-      // projection: customCRS.addCustomCrs('EPSG:5899'),
+      // projection: 'EPSG:4326',
+      projection: customCRS.addCustomCrs('EPSG:5899'),
 
       minZoom: 5,
       maxZoom: 22,
@@ -33,9 +34,11 @@ const runMap = () => {
   });
 
   var format = 'image/png';
-  var degreeBounds = [107.667, 15.228, 108.804, 16.197];
+  var degreeBounds = [107.667, 15.228, 108.804, 16.197]; // 4326
+  const meterBounds = [576281.1063905563, 1720086.1249637157, 580872.2309828001, 1724335.9856269273]; // 5899
+
   // const meterBounds = [576281.1063905563, 1720086.1249637157, 580872.2309828001, 1724335.9856269273];
-  const maxMeterBounds = [556421, 1702209, 604820, 1739026];
+  // const maxMeterBounds = [556421, 1702209, 604820, 1739026];
   // var TKmeterBounds = [548539.1168823242187500, 1719723.5018920898437500, 554086.7171020507812500, 1724261.0479125976562500];
   const maptilerKey = 'FaZvqSsyUcg9u0pnhR97';
   // ---------------------------------
@@ -125,7 +128,10 @@ const runMap = () => {
         // preview: 'F:/Programming project/Personal/web-gis-dev/front-end/src/assets/luffy-chilling-gear5-round.png',
         source: new VectorSource({
           // url: 'http://localhost:8080/geoserver/webgis_dev/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=webgis_dev%3Aho_dieu_hoa&outputFormat=application%2Fjson',
-          url: 'http://localhost:8080/geoserver/webgis_dev/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=webgis_dev%3Aho_chua_quang_nam_EPSG4326&outputFormat=application%2Fjson',
+          // url: 'http://localhost:8080/geoserver/webgis_dev/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=webgis_dev%3Aho_chua_quang_nam_EPSG4326&outputFormat=application%2Fjson',
+          url:
+            GEOSERVER_DOMAIN +
+            '/geoserver/thuy_loi_quang_nam/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=thuy_loi_quang_nam%3Aho_chua_quang_nam_epsg5899&outputFormat=application%2Fjson',
           format: new GeoJSON(),
         }),
         style: new Style({
@@ -138,13 +144,55 @@ const runMap = () => {
           }),
         }),
       }),
+
+      new VectorLayer({
+        title: 'Kênh layer',
+        source: new VectorSource({
+          // url: 'http://localhost:8080/geoserver/webgis_dev/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=webgis_dev%3Akenh&outputFormat=application%2Fjson',
+          url:
+            GEOSERVER_DOMAIN +
+            '/geoserver/thuy_loi_quang_nam/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=thuy_loi_quang_nam%3Akenh&outputFormat=application%2Fjson',
+          format: new GeoJSON(),
+        }),
+        style: new Style({
+          stroke: new Stroke({
+            color: '#00ab5b',
+            // lineDash: [10, 10],
+            width: 2,
+          }),
+        }),
+      }),
+
+      new VectorLayer({
+        title: 'Cửa xả layer',
+        source: new VectorSource({
+          // url: 'http://localhost:8080/geoserver/webgis_dev/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=webgis_dev%3Acua_xa&outputFormat=application%2Fjson',
+          // url: 'http://localhost:8080/geoserver/webgis_dev/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=webgis_dev%3Acua_xa_postgresql&outputFormat=application%2Fjson',
+          url:
+            GEOSERVER_DOMAIN +
+            '/geoserver/thuy_loi_quang_nam/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=thuy_loi_quang_nam%3Acuaxa&outputFormat=application%2Fjson',
+          format: new GeoJSON(),
+        }),
+        style: new Style({
+          image: new Circle({
+            radius: 5,
+            fill: new Fill({
+              color: '#ffa500',
+            }),
+            stroke: new Stroke({
+              color: 'white',
+              width: 1,
+            }),
+          }),
+        }),
+      }),
     ],
   });
 
   map.addLayer(baseLayerGroup);
   map.addLayer(mainLayerGroup);
   // map.getView().fit(meterBounds, map.getSize());
-  map.getView().fit(degreeBounds, map.getSize());
+  map.getView().fit(meterBounds, map.getSize());
 
   var hover = new ol_interaction_Hover({ cursor: 'pointer' });
   map.addInteraction(hover);

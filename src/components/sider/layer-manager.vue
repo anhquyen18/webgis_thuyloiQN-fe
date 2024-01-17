@@ -63,13 +63,21 @@
           </a-collapse>
         </a-collapse-panel>
         <a-collapse-panel key="2" header="Đập">
-          <p>Đang cập nhật</p>
+          <a-button
+            v-for="lake in lakeData.cuaxa"
+            class="no-border-ant-button mt-1"
+            size="small"
+            style="width: 100%; text-wrap: wrap; height: auto; text-align: left">
+            Đập {{ lake.ten }}
+          </a-button>
         </a-collapse-panel>
         <a-collapse-panel key="3" header="Trạm bơm">
           <p>Đang cập nhật</p>
         </a-collapse-panel>
         <a-collapse-panel key="4" header="Kênh mương">
-          <p>Đang cập nhật</p>
+          <a-button v-for="lake in lakeData.kenh" class="no-border-ant-button mt-1" size="small">
+            Kênh {{ lake.gid }}
+          </a-button>
         </a-collapse-panel>
         <a-collapse-panel key="5" header="Đê kè">
           <p>Đang cập nhật</p>
