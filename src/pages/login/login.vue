@@ -9,7 +9,9 @@
     <a-layout-header style="background: transparent; height: 10vh; padding: 0; line-height: normal">
       <a-row style="height: 100%">
         <a-col class="center-col mt-3" :span="2">
-          <img src="../../assets/Logo_BoNongNghiep.png" alt="" style="height: 5rem; width: 5rem" />
+          <a href="/">
+            <img src="../../assets/Logo_BoNongNghiep.png" alt="" style="height: 5rem; width: 5rem" />
+          </a>
         </a-col>
       </a-row>
     </a-layout-header>

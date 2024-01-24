@@ -3,7 +3,9 @@
     <a-layout-header class="home-header">
       <a-row style="height: 100%">
         <a-col class="center-col" :span="2">
-          <img src="../assets/Logo_BoNongNghiep.png" alt="" style="height: 5rem; width: 5rem" />
+          <a href="/">
+            <img src="../assets/Logo_BoNongNghiep.png" alt="" style="height: 5rem; width: 5rem" />
+          </a>
         </a-col>
         <a-col class="center-col" :span="12" :offset="3">
           <h1 style="font-size: 1.1rem">
