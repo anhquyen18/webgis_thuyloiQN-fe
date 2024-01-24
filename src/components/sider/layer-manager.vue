@@ -1,11 +1,11 @@
 <template>
   <a-card
     class="sider-content"
-    :active-tab-key="activeSiderTab"
+    :active-tab-key="siderLayerManagerState.activeSiderTab"
     :bodyStyle="{ padding: 0, backgroundColor: '#ffffff !important' }"
     style="border: none"
     :headStyle="{ borderRadius: '0.5rem' }">
-    <div v-if="activeSiderTab === 'layersTab'">
+    <div v-if="siderLayerManagerState.activeSiderTab === 'layersTab'">
       <!-- <a-menu class="layers-visible-menu" mode="inline" style="border: none">
           <a-sub-menu key="sub1">
             <template #title>
@@ -46,18 +46,30 @@
               <CaretRightOutlined :rotate="isActive ? 90 : 0" />
             </template>
             <a-collapse-panel key="1" header="Hồ chứa lớn">
-              <a-button v-for="lake in lakeData.bigLake" class="no-border-ant-button mt-1" size="small">
-                Hồ {{ lake.ten }}
+              <a-button
+                v-for="lake in lakeData.bigLake"
+                class="no-border-ant-button mt-1"
+                size="small"
+                @click="zoomToFeature(lake)">
+                {{ lake.displayname }}
               </a-button>
             </a-collapse-panel>
             <a-collapse-panel key="2" header="Hồ chứa vừa">
-              <a-button v-for="lake in lakeData.mediumLake" class="no-border-ant-button mt-1" size="small">
-                Hồ {{ lake.ten }}
+              <a-button
+                v-for="lake in lakeData.mediumLake"
+                class="no-border-ant-button mt-1"
+                size="small"
+                @click="zoomToFeature(lake)">
+                {{ lake.displayname }}
               </a-button>
             </a-collapse-panel>
             <a-collapse-panel key="3" header="Hồ chứa nhỏ">
-              <a-button v-for="lake in lakeData.smallLake" class="no-border-ant-button mt-1" size="small">
-                Hồ {{ lake.ten }}
+              <a-button
+                v-for="lake in lakeData.smallLake"
+                class="no-border-ant-button mt-1"
+                size="small"
+                @click="zoomToFeature(lake)">
+                {{ lake.displayname }}
               </a-button>
             </a-collapse-panel>
           </a-collapse>
@@ -67,16 +79,21 @@
             v-for="lake in lakeData.cuaxa"
             class="no-border-ant-button mt-1"
             size="small"
-            style="width: 100%; text-wrap: wrap; height: auto; text-align: left">
-            Đập {{ lake.ten }}
+            style="width: 100%; text-wrap: wrap; height: auto; text-align: left"
+            @click="zoomToFeature(lake)">
+            {{ lake.displayname }}
           </a-button>
         </a-collapse-panel>
         <a-collapse-panel key="3" header="Trạm bơm">
           <p>Đang cập nhật</p>
         </a-collapse-panel>
         <a-collapse-panel key="4" header="Kênh mương">
-          <a-button v-for="lake in lakeData.kenh" class="no-border-ant-button mt-1" size="small">
-            Kênh {{ lake.gid }}
+          <a-button
+            v-for="lake in lakeData.kenh"
+            class="no-border-ant-button mt-1"
+            size="small"
+            @click="zoomToFeature(lake)">
+            {{ lake.displayname }}
           </a-button>
         </a-collapse-panel>
         <a-collapse-panel key="5" header="Đê kè">
@@ -91,7 +108,23 @@
       </a-collapse>
     </div>
 
-    <div v-if="activeSiderTab === 'searchingTab'">kết quả tìm kiếm</div>
+    <div v-if="siderLayerManagerState.activeSiderTab === 'searchingTab'">
+      <a-spin :spinning="siderLayerManagerState.searchingTabSpinning">
+        <a-flex style="padding: 10px" vertical>
+          <p v-if="searchResult == ''">Không có kết quả nào được tìm thấy.</p>
+          <p v-else-if="searchResult.length > 0" class="fw-bold">Kết quả tìm kiếm:</p>
+
+          <a-button
+            v-for="item in searchResult"
+            class="no-border-ant-button mt-2"
+            size="small"
+            @click="zoomToFeature(item)"
+            style="text-wrap: wrap; height: auto; text-align: left; align-self: flex-start">
+            {{ item.displayname }}
+          </a-button>
+        </a-flex>
+      </a-spin>
+    </div>
   </a-card>
 </template>
 
@@ -99,6 +132,11 @@
 import { defineComponent, ref, inject } from 'vue';
 import Icon, { CaretRightOutlined } from '@ant-design/icons-vue';
 import thuyLoiApi from '../../js/axios/thuyLoiApi.js';
+import { mapState } from '../../stores/map-state';
+import * as VueLayer from '../../js/openlayers/VueLayer.js';
+
+import * as olExtent from 'ol/extent';
+import { GeoJSON } from 'ol/format';
 
 export default defineComponent({
   components: {
@@ -116,7 +154,6 @@ export default defineComponent({
         tab: 'Searching',
       },
     ];
-    const activeSiderTab = inject('activeSiderTab');
     const onTabChange = (value) => {
       key.value = value;
     };
@@ -132,11 +169,17 @@ export default defineComponent({
         console.log(error);
       });
 
+    const searchResult = inject('searchResult');
+    const siderLayerManagerState = inject('siderLayerManagerState');
+    const featurePropShow = inject('featurePropShow');
+
     return {
       tabList,
-      activeSiderTab,
       onTabChange,
       lakeData,
+      searchResult,
+      siderLayerManagerState,
+      featurePropShow,
     };
   },
   data() {
@@ -149,7 +192,96 @@ export default defineComponent({
       return mapState().getMap;
     },
   },
-  methods: {},
+  methods: {
+    zoomToFeature(item) {
+      console.log(VueLayer.getLayerByTitle(this.map, 'Hồ chứa layer', 1).getStyle());
+      VueLayer.getLayerByTitle(this.map, 'Feature highlight layer').getSource().clear();
+      popup.classList.remove('ol-popup__active');
+      thuyLoiApi
+        .post('/get-feature-info', {
+          layer: item.layername,
+          id: item.gid,
+          name: item.name,
+        })
+        .then((response) => {
+          console.log(response);
+          // delete response.data['']
+          if (response.data.message) {
+            this.$message.warning({
+              content: () => response.data.message,
+              // style: {
+              //   marginTop: '10vh',
+              // },
+            });
+          } else {
+            let props = response.data;
+            delete props['gid'];
+            delete props['geom'];
+
+            // Đang sử dụng mảng để triển khai cái props của feature
+            // Khi có được tất cả các layer chính thức
+            // và có thông tin cần hiển thị cho tất cả thì lúc đó dùng json
+            this.featurePropShow.props = [];
+            Object.keys(props).forEach((x, i, arr) => {
+              if (x != 'geometry' && x != 'HinhAnh') {
+                this.featurePropShow.props.push({
+                  // key: i + 1,
+                  name: x,
+                  value: props[x],
+                });
+              } else if (x == 'geometry') {
+                // featureProp.geom = props[x];
+              }
+            });
+
+            let popup = document.getElementById('popup');
+            popup.classList.add('ol-popup__active');
+            this.featurePropShow.displayName = item.displayname;
+            this.featurePropShow.id = item.gid;
+            this.featurePropShow.originalLayerTitle = item.layername;
+            this.featurePropShow.originalName = item.name;
+          }
+
+          // this.featurePropShow.props
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+
+      // this.map.getOverlayById('featurePopupOverlay').setPosition(undefined);
+      // console.log(item);
+
+      // props:
+      if (item.geojson) {
+        let feature = new GeoJSON().readFeature(item.geojson);
+        let extent = feature.getGeometry().getExtent();
+        this.map.getView().fit(extent, { duration: 1000 });
+        VueLayer.getLayerByTitle(this.map, 'Feature highlight layer').setVisible(true);
+        VueLayer.getLayerByTitle(this.map, 'Feature highlight layer').getSource().addFeature(feature);
+        this.map.getOverlayById('featurePopupOverlay').setPosition(olExtent.getCenter(extent));
+      }
+
+      // console.log(this.featurePropShow);
+      // console.log(extent);
+      // console.log(extent.getCenter(extent));
+      // console.log(olExtent.getCenter(extent));
+    },
+
+    statusSwitch() {
+      this.status = !this.status;
+      VueLayer.getLayerByTitle(this.map, 'Feature highlight layer').getSource().clear();
+      this.map.getOverlayById('featurePopupOverlay').setPosition(undefined);
+      if (this.status) {
+        this.buttonType = 'default';
+        VueLayer.getLayerByTitle(this.map, 'Feature highlight layer').setVisible(true);
+        this.$refs.olPopup.classList.add('ol-popup__active');
+      } else {
+        this.buttonType = 'primary';
+        VueLayer.getLayerByTitle(this.map, 'Feature highlight layer').setVisible(false);
+        this.$refs.olPopup.classList.remove('ol-popup__active');
+      }
+    },
+  },
   mounted() {},
 });
 </script>

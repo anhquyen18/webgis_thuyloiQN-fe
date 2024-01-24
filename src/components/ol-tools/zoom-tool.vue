@@ -1,10 +1,20 @@
 <template>
-  <a-button class="white-border-ant-button" type="primary" size="small" @click="zoomIn">
-    <i class="fa-solid fa-magnifying-glass-plus"></i>
-  </a-button>
-  <a-button class="white-border-ant-button" type="primary" size="small" @click="zoomOut">
-    <i class="fa-solid fa-magnifying-glass-minus"></i>
-  </a-button>
+  <a-tooltip overlayClassName="tool-container-tooltip">
+    <template #title>
+      <p>Phóng to</p>
+    </template>
+    <a-button class="white-border-ant-button" type="primary" size="small" @click="zoomIn">
+      <i class="fa-solid fa-magnifying-glass-plus"></i>
+    </a-button>
+  </a-tooltip>
+  <a-tooltip overlayClassName="tool-container-tooltip">
+    <template #title>
+      <p>Thu nhỏ</p>
+    </template>
+    <a-button class="white-border-ant-button" type="primary" size="small" @click="zoomOut">
+      <i class="fa-solid fa-magnifying-glass-minus"></i>
+    </a-button>
+  </a-tooltip>
 </template>
 
 <script>

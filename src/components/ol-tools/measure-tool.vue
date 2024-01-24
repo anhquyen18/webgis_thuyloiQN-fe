@@ -1,8 +1,14 @@
 <template>
   <div>
-    <a-button class="white-border-ant-button" type="primary" size="small" @click="startMeasure">
-      <i class="fa-solid fa-draw-polygon"></i>
-    </a-button>
+    <a-tooltip overlayClassName="tool-container-tooltip">
+      <template #title>
+        <p>Đo đạc</p>
+      </template>
+      <a-button class="white-border-ant-button" type="primary" size="small" @click="startMeasure">
+        <i class="fa-solid fa-draw-polygon"></i>
+      </a-button>
+    </a-tooltip>
+
     <div
       ref="controlPanel"
       class="ol-tool-control-panel measure-control-panel"
@@ -385,7 +391,7 @@ export default defineComponent({
 
 .close-button {
   &:hover {
-    color: var(--error-color);
+    color: var(--error-color) !important;
   }
 }
 </style>

@@ -7,10 +7,10 @@
       <i class="fa-solid fa-hand"></i>
     </a-button>
     <MeasureTool></MeasureTool>
-
-    <a-button class="white-border-ant-button" type="primary" size="small">
+    <FeatureInfoPopup></FeatureInfoPopup>
+    <!-- <a-button class="white-border-ant-button" type="primary" size="small">
       <i class="fa-solid fa-pencil"></i>
-    </a-button>
+    </a-button> -->
   </a-row>
 </template>
 
@@ -19,11 +19,14 @@ import { defineComponent } from 'vue';
 import PanToHome from './pan-to-home.vue';
 import ZoomTool from './zoom-tool.vue';
 import MeasureTool from './measure-tool.vue';
+import FeatureInfoPopup from './feature-info-popup.vue';
+
 export default defineComponent({
   components: {
     PanToHome,
     ZoomTool,
     MeasureTool,
+    FeatureInfoPopup,
   },
   setup() {
     return {};

@@ -1,0 +1,53 @@
+:root {
+    --zoom-silder-top: 20vh;
+    --dark1-theme-color: #012241;
+    --error-color: #ff4d4f;
+    --secondary-background-color: #f3f3f3;
+    --secondary-background-color2: #252525;
+}
+
+.map .ol-zoom {
+    position: absolute;
+    top: var(--zoom-silder-top);
+    left: auto;
+    right: 2vw;
+
+}
+
+.ol-zoom .ol-zoom-out {
+    margin-top: 200px;
+}
+
+.ol-zoomslider {
+    background-color: transparent !important;
+    /*
+    Zoom control top: 0.5em
+    Zoom control padding: 2px
+    Zoom in button margin top: 1px
+    Zoom in button height: font size 1.14em * 1.375 height
+    */
+
+    position: absolute;
+    /* top: 22.5vh !important; */
+    top: calc(var(--zoom-silder-top) + 2.5vh) !important;
+    left: auto !important;
+    right: 2vw !important;
+}
+
+.ol-touch .ol-zoom .ol-zoom-out {
+    margin-top: 212px;
+}
+
+.ol-touch .ol-zoomslider {
+    top: 2.75em;
+}
+
+.ol-zoom-in.ol-has-tooltip:hover [role=tooltip],
+.ol-zoom-in.ol-has-tooltip:focus [role=tooltip] {
+    top: 3px;
+}
+
+.ol-zoom-out.ol-has-tooltip:hover [role=tooltip],
+.ol-zoom-out.ol-has-tooltip:focus [role=tooltip] {
+    top: 232px;
+}

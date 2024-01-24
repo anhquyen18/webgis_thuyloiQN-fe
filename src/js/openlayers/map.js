@@ -15,13 +15,17 @@ import { LineString, Geometry, Polygon, Point } from 'ol/geom.js';
 import { Feature } from 'ol';
 import { Draw } from 'ol/interaction';
 import { WKB } from 'ol/format.js';
+import { ZoomSlider } from 'ol/control.js';
 
 import ol_interaction_Hover from 'ol-ext/interaction/Hover.js';
 import ol_source_IDW from 'ol-ext/source/IDW.js';
-
+import ol_legend_Legend from 'ol-ext/legend/Legend.js';
+import ol_control_Legend from 'ol-ext/control/Legend.js';
 const runMap = () => {
   // var map;
-  const GEOSERVER_DOMAIN = 'http://aqtran.name.vn:8080';
+  // const GEOSERVER_DOMAIN = 'http://aqtran.name.vn:8080';
+  const GEOSERVER_DOMAIN = 'http://localhost:8080';
+  const GEOSERVER_WORKSPACE = 'webgis_dev';
   const map = new Map({
     target: 'map',
     view: new View({
@@ -32,10 +36,13 @@ const runMap = () => {
       maxZoom: 22,
     }),
   });
+  const zoomslider = new ZoomSlider();
+  map.addControl(zoomslider);
 
   var format = 'image/png';
   var degreeBounds = [107.667, 15.228, 108.804, 16.197]; // 4326
-  const meterBounds = [576281.1063905563, 1720086.1249637157, 580872.2309828001, 1724335.9856269273]; // 5899
+  // const meterBounds = [576281.1063905563, 1720086.1249637157, 580872.2309828001, 1724335.9856269273]; // 5899
+  const meterBounds = [509147, 1686198, 603668, 1766721]; // 5899
 
   // const meterBounds = [576281.1063905563, 1720086.1249637157, 580872.2309828001, 1724335.9856269273];
   // const maxMeterBounds = [556421, 1702209, 604820, 1739026];
@@ -128,7 +135,7 @@ const runMap = () => {
         // preview: 'F:/Programming project/Personal/web-gis-dev/front-end/src/assets/luffy-chilling-gear5-round.png',
         source: new VectorSource({
           // url: 'http://localhost:8080/geoserver/webgis_dev/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=webgis_dev%3Aho_dieu_hoa&outputFormat=application%2Fjson',
-          // url: 'http://localhost:8080/geoserver/webgis_dev/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=webgis_dev%3Aho_chua_quang_nam_EPSG4326&outputFormat=application%2Fjson',
+          // url: 'http://localhost:8080/geoserver/webgis_dev/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=webgis_dev%3Aho_chua_quang_nam_EPSG5899&outputFormat=application%2Fjson',
           url:
             GEOSERVER_DOMAIN +
             '/geoserver/thuy_loi_quang_nam/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=thuy_loi_quang_nam%3Aho_chua_quang_nam_epsg5899&outputFormat=application%2Fjson',
@@ -149,6 +156,9 @@ const runMap = () => {
         title: 'Kênh layer',
         source: new VectorSource({
           // url: 'http://localhost:8080/geoserver/webgis_dev/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=webgis_dev%3Akenh&outputFormat=application%2Fjson',
+          // url:
+          //   GEOSERVER_DOMAIN +
+          //   '/geoserver/thuy_loi_quang_nam/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=thuy_loi_quang_nam%3Akenh&outputFormat=application%2Fjson',
           url:
             GEOSERVER_DOMAIN +
             '/geoserver/thuy_loi_quang_nam/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=thuy_loi_quang_nam%3Akenh&outputFormat=application%2Fjson',
@@ -205,6 +215,20 @@ const runMap = () => {
     // },
   });
   map.addLayer(measureVector);
+
+  // ---------------------------------
+  // ----------Layer legend--------------------------------------------------------------------------------------------------------
+  // ---------------------------------
+  // var legend = new ol_control_Legend({
+  //   title: 'Legend',
+  //   margin: 5,
+  //   maxWidth: 300,
+  // });
+  // var legendCtrl = new ol_control_Legend({
+  //   legend: legend,
+  //   // collapsed: false,
+  // });
+  // map.addControl(legendCtrl);
 
   return map;
 };

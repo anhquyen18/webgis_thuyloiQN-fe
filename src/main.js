@@ -7,6 +7,7 @@ import {
   Row,
   Col,
   Layout,
+  Flex,
   ConfigProvider,
   Input,
   Card,
@@ -19,6 +20,11 @@ import {
   Modal,
   Select,
   Switch,
+  Spin,
+  Table,
+  Carousel,
+  Form,
+  Checkbox,
 } from 'ant-design-vue';
 import App from './App.vue';
 import axios from 'axios';
@@ -42,9 +48,10 @@ app.use(createPinia());
 app.use(router);
 
 app.use(Button);
-app.use(Layout);
 app.use(Row);
 app.use(Col);
+app.use(Layout);
+app.use(Flex);
 app.use(ConfigProvider);
 app.use(Input);
 app.use(Card);
@@ -57,6 +64,11 @@ app.use(Popover);
 app.use(Modal);
 app.use(Select);
 app.use(Switch);
+app.use(Spin);
+app.use(Table);
+app.use(Carousel);
+app.use(Form);
+app.use(Checkbox);
 
 app.mount('#app');
 

@@ -1,9 +1,12 @@
 <template>
-  <div>
+  <a-tooltip overlayClassName="tool-container-tooltip">
+    <template #title>
+      <p>Trở về</p>
+    </template>
     <a-button class="white-border-ant-button" type="primary" size="small" @click="panToHome">
       <i class="fa-solid fa-house"></i>
     </a-button>
-  </div>
+  </a-tooltip>
 </template>
 
 <script>
@@ -25,7 +28,7 @@ export default defineComponent({
     panToHome() {
       this.map.getView().animate({
         // Quảng Nam
-        center: [108.167, 15.628],
+        center: [580872.2309828001, 1724335.9856269273],
         zoom: 10,
         duration: 1000,
       });
@@ -35,4 +38,11 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss"></style>
+<style lang="scss">
+.tool-container-tooltip {
+  & .ant-tooltip-content .ant-tooltip-inner {
+    min-height: auto !important;
+    padding: 5px;
+  }
+}
+</style>

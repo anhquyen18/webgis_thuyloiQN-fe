@@ -34,7 +34,14 @@
     </a-layout-header>
     <a-layout-content>
       <a-layout style="height: 100%">
-        <a-layout-header style="background-color: #0460ae; height: 5vh; padding: 0; line-height: normal !important">
+        <a-layout-header
+          style="
+            background-color: #0460ae;
+            height: 5vh;
+            padding: 0;
+            line-height: normal !important;
+            box-shadow: 1.95px 1.95px 2.6px rgba(0, 0, 0, 0.15);
+          ">
           <a-row style="height: 100%">
             <a-col :span="4">
               <a-row class="h-100" justify="space-between" align="middle">
@@ -62,14 +69,18 @@
             </a-col>
 
             <a-col class="center-col" :span="4">
-              <a-input-search class="ms-4" placeholder="Tìm kiếm..." enter-button />
+              <SearchByNameTool></SearchByNameTool>
             </a-col>
           </a-row>
         </a-layout-header>
 
         <a-layout-content>
           <a-layout class="h-100">
-            <a-layout-sider v-model:collapsed="siderCollapsed" theme="light" :collapsed-width="0">
+            <a-layout-sider
+              v-model:collapsed="siderCollapsed"
+              theme="light"
+              :collapsed-width="0"
+              style="box-shadow: 1.95px 1.95px 2.6px rgba(0, 0, 0, 0.15); z-index: 1">
               <SiderLayerManager></SiderLayerManager>
             </a-layout-sider>
             <a-layout-content style="height: 100%">
@@ -78,13 +89,21 @@
                 <div class="bottom-right-nav align-items-center">
                   <LayerManager class="mt-5"></LayerManager>
                 </div>
+                <LegendControl></LegendControl>
               </div>
             </a-layout-content>
           </a-layout>
         </a-layout-content>
       </a-layout>
     </a-layout-content>
-    <a-layout-footer style="background-color: #0460ae; height: 5vh; padding: 0; line-height: normal !important">
+    <a-layout-footer
+      style="
+        background-color: #0460ae;
+        height: 5vh;
+        padding: 0;
+        line-height: normal !important;
+        box-shadow: 1.95px 1.95px 2.6px rgba(0, 0, 0, 0.15);
+      ">
       <a-row style="height: 100%">
         <a-col :span="4">
           <a-row class="h-100" justify="space-between" align="middle">
@@ -117,14 +136,7 @@
       </a-row>
     </a-layout-footer>
 
-    <a-row class="sign-in-button-panel">
-      <a-col :span="10" :offset="4">
-        <a-button class="no-border-ant-button fw-bold" size="small" ghost>Đăng nhập</a-button>
-      </a-col>
-      <a-col :span="10">
-        <a-button class="no-border-ant-button fw-bold" size="small" ghost>Đăng ký</a-button>
-      </a-col>
-    </a-row>
+    <Login></Login>
   </a-layout>
 </template>
 
@@ -136,29 +148,53 @@ import runMap from '../js/openlayers/map.js';
 import ToolContainer from '../components/ol-tools/tool-container.vue';
 import SiderLayerManager from '../components/sider/layer-manager.vue';
 import LayerManager from '../components/ol-tools/layer-manager.vue';
+import SearchByNameTool from '../components/sider/search-by-name-tool.vue';
+import LegendControl from '@/components/ol-tools/legend-control.vue';
+import Login from '@/components/login/login.vue';
 export default defineComponent({
   components: {
     ToolContainer,
     SiderLayerManager,
     LayerManager,
+    SearchByNameTool,
+    LegendControl,
+    Login,
   },
   setup() {
+    const searchResult = ref([]);
+    provide('searchResult', searchResult);
+
     const sliderValue = ref(100);
-    const activeSiderTab = ref('layersTab');
-    provide('activeSiderTab', activeSiderTab);
+
     const mainLayerData = ref([
+      // new URL('/src/assets/layer-image/nobasemap.png', import.meta.url)
       {
         title: 'Hồ chứa layer',
         displayName: 'Hồ chứa',
-        imagePath: '',
+        imagePath: new URL('/src/assets/sample-image/0-1.jpg', import.meta.url),
         visible: true,
       },
     ]);
     provide('mainLayerData', mainLayerData);
 
+    const siderLayerManagerState = ref({
+      searchingTabSpinning: false,
+      activeSiderTab: 'layersTab',
+    });
+    provide('siderLayerManagerState', siderLayerManagerState);
+
+    const featurePropShow = ref({
+      originalLayerTitle: '',
+      props: [],
+      displayName: '',
+      originalName: '',
+      id: '',
+    });
+    provide('featurePropShow', featurePropShow);
+
     return {
       sliderValue,
-      activeSiderTab,
+      siderLayerManagerState,
     };
   },
   data() {
@@ -169,18 +205,18 @@ export default defineComponent({
   computed: {},
   methods: {
     danhMucClick() {
-      if (this.activeSiderTab == 'layersTab') {
+      if (this.siderLayerManagerState.activeSiderTab == 'layersTab') {
         this.siderCollapsed = !this.siderCollapsed;
       } else {
-        this.activeSiderTab = 'layersTab';
+        this.siderLayerManagerState.activeSiderTab = 'layersTab';
         this.siderCollapsed = false;
       }
     },
     truyVanClick() {
-      if (this.activeSiderTab == 'searchingTab') {
+      if (this.siderLayerManagerState.activeSiderTab == 'searchingTab') {
         this.siderCollapsed = !this.siderCollapsed;
       } else {
-        this.activeSiderTab = 'searchingTab';
+        this.siderLayerManagerState.activeSiderTab = 'searchingTab';
         this.siderCollapsed = false;
       }
     },
@@ -203,40 +239,14 @@ export default defineComponent({
   padding: 0 !important;
   line-height: normal !important;
 }
-.center-col {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  height: 100%;
-}
 
 .header-link {
   font-weight: bold;
 }
 
-.no-border-ant-button {
-  border: none !important;
-  background-color: transparent !important;
-  box-shadow: none !important;
-}
-
 .white-border-ant-button {
   border: 1px solid #fff !important;
-
   // background-color: transparent !important;
-}
-
-.sign-in-button-panel {
-  width: 18vw;
-  height: 3vh;
-  background-color: red;
-  position: fixed;
-  top: 0;
-  right: 0;
-  clip-path: polygon(0 0, 100% 0%, 100% 100%, 10% 100%);
-  background: rgb(2, 0, 36);
-  background: linear-gradient(167deg, rgba(2, 0, 36, 1) 0%, rgba(9, 9, 121, 1) 16%, rgba(0, 212, 255, 1) 100%);
 }
 
 .bottom-right-nav {
@@ -245,12 +255,5 @@ export default defineComponent({
   right: 1vw;
   display: flex;
   flex-direction: column;
-}
-
-.map .ol-zoom {
-  position: absolute;
-  top: 35vh;
-  left: auto;
-  right: 2vw;
 }
 </style>

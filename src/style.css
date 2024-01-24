@@ -1,14 +1,25 @@
+:root {
+  --dark-theme-color: #001529;
+  --dark1-theme-color: #012241;
+  --error-color: #ff4d4f;
+  --secondary-background-color: #f3f3f3;
+  --secondary-background-color2: #252525;
+  --primary-color: #2a83ff;
+  --hover-primary-color: #4096ff;
+  --gray-color: #919496;
+}
+
 * {
-    padding: 0;
-    margin: 0;
-    box-sizing: border-box;
-    font-family: 'Roboto', sans-serif;
-    list-style: none;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  font-family: 'Roboto', sans-serif;
+  list-style: none;
 }
 
 html {
-    padding: 0;
-    margin: 0;
+  padding: 0;
+  margin: 0;
 }
 
 input::-webkit-outer-spin-button,
@@ -19,10 +30,17 @@ input::-webkit-inner-spin-button {
 
 
 
-:root {
-  --dark-theme-color: #001529;
-  --dark1-theme-color: #012241;
-  --error-color:    #ff4d4f;
-  --secondary-background-color: #f3f3f3;
-  --secondary-background-color2:#252525;
+
+.center-col {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  height: 100%;
+}
+
+.no-border-ant-button {
+  border: none !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
 }

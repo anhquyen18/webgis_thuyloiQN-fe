@@ -3,19 +3,23 @@
 </template>
 
 <script>
-import { defineComponent } from 'vue'
+import { defineComponent } from 'vue';
 
 export default defineComponent({
   setup() {
-    return {}
+    return {};
   },
+
   data() {
-    return {}
+    return {};
   },
+
   computed: {},
+
   methods: {},
-  mounted() {}
-})
+
+  mounted() {},
+});
 </script>
 
 <style lang="scss"></style>

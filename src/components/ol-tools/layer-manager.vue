@@ -1,16 +1,16 @@
 <template>
-  <a-popover trigger="click" placement="topRight" color="white" :arrowPointAtCenter="true">
+  <a-popover trigger="click" placement="topRight" :arrowPointAtCenter="true">
     <template #content>
       <div style="max-width: 70vw">
         <a-divider style="border-color: black" orientation="left">
           Layers
-          <a-button @click="showLayersInfoModal" style="border: none; padding: 0; font-size: 1rem">
+          <!-- <a-button @click="showLayersInfoModal" style="border: none; padding: 0; font-size: 0.8rem">
             <InfoCircleOutlined />
-          </a-button>
+          </a-button> -->
         </a-divider>
         <a-row class="main-layer" :gutter="[0, 8]">
           <a-col :xl="4" :xs="6" v-for="(layer, index) in mainLayerData">
-            <a-tooltip>
+            <a-tooltip overlayClassName="tool-container-tooltip">
               <template #title> {{ layer.displayName }}</template>
               <div class="layer-image">
                 <a-button
@@ -32,10 +32,10 @@
             </a-tooltip>
           </a-col>
         </a-row>
-        <a-divider style="border-color: black" orientation="left">Basemaps</a-divider>
+        <a-divider style="border-color: black" orientation="left"> Basemaps</a-divider>
         <a-row class="basemap-layer" :gutter="[0, 8]">
           <a-col :xl="4" :xs="6" v-for="layer in basemapLayerData">
-            <a-tooltip>
+            <a-tooltip overlayClassName="tool-container-tooltip">
               <template #title>{{ layer.title }}</template>
               <div class="layer-image">
                 <a-button
