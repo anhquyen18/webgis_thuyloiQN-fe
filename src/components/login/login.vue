@@ -35,10 +35,14 @@
 
     <a-row v-else class="sign-in-button-panel--logged" justify="space-between" style="width: 200px">
       <a-col :span="10" :offset="2">
-        <a-button class="no-border-ant-button fw-bold" size="small" ghost @click="loggin"> Đăng nhập </a-button>
+        <router-link :to="{ name: 'login-page' }">
+          <a-button class="no-border-ant-button fw-bold" size="small" ghost @click="loggin"> Đăng nhập </a-button>
+        </router-link>
       </a-col>
       <a-col :span="10">
-        <a-button class="no-border-ant-button fw-bold" size="small" ghost>Đăng ký</a-button>
+        <router-link :to="{ name: 'signup-page' }">
+          <a-button class="no-border-ant-button fw-bold" size="small" ghost>Đăng ký</a-button>
+        </router-link>
       </a-col>
     </a-row>
   </div>
