@@ -9,7 +9,7 @@ export const userState = defineStore('userStateId', {
     onAuthentication() {
       this.loginState = true;
     },
-    onLogOut() {
+    onLogout() {
       this.loginState = false;
     },
   },

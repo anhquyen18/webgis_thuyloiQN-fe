@@ -1,150 +1,157 @@
 <template>
-  <a-layout style="height: 100vh">
-    <a-layout-header class="home-header">
-      <a-row style="height: 100%">
-        <a-col class="center-col" :span="2">
-          <a href="/">
-            <img src="../assets/Logo_BoNongNghiep.png" alt="" style="height: 5rem; width: 5rem" />
-          </a>
-        </a-col>
-        <a-col class="center-col" :span="12" :offset="3">
-          <h1 style="font-size: 1.1rem">
-            HỆ THỐNG QUẢN LÝ CÔNG TRÌNH THUỶ LỢI QUẢNG NAM <br />
-            QUANG NAM IRRIGATION MANAGEMENT SYSTEM
-          </h1>
-        </a-col>
-        <a-col :span="7">
-          <a-row class="h-100 mt-2" justify="space-around" align="middle">
-            <a-button class="header-link no-border-ant-button">
-              <a href="#"> Trang Chủ </a>
-            </a-button>
-            <a-button class="header-link no-border-ant-button">
-              <a href="#">Giới Thiệu</a>
-            </a-button>
-            <a-button class="header-link no-border-ant-button">
-              <a href="#">Quản Lý</a>
-            </a-button>
-            <a-button class="header-link no-border-ant-button">
-              <a href="#">Tin Tức</a>
-            </a-button>
-            <a-button class="header-link no-border-ant-button">
-              <a href="#">Liên Hệ</a>
-            </a-button>
-          </a-row>
-        </a-col>
-      </a-row>
-    </a-layout-header>
-    <a-layout-content>
-      <a-layout style="height: 100%">
-        <a-layout-header
-          style="
-            background-color: #0460ae;
-            height: 5vh;
-            padding: 0;
-            line-height: normal !important;
-            box-shadow: 1.95px 1.95px 2.6px rgba(0, 0, 0, 0.15);
-          ">
-          <a-row style="height: 100%">
-            <a-col :span="4">
-              <a-row class="h-100" justify="space-between" align="middle">
-                <a-button
-                  class="white-border-ant-button ms-2"
-                  type="primary"
-                  @click="danhMucClick"
-                  size="small"
-                  style="padding-left: 15px; padding-right: 15px">
-                  Danh Mục
-                </a-button>
-                <a-button
-                  class="white-border-ant-button"
-                  type="primary"
-                  @click="truyVanClick"
-                  size="small"
-                  style="padding-left: 15px; padding-right: 15px">
-                  Truy vấn
-                </a-button>
-              </a-row>
-            </a-col>
+  <a-spin :spinning="homeSpinning" size="large">
+    <a-layout style="height: 100vh">
+      <a-layout-header class="home-header">
+        <a-row style="height: 100%">
+          <a-col class="center-col" :span="2">
+            <a href="/">
+              <img src="../assets/Logo_BoNongNghiep.png" alt="" style="height: 5rem; width: 5rem" />
+            </a>
+          </a-col>
+          <a-col class="center-col" :span="12" :offset="3">
+            <h1 style="font-size: 1.1rem">
+              HỆ THỐNG QUẢN LÝ CÔNG TRÌNH THUỶ LỢI QUẢNG NAM <br />
+              QUANG NAM IRRIGATION MANAGEMENT SYSTEM
+            </h1>
+          </a-col>
+          <a-col :span="7">
+            <a-row class="h-100 mt-2" justify="space-around" align="middle">
+              <a-button class="header-link no-border-ant-button">
+                <a href="#"> Trang Chủ </a>
+              </a-button>
+              <a-button class="header-link no-border-ant-button">
+                <a href="#">Giới Thiệu</a>
+              </a-button>
+              <a-button class="header-link no-border-ant-button">
+                <a href="#">Quản Lý</a>
+              </a-button>
+              <a-button class="header-link no-border-ant-button">
+                <a href="#">Tin Tức</a>
+              </a-button>
+              <a-button class="header-link no-border-ant-button">
+                <a href="#">Liên Hệ</a>
+              </a-button>
+            </a-row>
+          </a-col>
+        </a-row>
+      </a-layout-header>
+      <a-layout-content>
+        <a-layout style="height: 100%">
+          <a-layout-header
+            style="
+              background-color: #0460ae;
+              height: 5vh;
+              padding: 0;
+              line-height: normal !important;
+              box-shadow: 1.95px 1.95px 2.6px rgba(0, 0, 0, 0.15);
+            ">
+            <a-row style="height: 100%">
+              <a-col :span="4">
+                <a-row class="h-100" justify="space-between" align="middle">
+                  <a-button
+                    class="white-border-ant-button ms-2"
+                    type="primary"
+                    @click="danhMucClick"
+                    size="small"
+                    style="padding-left: 15px; padding-right: 15px">
+                    Danh Mục
+                  </a-button>
+                  <a-button
+                    class="white-border-ant-button"
+                    type="primary"
+                    @click="truyVanClick"
+                    size="small"
+                    style="padding-left: 15px; padding-right: 15px">
+                    Truy vấn
+                  </a-button>
+                </a-row>
+              </a-col>
 
-            <a-col :span="5" class="h-100">
-              <ToolContainer></ToolContainer>
-            </a-col>
+              <a-col :span="5" class="h-100">
+                <ToolContainer></ToolContainer>
+              </a-col>
 
-            <a-col class="center-col" :span="4">
-              <SearchByNameTool></SearchByNameTool>
-            </a-col>
-          </a-row>
-        </a-layout-header>
+              <a-col class="center-col" :span="4">
+                <SearchByNameTool></SearchByNameTool>
+              </a-col>
+            </a-row>
+          </a-layout-header>
 
-        <a-layout-content>
-          <a-layout class="h-100">
-            <a-layout-sider
-              v-model:collapsed="siderCollapsed"
-              theme="light"
-              :collapsed-width="0"
-              style="box-shadow: 1.95px 1.95px 2.6px rgba(0, 0, 0, 0.15); z-index: 1">
-              <SiderLayerManager></SiderLayerManager>
-            </a-layout-sider>
-            <a-layout-content style="height: 100%">
-              <div ref="mapContainer" id="map-container" class="content-container h-100" style="position: relative">
-                <div id="map" class="map h-100"></div>
-                <div class="bottom-right-nav align-items-center">
-                  <LayerManager class="mt-5"></LayerManager>
+          <a-layout-content>
+            <a-layout class="h-100">
+              <a-layout-sider
+                v-model:collapsed="siderCollapsed"
+                theme="light"
+                :collapsed-width="0"
+                style="box-shadow: 1.95px 1.95px 2.6px rgba(0, 0, 0, 0.15); z-index: 1">
+                <SiderLayerManager></SiderLayerManager>
+              </a-layout-sider>
+              <a-layout-content style="height: 100%">
+                <div ref="mapContainer" id="map-container" class="content-container h-100" style="position: relative">
+                  <div id="map" class="map h-100"></div>
+                  <div class="bottom-right-nav align-items-center">
+                    <LayerManager class="mt-5"></LayerManager>
+                  </div>
+                  <LegendControl></LegendControl>
                 </div>
-                <LegendControl></LegendControl>
-              </div>
-            </a-layout-content>
-          </a-layout>
-        </a-layout-content>
-      </a-layout>
-    </a-layout-content>
-    <a-layout-footer
-      style="
-        background-color: #0460ae;
-        height: 5vh;
-        padding: 0;
-        line-height: normal !important;
-        box-shadow: 1.95px 1.95px 2.6px rgba(0, 0, 0, 0.15);
-      ">
-      <a-row style="height: 100%">
-        <a-col :span="4">
-          <a-row class="h-100" justify="space-between" align="middle">
-            <a-button
-              class="white-border-ant-button ms-2"
-              type="primary"
-              style="padding-left: 15px; padding-right: 15px">
-              Chú thích
-            </a-button>
+              </a-layout-content>
+            </a-layout>
+          </a-layout-content>
+        </a-layout>
+      </a-layout-content>
+      <a-layout-footer
+        style="
+          background-color: #0460ae;
+          height: 5vh;
+          padding: 0;
+          line-height: normal !important;
+          box-shadow: 1.95px 1.95px 2.6px rgba(0, 0, 0, 0.15);
+        ">
+        <a-row style="height: 100%">
+          <a-col :span="4">
+            <a-row class="h-100" justify="space-between" align="middle">
+              <a-button
+                class="white-border-ant-button ms-2"
+                type="primary"
+                style="padding-left: 15px; padding-right: 15px"
+                @click="test">
+                Chú thích
+              </a-button>
 
-            <a-button
-              class="white-border-ant-button ms-2"
-              type="primary"
-              style="padding-left: 15px; padding-right: 15px">
-              Overview map
-            </a-button>
-          </a-row>
-        </a-col>
-        <a-col :span="4" :offset="1">
-          <a-row class="h-100" align="middle">
-            <a-col :span="8">
-              <span class="text-white">Trong suốt: </span>
-            </a-col>
-            <a-col :span="16">
-              <a-slider id="test" v-model:value="sliderValue" size="small" />
-            </a-col>
-          </a-row>
-        </a-col>
-        <a-col :span="4"> </a-col>
-      </a-row>
-    </a-layout-footer>
+              <a-button
+                class="white-border-ant-button ms-2"
+                type="primary"
+                style="padding-left: 15px; padding-right: 15px">
+                Overview map
+              </a-button>
+            </a-row>
+          </a-col>
+          <a-col :span="4" :offset="1">
+            <a-row class="h-100" align="middle">
+              <a-col :span="8">
+                <span class="text-white">Trong suốt: </span>
+              </a-col>
+              <a-col :span="16">
+                <a-slider id="test" v-model:value="sliderValue" size="small" />
+              </a-col>
+            </a-row>
+          </a-col>
+          <a-col :span="4"> </a-col>
+        </a-row>
+      </a-layout-footer>
 
-    <Login></Login>
-  </a-layout>
+      <Login></Login>
+    </a-layout>
+  </a-spin>
 </template>
 
 <script>
 import { defineComponent, ref, provide } from 'vue';
 import { mapState } from '../stores/map-state';
+import { userState } from '@/stores/user-state';
+import { getCookie, setCookie } from '@/js/utils/cookie.js';
+import thuyLoiApi from '@/js/axios/thuyLoiApi';
+
 import runMap from '../js/openlayers/map.js';
 
 import ToolContainer from '../components/ol-tools/tool-container.vue';
@@ -162,7 +169,52 @@ export default defineComponent({
     LegendControl,
     Login,
   },
+
+  beforeRouteEnter(to, from, next) {
+    if (getCookie('accessToken') === '') {
+      next((data) => {
+        data.homeSpinning = false;
+      });
+    } else {
+      next((data) => {
+        const getAuthenticatedUser = () => {
+          thuyLoiApi
+            .post(
+              '/get-authenticated-user',
+              {},
+              {
+                headers: {
+                  Authorization: `Bearer ${getCookie('accessToken')}`,
+                },
+              },
+            )
+            .then((response) => {
+              if (response) {
+                // console.log(response);
+                userState().onAuthentication();
+                data.homeSpinning = false;
+                data.userProfile = JSON.parse(getCookie('user'));
+                setCookie('user', JSON.stringify(response.data.user));
+              }
+            })
+            .catch((error) => {
+              console.log(error);
+              data.homeSpinning = false;
+              setCookie('accessToken', '');
+              setCookie('user', '');
+              userState().onLogout();
+            });
+        };
+        getAuthenticatedUser();
+      });
+    }
+  },
+
   setup() {
+    const useStateStore = userState();
+    const userProfile = ref();
+    provide('userProfile', userProfile);
+
     const searchResult = ref([]);
     provide('searchResult', searchResult);
 
@@ -197,14 +249,20 @@ export default defineComponent({
     return {
       sliderValue,
       siderLayerManagerState,
+      userProfile,
     };
   },
   data() {
     return {
       siderCollapsed: false,
+      homeSpinning: true,
     };
   },
-  computed: {},
+
+  loginState: function () {
+    return userState().getLogin;
+  },
+
   methods: {
     danhMucClick() {
       if (this.siderLayerManagerState.activeSiderTab == 'layersTab') {
@@ -221,6 +279,9 @@ export default defineComponent({
         this.siderLayerManagerState.activeSiderTab = 'searchingTab';
         this.siderCollapsed = false;
       }
+    },
+    test() {
+      console.log(this.userProfile);
     },
   },
   mounted() {

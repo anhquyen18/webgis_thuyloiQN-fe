@@ -5,7 +5,7 @@
         <a-popover trigger="click" :arrowPointAtCenter="true" placement="bottomRight">
           <template #content>
             <a-flex vertical>
-              <a-button class="no-border-ant-button fw-bold">Tài khoản</a-button>
+              <a-button class="no-border-ant-button fw-bold"> Tài khoản </a-button>
 
               <a-config-provider
                 :theme="{
@@ -13,7 +13,7 @@
                     colorTextBase: '#919496',
                   },
                 }">
-                <a-button class="no-border-ant-button fw-bold"> Đăng xuất </a-button>
+                <a-button class="no-border-ant-button fw-bold" @click="logout"> Đăng xuất </a-button>
               </a-config-provider>
             </a-flex>
           </template>
@@ -36,7 +36,7 @@
     <a-row v-else class="sign-in-button-panel--logged" justify="space-between" style="width: 200px">
       <a-col :span="10" :offset="2">
         <router-link :to="{ name: 'login-page' }">
-          <a-button class="no-border-ant-button fw-bold" size="small" ghost @click="loggin"> Đăng nhập </a-button>
+          <a-button class="no-border-ant-button fw-bold" size="small" ghost> Đăng nhập </a-button>
         </router-link>
       </a-col>
       <a-col :span="10">
@@ -51,7 +51,7 @@
 <script>
 import { defineComponent } from 'vue';
 import { userState } from '@/stores/user-state';
-
+import { setCookie } from '@/js/utils/cookie';
 export default defineComponent({
   setup() {
     return {};
@@ -68,9 +68,11 @@ export default defineComponent({
   },
 
   methods: {
-    loggin() {
-      // userState().onAuthentication();
-      // console.log(userState().getLogin);
+    logout() {
+      // userState().onLogout();
+      setCookie('accessToken', '');
+      setCookie('user', '');
+      location.reload();
     },
   },
 

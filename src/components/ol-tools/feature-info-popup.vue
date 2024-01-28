@@ -5,8 +5,8 @@
         <p>Bật/tắt click popup</p>
       </template>
       <a-button class="white-border-ant-button" :type="buttonType" size="small" @click="statusSwitch" :ghost="status">
-      <i class="fa-solid fa-window-restore"></i>
-    </a-button>
+        <i class="fa-solid fa-window-restore"></i>
+      </a-button>
     </a-tooltip>
 
     <div ref="olPopup" id="popup" class="ol-popup">
@@ -77,6 +77,7 @@
         </a-card>
       </div>
     </div>
+
     <a-modal class="feature-details-modal" v-model:open="modalOpen" :footer="null" :closable="false" width="800px">
       <a-spin :spinning="featureDetailsModalSpinning">
         <div style="height: 370px">
@@ -87,13 +88,20 @@
                   v-if="
                     featurePropShow.originalLayerTitle === 'ho_chua_quang_nam_epsg5899' && !featureDataFromDB.message
                   "
-                  style="font-weight: bold"
                   class="me-2 fs-5">
-                  Hồ {{ featureDataFromDB.generalInfo['Tên'] }}
+                  Hồ {{ featureDataFromDB.generalInfo['ten'] }}
                 </span>
               </a-flex>
             </template>
             <template #extra>
+              <a-button
+                v-if="userProfile && userProfile['department_id'] == 2"
+                class="no-border-ant-button me-2"
+                shape="circle"
+                style="padding: 0; height: auto"
+                @click="openEditModal">
+                <i class="fa-regular fa-pen-to-square"></i>
+              </a-button>
               <a class="close-button" @click="closeModal"><i class="fa-solid fa-xmark"></i></a>
             </template>
             <a-row v-if="!featureDataFromDB.message">
@@ -114,40 +122,49 @@
               <a-col class="p-2" :span="18">
                 <div v-if="menuSelectedKeys[0] == 1">
                   <a-card class="detail-feature-modal-content" :bodyStyle="{ padding: '0' }" style="font-size: large">
-                    <a-flex v-for="(value, key, index) in featureDataFromDB.generalInfo" class="mb-2" :vertical="true">
-                      <p class="detail-feature-item--title">{{ key }}</p>
-                      <p class="ps-3 mt-1">{{ value }}</p>
+                    <a-flex v-for="(value, key, index) in featureNameDisplay.generalInfo" class="mb-2" :vertical="true">
+                      <div v-if="key === 'vi_tri'">
+                        <p class="detail-feature-item--title">{{ value }}</p>
+                        <p>
+                          xã {{ featureDataFromDB.generalInfo['vi_tri_xa'] }}, huyện
+                          {{ featureDataFromDB.generalInfo['vi_tri_huyen'] }}
+                        </p>
+                      </div>
+                      <div v-else>
+                        <p class="detail-feature-item--title">{{ value }}</p>
+                        <p>{{ featureDataFromDB.generalInfo[key] }}</p>
+                      </div>
                     </a-flex>
                   </a-card>
                 </div>
                 <div v-if="menuSelectedKeys[0] == 2">
                   <a-card class="detail-feature-modal-content" :bodyStyle="{ padding: 0 }">
-                    <a-flex v-for="(value, key, index) in featureDataFromDB.techInfo1" class="mb-2" :vertical="true">
-                      <p class="detail-feature-item--title">{{ key }}</p>
-                      <p v-if="value" class="ps-3 mt-1">{{ value }}</p>
-                      <p v-else="" class="ps-3 mt-1">Đang cập nhật</p>
+                    <a-flex v-for="(value, key, index) in featureNameDisplay.techInfo1" class="mb-2" :vertical="true">
+                      <p class="detail-feature-item--title">{{ value }}</p>
+                      <p v-if="featureDataFromDB.techInfo1[key]">
+                        {{ featureDataFromDB.techInfo1[key] }}
+                      </p>
+                      <p v-else="">Đang cập nhật</p>
                     </a-flex>
                     <a-flex
-                      v-for="(item, itemKey, itemIndex) in featureDataFromDB.techInfo2[0]"
+                      v-for="(value1, key1, index1) in featureNameDisplay.techInfo2"
                       class="mb-2"
                       :vertical="true">
-                      <p class="detail-feature-item--title">{{ itemKey }}</p>
-                      <p v-for="(value, key, itemIndex) in featureDataFromDB.techInfo2" class="ps-3 mt-1">
-                        <p v-if="value[itemKey]">
-                          {{ value[itemKey] }}
-                        </p>
-                        <p v-else>Đang cập nhật</p>
+                      <p class="detail-feature-item--title">{{ value1 }}</p>
+                      <p v-for="(value2, key2, index2) in featureDataFromDB.techInfo2">
+                        <span v-if="value2[key1]">{{ value2[key1] }}</span>
+                        <span v-else>Đang cập nhật</span>
                       </p>
                     </a-flex>
                     <a-flex class="mb-2" :vertical="true">
                       <p class="detail-feature-item--title">Cống lấy nước và tràn xả lũ</p>
                       <a-table
-                        :columns="techInfo3Columns"
+                        :columns="featureNameDisplay.techInfo3"
                         :data-source="featureDataFromDB.techInfo3"
                         :pagination="false"
                         style="font-size: 0.8rem">
                         <template #bodyCell="{ column, text }">
-                          <template v-if="column.dataIndex === 'Tràn sự cố'">
+                          <template v-if="column.dataIndex === 'co_tran_su_co'">
                             <p v-if="text == true">Có</p>
                             <p v-else="text == true">Không</p>
                           </template>
@@ -160,52 +177,44 @@
                   <a-card class="detail-feature-modal-content" :bodyStyle="{ padding: 0 }">
                     <a-flex class="mb-2" vertical justify="flex-start">
                       <p class="detail-feature-item--title">Hồ sơ pháp lý</p>
-                      <a class="ps-3 mt-1"> <i class="fa-solid fa-paperclip me-2"></i>Thông tin quản lý </a>
-                      <a class="ps-3 mt-1"> <i class="fa-solid fa-paperclip me-2"></i>Hồ sơ pháp lý </a>
+                      <a> <i class="fa-solid fa-paperclip me-2"></i>Thông tin quản lý </a>
+                      <a> <i class="fa-solid fa-paperclip me-2"></i>Hồ sơ pháp lý </a>
                     </a-flex>
                   </a-card>
 
                   <a-flex class="mb-2" :vertical="true">
                     <p class="detail-feature-item--title">Hồ sơ thiết kế</p>
-                    <a class="ps-3 mt-1"> <i class="fa-solid fa-paperclip me-2"></i>Hồ sơ thiết kế công trình </a>
+                    <a> <i class="fa-solid fa-paperclip me-2"></i>Hồ sơ thiết kế công trình </a>
                   </a-flex>
 
                   <a-flex class="mb-2" :vertical="true">
                     <p class="detail-feature-item--title">Nhật ký vận hành</p>
-                    <a class="ps-3 mt-1"> <i class="fa-solid fa-paperclip me-2"></i>Số liệu thuỷ văn </a>
-                    <a class="ps-3 mt-1"> <i class="fa-solid fa-paperclip me-2"></i>Nhật ký vận hành công trình </a>
+                    <a> <i class="fa-solid fa-paperclip me-2"></i>Số liệu thuỷ văn </a>
+                    <a> <i class="fa-solid fa-paperclip me-2"></i>Nhật ký vận hành công trình </a>
                   </a-flex>
                 </div>
                 <div v-if="menuSelectedKeys[0] == 4">
                   <a-card class="detail-feature-modal-content" :bodyStyle="{ padding: 0 }">
                     <a-flex class="mb-2" :vertical="true">
                       <p class="detail-feature-item--title">Kê khai đăng ký an toàn đập</p>
-                      <a class="ps-3 mt-1">
+                      <a>
                         <i class="fa-solid fa-paperclip me-2"></i>Thông tin kê khai đăng ký an toàn đạp, hồ chứa nước
                       </a>
-                      <a class="ps-3 mt-1"> <i class="fa-solid fa-paperclip me-2"></i>Báo cáo an toàn công trình </a>
+                      <a> <i class="fa-solid fa-paperclip me-2"></i>Báo cáo an toàn công trình </a>
                     </a-flex>
                     <a-flex class="mb-2" :vertical="true">
                       <p class="detail-feature-item--title">Hiện trạng an toàn đạp</p>
-                      <a class="ps-3 mt-1">
-                        <i class="fa-solid fa-paperclip me-2"></i>Thông tin kiểm tra an toàn đập và hồ chứa nước
-                      </a>
-                      <a class="ps-3 mt-1">
-                        <i class="fa-solid fa-paperclip me-2"></i>Báo cáo hiện trạng an toàn đập và hồ chứa nước</a
-                      >
+                      <a> <i class="fa-solid fa-paperclip me-2"></i>Thông tin kiểm tra an toàn đập và hồ chứa nước </a>
+                      <a> <i class="fa-solid fa-paperclip me-2"></i>Báo cáo hiện trạng an toàn đập và hồ chứa nước</a>
                     </a-flex>
                     <a-flex class="mb-2" :vertical="true">
                       <p class="detail-feature-item--title">Kiểm định an toàn đập</p>
-                      <a class="ps-3 mt-1">
-                        <i class="fa-solid fa-paperclip me-2"></i>Thông tin kết quả kiểm định an toàn đập
-                      </a>
+                      <a> <i class="fa-solid fa-paperclip me-2"></i>Thông tin kết quả kiểm định an toàn đập </a>
                     </a-flex>
                     <a-flex class="mb-2" :vertical="true">
                       <p class="detail-feature-item--title">Phương án bảo vệ công trình</p>
-                      <a class="ps-3 mt-1">
-                        <i class="fa-solid fa-paperclip me-2"></i>Thông tin phương án bảo vệ đập hồ chứa nước
-                      </a>
-                      <a class="ps-3 mt-1">
+                      <a> <i class="fa-solid fa-paperclip me-2"></i>Thông tin phương án bảo vệ đập hồ chứa nước </a>
+                      <a>
                         <i class="fa-solid fa-paperclip me-2"></i>Phương án bảo vệ thiên tai và trường hợp khẩn cấp
                       </a>
                     </a-flex>
@@ -215,15 +224,15 @@
                   <a-card class="detail-feature-modal-content" :bodyStyle="{ padding: 0 }">
                     <a-flex class="mb-2" :vertical="true">
                       <p class="detail-feature-item--title">Thông tin thiết bị quan trắc</p>
-                      <a class="ps-3 mt-1"> <i class="fa-solid fa-paperclip me-2"></i>Thông tin thiết bị quan trắc </a>
+                      <a> <i class="fa-solid fa-paperclip me-2"></i>Thông tin thiết bị quan trắc </a>
                     </a-flex>
                     <a-flex class="mb-2" :vertical="true">
                       <p class="detail-feature-item--title">Báo cáo kết quả quan trắc</p>
-                      <a class="ps-3 mt-1"> <i class="fa-solid fa-paperclip me-2"></i>Báo cáo định kỳ </a>
+                      <a> <i class="fa-solid fa-paperclip me-2"></i>Báo cáo định kỳ </a>
                     </a-flex>
                     <a-flex class="mb-2" :vertical="true">
                       <p class="detail-feature-item--title">Báo cáo sự cố</p>
-                      <a class="ps-3 mt-1"> <i class="fa-solid fa-paperclip me-2"></i>Báo cáo sự cố </a>
+                      <a> <i class="fa-solid fa-paperclip me-2"></i>Báo cáo sự cố </a>
                     </a-flex>
                   </a-card>
                 </div>
@@ -231,15 +240,15 @@
                   <a-card class="detail-feature-modal-content" :bodyStyle="{ padding: 0 }">
                     <a-flex class="mb-2" :vertical="true">
                       <p class="detail-feature-item--title">Thông tin quy trình vận hành</p>
-                      <p class="ps-3 mt-1">
-                        Quy trình vận hành hồ chứa nước Phú Ninh được ban hbafnh theo quyết định 2803/QĐ-UBND Quảng Nam,
+                      <p>
+                        Quy trình vận hành hồ chứa nước Phú Ninh được ban hành theo quyết định 2803/QĐ-UBND Quảng Nam,
                         ngày 12 tháng 09 năm 2013 của Uỷ ban nhân dân tỉnh Quảng Nam
                       </p>
-                      <a class="ps-3 mt-1"> <i class="fa-solid fa-paperclip me-2"></i>Thông tin chi tiết </a>
+                      <a> <i class="fa-solid fa-paperclip me-2"></i>Thông tin chi tiết </a>
                     </a-flex>
                     <a-flex class="mb-2" :vertical="true">
                       <p class="detail-feature-item--title">Thông tin chỉ đạo</p>
-                      <a class="ps-3 mt-1"> <i class="fa-solid fa-paperclip me-2"></i>Thông tin chỉ đạo </a>
+                      <a> <i class="fa-solid fa-paperclip me-2"></i>Thông tin chỉ đạo </a>
                     </a-flex>
                   </a-card>
                 </div>
@@ -247,18 +256,14 @@
                   <a-card class="detail-feature-modal-content" :bodyStyle="{ padding: 0 }">
                     <a-flex class="mb-2" :vertical="true">
                       <p class="detail-feature-item--title" style="background-color: transparent !important"></p>
-                      <p class="ps-3 mt-1">
+                      <p>
                         Bản đồ ngập lụt hạ du hồ chứa nước Phú Ninh được ban hành kèm theo quyết định số ...... ngày
                         .../.../... của Uỷ ban Nhân dân tỉnh Quảng Nam. Bản đồ ngập lụt hạ du theo các kịch bản lũ thiết
                         kế, lũ kiểm tra và kịch bản vỡ hồ:
                       </p>
-                      <p class="ps-3 mt-1">
-                        - Kịch bản lũ thiết kế: <a style="text-decoration: underline"> Xem tại đây </a>
-                      </p>
-                      <p class="ps-3 mt-1">
-                        - Kịch bản lũ kiểm tra: <a style="text-decoration: underline"> Xem tại đây </a>
-                      </p>
-                      <p class="ps-3 mt-1">- Kịch bản vỡ hồ: <a style="text-decoration: underline"> Xem tại đây </a></p>
+                      <p>- Kịch bản lũ thiết kế: <a style="text-decoration: underline"> Xem tại đây </a></p>
+                      <p>- Kịch bản lũ kiểm tra: <a style="text-decoration: underline"> Xem tại đây </a></p>
+                      <p>- Kịch bản vỡ hồ: <a style="text-decoration: underline"> Xem tại đây </a></p>
                     </a-flex>
                   </a-card>
                 </div>
@@ -266,18 +271,18 @@
                   <a-card class="detail-feature-modal-content" :bodyStyle="{ padding: 0 }">
                     <a-flex class="mb-2" :vertical="true">
                       <p class="detail-feature-item--title">Danh mục, kế hoạch bảo trì</p>
-                      <a class="ps-3 mt-1"> <i class="fa-solid fa-paperclip me-2"></i>Bảo trì </a>
-                      <a class="ps-3 mt-1"> <i class="fa-solid fa-paperclip me-2"></i>Sửa chữa thường xuyên </a>
-                      <a class="ps-3 mt-1"> <i class="fa-solid fa-paperclip me-2"></i>Sửa chữa khẩn cấp </a>
-                      <a class="ps-3 mt-1"> <i class="fa-solid fa-paperclip me-2"></i>Nâng cấp </a>
+                      <a> <i class="fa-solid fa-paperclip me-2"></i>Bảo trì </a>
+                      <a> <i class="fa-solid fa-paperclip me-2"></i>Sửa chữa thường xuyên </a>
+                      <a> <i class="fa-solid fa-paperclip me-2"></i>Sửa chữa khẩn cấp </a>
+                      <a> <i class="fa-solid fa-paperclip me-2"></i>Nâng cấp </a>
                     </a-flex>
                     <a-flex class="mb-2" :vertical="true">
                       <p class="detail-feature-item--title">Khối lượng thực hiện</p>
-                      <a class="ps-3 mt-1"> <i class="fa-solid fa-paperclip me-2"></i>Chi tiết </a>
+                      <a> <i class="fa-solid fa-paperclip me-2"></i>Chi tiết </a>
                     </a-flex>
                     <a-flex class="mb-2" :vertical="true">
                       <p class="detail-feature-item--title">Kinh phí thực hiện</p>
-                      <a class="ps-3 mt-1"> <i class="fa-solid fa-paperclip me-2"></i>Chi tiết </a>
+                      <a> <i class="fa-solid fa-paperclip me-2"></i>Chi tiết </a>
                     </a-flex>
                   </a-card>
                 </div>
@@ -345,12 +350,112 @@
         </div>
       </a-spin>
     </a-modal>
+
+    <a-modal v-model:open="editModalOpen" :maskClosable="false">
+      <template #closeIcon>
+        <a class="close-button" @click="closeEditModal"><i class="fa-solid fa-xmark"></i></a>
+      </template>
+      <template #title>
+        <span>
+          <i class="fa-regular fa-pen-to-square fs-4"></i>
+        </span>
+        <span class="fs-6"> Chỉnh sửa thông tin Hồ {{ featureDataFromDB.generalInfo['ten'] }} </span>
+      </template>
+      <template #footer>
+        <a-button key="back" @click="editCancel">Huỷ</a-button>
+
+        <a-popconfirm
+          title="Bạn có muốn lưu thay đổi?"
+          ok-text="Có"
+          cancel-text="Không"
+          @confirm="saveEditConfirm"
+          @cancel="saveEditCancel">
+          <a-button key="submit" type="primary" :loading="editModalSpinning" @click="editSave" style="padding: 0 30px">
+            Lưu
+          </a-button>
+        </a-popconfirm>
+      </template>
+      <a-spin :spinning="editModalSpinning">
+        <a-card style="height: 405px; overflow: auto">
+          <a-flex v-for="(value, key, index) in featureNameDisplay.generalInfo" class="mb-2" :vertical="true">
+            <div v-if="key === 'vi_tri'">
+              <p class="detail-feature-item--title">{{ value }}</p>
+              <div style="display: flex">
+                <p>xã</p>
+                <a-input
+                  v-model:value="temporaryEditData.generalInfo['vi_tri_xa']"
+                  size="small"
+                  style="font-size: 0.8rem; width: 150px; margin-left: 5px" />
+                <p>, huyện</p>
+                <a-input
+                  v-model:value="temporaryEditData.generalInfo['vi_tri_huyen']"
+                  size="small"
+                  style="font-size: 0.8rem; width: 150px; margin-left: 5px" />
+              </div>
+            </div>
+
+            <div v-else-if="key === 'co_quy_trinh_vh'">
+              <p class="detail-feature-item--title">{{ value }}</p>
+              <a-checkbox v-model:checked="temporaryEditData.generalInfo[key]">Có hoặc không</a-checkbox>
+            </div>
+
+            <div v-else>
+              <p class="detail-feature-item--title">{{ value }}</p>
+              <a-input v-model:value="temporaryEditData.generalInfo[key]" size="small" />
+            </div>
+          </a-flex>
+          <a-flex v-for="(value, key, index) in featureNameDisplay.techInfo1" class="mb-2" :vertical="true">
+            <p class="detail-feature-item--title">{{ value }}</p>
+            <a-input v-model:value="temporaryEditData.techInfo1[key]" size="small" />
+          </a-flex>
+          <a-flex v-for="(value1, key1, index1) in featureNameDisplay.techInfo2" class="mb-2" :vertical="true">
+            <p class="detail-feature-item--title">{{ value1 }}</p>
+            <p v-for="(value2, key2, index2) in temporaryEditData.techInfo2">
+              <a-input v-model:value="value2[key1]" size="small" style="font-size: 0.8rem" />
+            </p>
+          </a-flex>
+          <a-flex class="mb-2" :vertical="true">
+            <p class="detail-feature-item--title">Cống lấy nước và tràn xả lũ</p>
+            <a-table
+              :columns="featureNameDisplay.techInfo3"
+              :data-source="temporaryEditData.techInfo3"
+              :pagination="false"
+              style="font-size: 0.8rem">
+              <template #bodyCell="{ column, text, record, index }">
+                <!-- <template v-if="column.dataIndex === 'co_tran_su_co'">
+                  <p v-if="text == true">Có</p>
+                  <p v-else="text == true">Không</p>
+                </template> -->
+                <!-- <div> -->
+                <template v-if="column.dataIndex === 'co_tran_su_co'">
+                  <a-checkbox v-model:checked="temporaryEditData.techInfo3[index][column.dataIndex]"></a-checkbox>
+                </template>
+
+                <template v-else>
+                  <a-input
+                    v-model:value="temporaryEditData.techInfo3[index][column.dataIndex]"
+                    size="small"
+                    style="font-size: 0.8rem" />
+                </template>
+                <!-- <a-input
+                  
+            v-model:value="temporaryEditData[column]"
+            style="margin: -5px 0"
+          /> -->
+
+                <!-- </div> -->
+              </template>
+            </a-table>
+          </a-flex>
+        </a-card>
+      </a-spin>
+    </a-modal>
   </div>
 </template>
 
 <script>
-import { defineComponent, inject } from 'vue';
-
+import { defineComponent, inject, ref } from 'vue';
+import { userState } from '@/stores/user-state';
 import { mapState } from '../../stores/map-state';
 import * as VueLayer from '../../js/openlayers/VueLayer.js';
 
@@ -367,47 +472,78 @@ export default defineComponent({
   },
   setup() {
     const featurePropShow = inject('featurePropShow');
+    const userProfile = inject('userProfile');
     return {
       featurePropShow,
+      userProfile,
     };
   },
 
   data() {
     return {
       modalOpen: false,
+      editModalOpen: false,
       menuSelectedKeys: ['1'],
       buttonType: 'primary',
       status: false,
       featureDataFromDB: { generalInfo: { ten: '' } },
       featureDetailsModalSpinning: false,
       currentFeature: '',
-      techInfo3Columns: [
-        {
-          title: 'Kích thước cống lấy nước (m)',
-          dataIndex: 'Kích thước cống lấy nước (m)',
+      featureNameDisplay: {
+        generalInfo: {
+          ten: 'Tên',
+          vi_tri: 'Vị trí',
+          nam_xd: 'Năm xây dựng',
+          don_vi_ql: 'Đơn vị quản lý',
+          co_quy_trinh_vh: 'Quy trình vận hành',
         },
-        {
-          title: 'Hình thức cống lấy nước',
-          dataIndex: 'Hình thức cống lấy nước',
+        techInfo1: {
+          f_tuoi_tk: 'Diện tích tưới thiết kế (ha)',
+          f_tuoi_tk: 'Diện tích tưới thật tế (ha)',
+          f_lv: 'Diện tích lưu vực (km2)',
+          wmndb: 'W mndbt (10^6 m3)',
+          mnc: 'Mực nước chết (m)',
+          mndbt: 'Mực nước dâng bình thường (m)',
+          mnltk: 'Mực nước lũ thiết kế (m)',
+          so_dap_phu: 'Số đập phụ',
+          cao_trinh_dinh_tcs: 'Cao trình đỉnh tường chắn sóng (m)',
         },
-        {
-          title: 'Cao trình ngưỡng tràn (m)',
-          dataIndex: 'Cao trình ngưỡng tràn (m)',
+        techInfo2: {
+          cao_trinh_dinh_dap: 'Cao trình đỉnh đập (m)',
+          H_max: 'H max (m)',
+          length: 'Chiều dài đập (m)',
         },
-        {
-          title: 'B tràn (m)',
-          dataIndex: 'B tràn (m)',
-        },
-        {
-          title: 'Hình thức tràn',
-          dataIndex: 'Hình thức tràn',
-        },
-        {
-          title: 'Tràn sự cố',
-          dataIndex: 'Tràn sự cố',
-        },
-      ],
-      // popup-----------------------
+        techInfo3: [
+          {
+            title: 'Kích thước cống lấy nước (m)',
+            dataIndex: 'kich_thuoc_cong',
+          },
+          {
+            title: 'Hình thức cống lấy nước',
+            dataIndex: 'hinh_thuc_cong',
+          },
+          {
+            title: 'Cao trình ngưỡng tràn (m)',
+            dataIndex: 'cao_trinh_nguong_tran',
+          },
+          {
+            title: 'B tràn (m)',
+            dataIndex: 'B_tran',
+          },
+          {
+            title: 'Hình thức tràn',
+            dataIndex: 'hinh_thuc_tran',
+          },
+          {
+            title: 'Tràn sự cố',
+            dataIndex: 'co_tran_su_co',
+          },
+        ],
+      },
+
+      editModalSpinning: false,
+      temporaryEditData: '',
+      // popup------------------------------------------------------
       featureProps: [{ rows: ['loading', 'loading...'] }],
       // feature
       highlightLabelStyles: {
@@ -469,6 +605,10 @@ export default defineComponent({
   computed: {
     map() {
       return mapState().getMap;
+    },
+
+    loginState: function () {
+      return userState().getLogin;
     },
   },
 
@@ -597,7 +737,7 @@ export default defineComponent({
           that.featurePropShow.originalName = that.featureProps[0].name;
           that.featurePropShow.id = that.featureProps[0].id.split('.')[1];
 
-          console.log(that.featurePropShow);
+          // console.log(that.featurePropShow);
           let feature = new Feature({
             geometry: that.featureProps[0].geom,
           });
@@ -623,6 +763,10 @@ export default defineComponent({
       this.modalOpen = false;
     },
 
+    closeEditModal() {
+      this.editModalOpen = false;
+    },
+
     openModal() {
       this.modalOpen = true;
       // console.log(this.featureProps[0]);
@@ -640,7 +784,7 @@ export default defineComponent({
           name: this.featurePropShow.originalName,
         })
         .then((response) => {
-          console.log(response);
+          // console.log(response);
           if (response.data) {
             this.featureDataFromDB = response.data;
             this.featureDetailsModalSpinning = false;
@@ -651,6 +795,26 @@ export default defineComponent({
           this.featureDetailsModalSpinning = false;
         });
     },
+
+    openEditModal() {
+      this.editModalOpen = true;
+      this.temporaryEditData = JSON.parse(JSON.stringify(this.featureDataFromDB));
+    },
+
+    editCancel() {
+      this.editModalOpen = false;
+    },
+
+    editSave() {
+      // console.log(this.temporaryEditData);
+    },
+
+    saveEditConfirm() {
+      this.editModalOpen = false;
+      this.featureDataFromDB = this.temporaryEditData;
+    },
+
+    saveEditCancel() {},
   },
   mounted() {},
 });
@@ -717,10 +881,17 @@ export default defineComponent({
   font-weight: bold;
   line-height: normal !important;
   font-size: 0.8rem;
-  & ~ p,
-  ~ a {
+
+  // hạ font-size cùng hàng
+  & ~ div,
+  ~ a,
+  ~ p,
+  ~ input,
+  ~ label {
     font-size: 0.8rem;
-    // color: black;
+    padding-left: 5px;
+    margin-top: 5px;
+
     & p {
       font-size: 0.8rem;
     }

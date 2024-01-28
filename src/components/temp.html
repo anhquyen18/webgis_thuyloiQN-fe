@@ -1,0 +1,272 @@
+<!-- <a-modal class="feature-details-modal" v-model:open="modalOpen" :footer="null" :closable="false" width="800px">
+<a-spin :spinning="featureDetailsModalSpinning">
+  <div style="height: 370px">
+    <a-card v-if="!featureDetailsModalSpinning" :bodyStyle="{ padding: 0 }">
+      <template #title>
+        <a-flex justify="center">
+          <span
+            v-if="
+              featurePropShow.originalLayerTitle === 'ho_chua_quang_nam_epsg5899' && !featureDataFromDB.message
+            "
+            class="me-2 fs-5">
+            Hồ {{ featureDataFromDB.generalInfo['ten'] }}
+          </span>
+        </a-flex>
+      </template>
+      <template #extra>
+        <a-button
+          class="no-border-ant-button me-2"
+          shape="circle"
+          style="padding: 0; height: auto"
+          @click="openEditModal">
+          <i class="fa-regular fa-pen-to-square"></i>
+        </a-button>
+        <a class="close-button" @click="closeModal"><i class="fa-solid fa-xmark"></i></a>
+      </template>
+      <a-row v-if="!featureDataFromDB.message">
+        <a-col :span="6" style="padding-top: 1px">
+          <a-menu v-model:selectedKeys="menuSelectedKeys" style="border-radius: 0px 0px 0px 6px">
+            <a-menu-item key="1">Thông tin chung</a-menu-item>
+            <a-menu-item key="2">Thông tin kỹ thuật</a-menu-item>
+            <a-menu-item key="3">Hồ sơ công trình</a-menu-item>
+            <a-menu-item key="4">An toàn công trình</a-menu-item>
+            <a-menu-item key="5">Quan trắc công trình</a-menu-item>
+            <a-menu-item key="6">Quy trình vận hành</a-menu-item>
+            <a-menu-item key="7">Ngập lụt hạ du hồ chứa</a-menu-item>
+            <a-menu-item key="8">Bảo trì hồ chứa</a-menu-item>
+            <a-menu-item key="9">Hình ảnh</a-menu-item>
+            <a-menu-item key="10">Camera</a-menu-item>
+          </a-menu>
+        </a-col>
+        <a-col class="p-2" :span="18">
+          <div v-if="menuSelectedKeys[0] == 1">
+            <a-card class="detail-feature-modal-content" :bodyStyle="{ padding: '0' }" style="font-size: large">
+              <a-flex v-for="(value, key, index) in featureDataFromDB.generalInfo" class="mb-2" :vertical="true">
+                <p class="detail-feature-item--title">{{ key }}</p>
+                <p class="ps-3 mt-1">{{ value }}</p>
+              </a-flex>
+            </a-card>
+          </div>
+          <div v-if="menuSelectedKeys[0] == 2">
+            <a-card class="detail-feature-modal-content" :bodyStyle="{ padding: 0 }">
+              <a-flex v-for="(value, key, index) in featureDataFromDB.techInfo1" class="mb-2" :vertical="true">
+                <p class="detail-feature-item--title">{{ key }}</p>
+                <p v-if="value" class="ps-3 mt-1">{{ value }}</p>
+                <p v-else="" class="ps-3 mt-1">Đang cập nhật</p>
+              </a-flex>
+              <a-flex
+                v-for="(item, itemKey, itemIndex) in featureDataFromDB.techInfo2[0]"
+                class="mb-2"
+                :vertical="true">
+                <p class="detail-feature-item--title">{{ itemKey }}</p>
+                <p v-for="(value, key, itemIndex) in featureDataFromDB.techInfo2" class="ps-3 mt-1">
+                  <span v-if="value[itemKey]">{{ value[itemKey] }}</span>
+                  <span v-else>Đang cập nhật</span>
+                </p>
+              </a-flex>
+              <a-flex class="mb-2" :vertical="true">
+                <p class="detail-feature-item--title">Cống lấy nước và tràn xả lũ</p>
+                <a-table
+                  :columns="techInfo3Columns"
+                  :data-source="featureDataFromDB.techInfo3"
+                  :pagination="false"
+                  style="font-size: 0.8rem">
+                  <template #bodyCell="{ column, text }">
+                    <template v-if="column.dataIndex === 'Tràn sự cố'">
+                      <p v-if="text == true">Có</p>
+                      <p v-else="text == true">Không</p>
+                    </template>
+                  </template>
+                </a-table>
+              </a-flex>
+            </a-card>
+          </div>
+          <div v-if="menuSelectedKeys[0] == 3">
+            <a-card class="detail-feature-modal-content" :bodyStyle="{ padding: 0 }">
+              <a-flex class="mb-2" vertical justify="flex-start">
+                <p class="detail-feature-item--title">Hồ sơ pháp lý</p>
+                <a class="ps-3 mt-1"> <i class="fa-solid fa-paperclip me-2"></i>Thông tin quản lý </a>
+                <a class="ps-3 mt-1"> <i class="fa-solid fa-paperclip me-2"></i>Hồ sơ pháp lý </a>
+              </a-flex>
+            </a-card>
+
+            <a-flex class="mb-2" :vertical="true">
+              <p class="detail-feature-item--title">Hồ sơ thiết kế</p>
+              <a class="ps-3 mt-1"> <i class="fa-solid fa-paperclip me-2"></i>Hồ sơ thiết kế công trình </a>
+            </a-flex>
+
+            <a-flex class="mb-2" :vertical="true">
+              <p class="detail-feature-item--title">Nhật ký vận hành</p>
+              <a class="ps-3 mt-1"> <i class="fa-solid fa-paperclip me-2"></i>Số liệu thuỷ văn </a>
+              <a class="ps-3 mt-1"> <i class="fa-solid fa-paperclip me-2"></i>Nhật ký vận hành công trình </a>
+            </a-flex>
+          </div>
+          <div v-if="menuSelectedKeys[0] == 4">
+            <a-card class="detail-feature-modal-content" :bodyStyle="{ padding: 0 }">
+              <a-flex class="mb-2" :vertical="true">
+                <p class="detail-feature-item--title">Kê khai đăng ký an toàn đập</p>
+                <a class="ps-3 mt-1">
+                  <i class="fa-solid fa-paperclip me-2"></i>Thông tin kê khai đăng ký an toàn đạp, hồ chứa nước
+                </a>
+                <a class="ps-3 mt-1"> <i class="fa-solid fa-paperclip me-2"></i>Báo cáo an toàn công trình </a>
+              </a-flex>
+              <a-flex class="mb-2" :vertical="true">
+                <p class="detail-feature-item--title">Hiện trạng an toàn đạp</p>
+                <a class="ps-3 mt-1">
+                  <i class="fa-solid fa-paperclip me-2"></i>Thông tin kiểm tra an toàn đập và hồ chứa nước
+                </a>
+                <a class="ps-3 mt-1">
+                  <i class="fa-solid fa-paperclip me-2"></i>Báo cáo hiện trạng an toàn đập và hồ chứa nước</a
+                >
+              </a-flex>
+              <a-flex class="mb-2" :vertical="true">
+                <p class="detail-feature-item--title">Kiểm định an toàn đập</p>
+                <a class="ps-3 mt-1">
+                  <i class="fa-solid fa-paperclip me-2"></i>Thông tin kết quả kiểm định an toàn đập
+                </a>
+              </a-flex>
+              <a-flex class="mb-2" :vertical="true">
+                <p class="detail-feature-item--title">Phương án bảo vệ công trình</p>
+                <a class="ps-3 mt-1">
+                  <i class="fa-solid fa-paperclip me-2"></i>Thông tin phương án bảo vệ đập hồ chứa nước
+                </a>
+                <a class="ps-3 mt-1">
+                  <i class="fa-solid fa-paperclip me-2"></i>Phương án bảo vệ thiên tai và trường hợp khẩn cấp
+                </a>
+              </a-flex>
+            </a-card>
+          </div>
+          <div v-if="menuSelectedKeys[0] == 5">
+            <a-card class="detail-feature-modal-content" :bodyStyle="{ padding: 0 }">
+              <a-flex class="mb-2" :vertical="true">
+                <p class="detail-feature-item--title">Thông tin thiết bị quan trắc</p>
+                <a class="ps-3 mt-1"> <i class="fa-solid fa-paperclip me-2"></i>Thông tin thiết bị quan trắc </a>
+              </a-flex>
+              <a-flex class="mb-2" :vertical="true">
+                <p class="detail-feature-item--title">Báo cáo kết quả quan trắc</p>
+                <a class="ps-3 mt-1"> <i class="fa-solid fa-paperclip me-2"></i>Báo cáo định kỳ </a>
+              </a-flex>
+              <a-flex class="mb-2" :vertical="true">
+                <p class="detail-feature-item--title">Báo cáo sự cố</p>
+                <a class="ps-3 mt-1"> <i class="fa-solid fa-paperclip me-2"></i>Báo cáo sự cố </a>
+              </a-flex>
+            </a-card>
+          </div>
+          <div v-if="menuSelectedKeys[0] == 6">
+            <a-card class="detail-feature-modal-content" :bodyStyle="{ padding: 0 }">
+              <a-flex class="mb-2" :vertical="true">
+                <p class="detail-feature-item--title">Thông tin quy trình vận hành</p>
+                <p class="ps-3 mt-1">
+                  Quy trình vận hành hồ chứa nước Phú Ninh được ban hành theo quyết định 2803/QĐ-UBND Quảng Nam,
+                  ngày 12 tháng 09 năm 2013 của Uỷ ban nhân dân tỉnh Quảng Nam
+                </p>
+                <a class="ps-3 mt-1"> <i class="fa-solid fa-paperclip me-2"></i>Thông tin chi tiết </a>
+              </a-flex>
+              <a-flex class="mb-2" :vertical="true">
+                <p class="detail-feature-item--title">Thông tin chỉ đạo</p>
+                <a class="ps-3 mt-1"> <i class="fa-solid fa-paperclip me-2"></i>Thông tin chỉ đạo </a>
+              </a-flex>
+            </a-card>
+          </div>
+          <div v-if="menuSelectedKeys[0] == 7">
+            <a-card class="detail-feature-modal-content" :bodyStyle="{ padding: 0 }">
+              <a-flex class="mb-2" :vertical="true">
+                <p class="detail-feature-item--title" style="background-color: transparent !important"></p>
+                <p class="ps-3 mt-1">
+                  Bản đồ ngập lụt hạ du hồ chứa nước Phú Ninh được ban hành kèm theo quyết định số ...... ngày
+                  .../.../... của Uỷ ban Nhân dân tỉnh Quảng Nam. Bản đồ ngập lụt hạ du theo các kịch bản lũ thiết
+                  kế, lũ kiểm tra và kịch bản vỡ hồ:
+                </p>
+                <p class="ps-3 mt-1">
+                  - Kịch bản lũ thiết kế: <a style="text-decoration: underline"> Xem tại đây </a>
+                </p>
+                <p class="ps-3 mt-1">
+                  - Kịch bản lũ kiểm tra: <a style="text-decoration: underline"> Xem tại đây </a>
+                </p>
+                <p class="ps-3 mt-1">- Kịch bản vỡ hồ: <a style="text-decoration: underline"> Xem tại đây </a></p>
+              </a-flex>
+            </a-card>
+          </div>
+          <div v-if="menuSelectedKeys[0] == 8">
+            <a-card class="detail-feature-modal-content" :bodyStyle="{ padding: 0 }">
+              <a-flex class="mb-2" :vertical="true">
+                <p class="detail-feature-item--title">Danh mục, kế hoạch bảo trì</p>
+                <a class="ps-3 mt-1"> <i class="fa-solid fa-paperclip me-2"></i>Bảo trì </a>
+                <a class="ps-3 mt-1"> <i class="fa-solid fa-paperclip me-2"></i>Sửa chữa thường xuyên </a>
+                <a class="ps-3 mt-1"> <i class="fa-solid fa-paperclip me-2"></i>Sửa chữa khẩn cấp </a>
+                <a class="ps-3 mt-1"> <i class="fa-solid fa-paperclip me-2"></i>Nâng cấp </a>
+              </a-flex>
+              <a-flex class="mb-2" :vertical="true">
+                <p class="detail-feature-item--title">Khối lượng thực hiện</p>
+                <a class="ps-3 mt-1"> <i class="fa-solid fa-paperclip me-2"></i>Chi tiết </a>
+              </a-flex>
+              <a-flex class="mb-2" :vertical="true">
+                <p class="detail-feature-item--title">Kinh phí thực hiện</p>
+                <a class="ps-3 mt-1"> <i class="fa-solid fa-paperclip me-2"></i>Chi tiết </a>
+              </a-flex>
+            </a-card>
+          </div>
+          <div v-if="menuSelectedKeys[0] == 9" style="width: auto">
+            <a-carousel arrows>
+              <template #prevArrow>
+                <div class="custom-slick-arrow" style="left: 10px; z-index: 1">
+                  <LeftCircleOutlined />
+                </div>
+              </template>
+              <template #nextArrow>
+                <div class="custom-slick-arrow" style="right: 10px">
+                  <RightCircleOutlined />
+                </div>
+              </template>
+              <div><img src="../../assets/sample-image/0-1.jpg" alt="" style="width: 100%; height: 405px" /></div>
+              <div>
+                <img
+                  src="../../assets/sample-image/12032019vthuy13.jpg"
+                  alt=""
+                  style="width: 100%; height: 405px" />
+              </div>
+              <div>
+                <img
+                  src="../../assets/sample-image/ho-phu-ninh-1_1632822386.jpg"
+                  alt=""
+                  style="width: 100%; height: 405px" />
+              </div>
+              <div>
+                <img
+                  src="../../assets/sample-image/ho-phu-ninh-quang-nam-banner.jpg"
+                  alt=""
+                  style="width: 100%; height: 405px" />
+              </div>
+
+              <div>
+                <img src="../../assets/sample-image/ho-phu-ninh.jpg" alt="" style="width: 100%; height: 405px" />
+              </div>
+            </a-carousel>
+          </div>
+          <div v-if="menuSelectedKeys[0] == 10">
+            <a-carousel arrows style="color: white">
+              <template #prevArrow>
+                <div class="custom-slick-arrow" style="left: 10px; z-index: 1">
+                  <LeftCircleOutlined />
+                </div>
+              </template>
+              <template #nextArrow>
+                <div class="custom-slick-arrow" style="right: 10px">
+                  <RightCircleOutlined />
+                </div>
+              </template>
+              <div><h3>Camera 1</h3></div>
+              <div><h3>Camera 2</h3></div>
+              <div><h3>Camera 3</h3></div>
+              <div><h3>Camera 4</h3></div>
+            </a-carousel>
+          </div>
+        </a-col>
+      </a-row>
+      <div v-else style="height: 250px">
+        {{ featureDataFromDB.message }}
+      </div>
+    </a-card>
+  </div>
+</a-spin>
+</a-modal> -->

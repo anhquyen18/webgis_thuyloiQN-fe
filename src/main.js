@@ -25,6 +25,7 @@ import {
   Carousel,
   Form,
   Checkbox,
+  Popconfirm,
 } from 'ant-design-vue';
 import App from './App.vue';
 import axios from 'axios';
@@ -69,6 +70,7 @@ app.use(Table);
 app.use(Carousel);
 app.use(Form);
 app.use(Checkbox);
+app.use(Popconfirm);
 
 app.mount('#app');
 
