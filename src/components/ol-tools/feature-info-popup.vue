@@ -351,15 +351,16 @@
       </a-spin>
     </a-modal>
 
-    <a-modal v-model:open="editModalOpen" :maskClosable="false">
-      <template #closeIcon>
-        <a class="close-button" @click="closeEditModal"><i class="fa-solid fa-xmark"></i></a>
-      </template>
+    <a-modal v-model:open="editModalOpen" :maskClosable="false" :closable="false">
+      <!-- <template #closeIcon> </template> -->
       <template #title>
-        <span>
-          <i class="fa-regular fa-pen-to-square fs-4"></i>
-        </span>
-        <span class="fs-6"> Chỉnh sửa thông tin Hồ {{ featureDataFromDB.generalInfo['ten'] }} </span>
+        <a-flex justify="space-between">
+          <span class="fs-6">
+            <i class="fa-regular fa-pen-to-square fs-4"></i>
+            Chỉnh sửa thông tin Hồ {{ featureDataFromDB.generalInfo['ten'] }}
+          </span>
+          <a class="close-button me-2" @click="closeEditModal"><i class="fa-solid fa-xmark"></i></a>
+        </a-flex>
       </template>
       <template #footer>
         <a-button key="back" @click="editCancel">Huỷ</a-button>
@@ -458,6 +459,7 @@ import { defineComponent, inject, ref } from 'vue';
 import { userState } from '@/stores/user-state';
 import { mapState } from '../../stores/map-state';
 import * as VueLayer from '../../js/openlayers/VueLayer.js';
+import { getCookie } from '@/js/utils/cookie.js';
 
 import VectorLayer from 'ol/layer/Vector';
 import { Vector as VectorSource } from 'ol/source';
@@ -473,9 +475,11 @@ export default defineComponent({
   setup() {
     const featurePropShow = inject('featurePropShow');
     const userProfile = inject('userProfile');
+    const cancelUpdateFeatureInfo = ref('');
     return {
       featurePropShow,
       userProfile,
+      cancelUpdateFeatureInfo,
     };
   },
 
@@ -765,6 +769,8 @@ export default defineComponent({
 
     closeEditModal() {
       this.editModalOpen = false;
+      this.cancelUpdateFeatureInfo.cancel('Cập nhật feature không thành công');
+      this.editModalSpinning = false;
     },
 
     openModal() {
@@ -803,6 +809,8 @@ export default defineComponent({
 
     editCancel() {
       this.editModalOpen = false;
+      this.cancelUpdateFeatureInfo.cancel('Cập nhật feature không thành công');
+      this.editModalSpinning = false;
     },
 
     editSave() {
@@ -810,8 +818,37 @@ export default defineComponent({
     },
 
     saveEditConfirm() {
-      this.editModalOpen = false;
-      this.featureDataFromDB = this.temporaryEditData;
+      this.cancelUpdateFeatureInfo = axios.CancelToken.source();
+
+      this.editModalSpinning = true;
+      thuyLoiApi
+        .post('/update-feature-info', this.temporaryEditData, {
+          cancelToken: this.cancelUpdateFeatureInfo.token,
+          headers: {
+            Authorization: `Bearer ${getCookie('accessToken')}`,
+          },
+        })
+        .then((response) => {
+          if (response.data) {
+            // console.log(response.data);
+            this.featureDataFromDB = this.temporaryEditData;
+            this.editModalOpen = false;
+            this.$message.success(response.data.message, 3);
+            this.editModalSpinning = false;
+          }
+        })
+        .catch((error) => {
+          this.editModalSpinning = false;
+          if (axios.isCancel(error)) {
+            this.$message.error(error.message, 3);
+            console.log(error);
+          } else {
+            // this.$message.error(error.message, 3);
+            console.log(error);
+            this.$message.error(error.response.data.message);
+          }
+          // this.editModalSpinning = false;
+        });
     },
 
     saveEditCancel() {},
