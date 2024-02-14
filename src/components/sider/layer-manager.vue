@@ -299,7 +299,8 @@ export default defineComponent({
 }
 
 .sider-content {
-  max-height: 80vh;
+  // max-height: 85vh;
+  height: 100%;
 
   overflow-y: auto;
   &::-webkit-scrollbar {

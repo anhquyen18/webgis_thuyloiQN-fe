@@ -24,6 +24,7 @@ import ol_control_Legend from 'ol-ext/control/Legend.js';
 const runMap = () => {
   // var map;
   // const GEOSERVER_DOMAIN = 'http://aqtran.name.vn:8080';
+  // const GEOSERVER_DOMAIN = 'https://geo.tamky.click';
   const GEOSERVER_DOMAIN = 'http://localhost:8080';
   const GEOSERVER_WORKSPACE = 'webgis_dev';
   const map = new Map({

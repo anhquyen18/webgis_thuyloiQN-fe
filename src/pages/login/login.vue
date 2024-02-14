@@ -51,7 +51,11 @@
                 <template #label>
                   <p class="form-item-title">Tên đăng nhập</p>
                 </template>
-                <a-input v-model:value="user.username" size="large" placeholder="Tên đăng nhập"></a-input>
+                <a-input
+                  ref="usernameInput"
+                  v-model:value="user.username"
+                  size="large"
+                  placeholder="Tên đăng nhập"></a-input>
               </a-form-item>
               <a-form-item class="mt-2" name="password">
                 <template #label>
@@ -306,7 +310,9 @@ export default defineComponent({
     toSignup() {},
   },
 
-  mounted() {},
+  mounted() {
+    this.$refs.usernameInput.focus();
+  },
 });
 </script>
 

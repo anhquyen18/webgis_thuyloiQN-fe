@@ -99,7 +99,7 @@
           </a-layout-content>
         </a-layout>
       </a-layout-content>
-      <a-layout-footer
+      <!-- <a-layout-footer
         style="
           background-color: #0460ae;
           height: 5vh;
@@ -138,7 +138,7 @@
           </a-col>
           <a-col :span="4"> </a-col>
         </a-row>
-      </a-layout-footer>
+      </a-layout-footer> -->
 
       <Login></Login>
     </a-layout>
@@ -171,7 +171,7 @@ export default defineComponent({
   },
 
   beforeRouteEnter(to, from, next) {
-    if (getCookie('accessToken') === '') {
+    if (getCookie('accessToken') === '' || from.name === 'login-page') {
       next((data) => {
         data.homeSpinning = false;
       });
