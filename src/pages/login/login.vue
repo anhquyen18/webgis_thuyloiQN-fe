@@ -151,7 +151,7 @@ import { defineComponent, ref } from 'vue';
 import { userState } from '@/stores/user-state';
 import { useRoute } from 'vue-router';
 import thuyLoiApi from '@/js/axios/thuyLoiApi';
-import { getCookie, setCookie } from '@/js/utils/cookie.js';
+import { getItem, setItem, removeItem } from '@/js/utils/localStorage.js';
 import { InfoCircleOutlined } from '@ant-design/icons-vue';
 
 export default defineComponent({
@@ -160,7 +160,7 @@ export default defineComponent({
   },
 
   beforeRouteEnter(to, from, next) {
-    if (getCookie('accessToken') === '') {
+    if (getItem('accessToken') === '') {
       next((data) => {});
     } else {
       // next((data) => {
@@ -171,7 +171,7 @@ export default defineComponent({
       //         {},
       //         {
       //           headers: {
-      //             Authorization: `Bearer ${getCookie('accessToken')}`,
+      //             Authorization: `Bearer ${getItem('accessToken')}`,
       //           },
       //         },
       //       )
@@ -181,14 +181,14 @@ export default defineComponent({
       //           userState().onAuthentication();
       //           data.homeSpinning = false;
       //           this.$router.push({ name: 'home-page' });
-      //           setCookie('user', JSON.stringify(response.data.user));
+      //           setItem('user', JSON.stringify(response.data.user));
       //         }
       //       })
       //       .catch((error) => {
       //         console.log(error);
       //         data.homeSpinning = false;
-      //         setCookie('accessToken', '');
-      //         setCookie('user', '');
+      //          removeItem('accessToken', '');
+      //         removeItem('user', '');
       //         userState().onLogout();
       //       });
       //   };
@@ -202,7 +202,7 @@ export default defineComponent({
             {},
             {
               headers: {
-                Authorization: `Bearer ${getCookie('accessToken')}`,
+                Authorization: `Bearer ${getItem('accessToken')}`,
               },
             },
           )
@@ -212,13 +212,13 @@ export default defineComponent({
               userState().onAuthentication();
               // this.$router.push({ name: 'home-page' });
               next({ name: 'home-page' });
-              setCookie('user', JSON.stringify(response.data.user));
+              setItem('user', JSON.stringify(response.data.user));
             }
           })
           .catch((error) => {
             console.log(error);
-            setCookie('accessToken', '');
-            setCookie('user', '');
+            removeItem('accessToken');
+            removeItem('user');
             userState().onLogout();
             next((data) => {});
           });
@@ -279,8 +279,12 @@ export default defineComponent({
           thuyLoiApi
             .post('/login', this.user)
             .then((response) => {
-              setCookie('accessToken', response.data.token);
-              setCookie('user', JSON.stringify(response.data.user));
+              setItem('accessToken', response.data.token);
+              setItem('user', JSON.stringify(response.data.user));
+
+              // setItem('user', JSON.stringify(response.data.user));
+              // console.log(JSON.parse(getItem('user')));
+
               // message.success('Sign in successfully!');
               userState().onAuthentication();
               this.loginSpinning = false;

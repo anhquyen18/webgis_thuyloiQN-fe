@@ -459,7 +459,7 @@ import { defineComponent, inject, ref } from 'vue';
 import { userState } from '@/stores/user-state';
 import { mapState } from '../../stores/map-state';
 import * as VueLayer from '../../js/openlayers/VueLayer.js';
-import { getCookie } from '@/js/utils/cookie.js';
+import { getItem, setItem,removeItem } from '@/js/utils/localStorage.js';
 
 import VectorLayer from 'ol/layer/Vector';
 import { Vector as VectorSource } from 'ol/source';
@@ -825,7 +825,7 @@ export default defineComponent({
         .post('/update-feature-info', this.temporaryEditData, {
           cancelToken: this.cancelUpdateFeatureInfo.token,
           headers: {
-            Authorization: `Bearer ${getCookie('accessToken')}`,
+            Authorization: `Bearer ${getItem('accessToken')}`,
           },
         })
         .then((response) => {

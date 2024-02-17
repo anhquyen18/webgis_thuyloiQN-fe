@@ -149,7 +149,7 @@
 import { defineComponent, ref, provide } from 'vue';
 import { mapState } from '../stores/map-state';
 import { userState } from '@/stores/user-state';
-import { getCookie, setCookie } from '@/js/utils/cookie.js';
+import { getItem, setItem, removeItem } from '@/js/utils/localStorage.js';
 import thuyLoiApi from '@/js/axios/thuyLoiApi';
 
 import runMap from '../js/openlayers/map.js';
@@ -171,7 +171,7 @@ export default defineComponent({
   },
 
   beforeRouteEnter(to, from, next) {
-    if (getCookie('accessToken') === '' || from.name === 'login-page') {
+    if (getItem('accessToken') === '' || from.name === 'login-page') {
       next((data) => {
         data.homeSpinning = false;
       });
@@ -184,7 +184,7 @@ export default defineComponent({
               {},
               {
                 headers: {
-                  Authorization: `Bearer ${getCookie('accessToken')}`,
+                  Authorization: `Bearer ${getItem('accessToken')}`,
                 },
               },
             )
@@ -193,15 +193,15 @@ export default defineComponent({
                 // console.log(response);
                 userState().onAuthentication();
                 data.homeSpinning = false;
-                data.userProfile = JSON.parse(getCookie('user'));
-                setCookie('user', JSON.stringify(response.data.user));
+                data.userProfile = JSON.parse(getItem('user'));
+                setItem('user', JSON.stringify(response.data.user));
               }
             })
             .catch((error) => {
               console.log(error);
               data.homeSpinning = false;
-              setCookie('accessToken', '');
-              setCookie('user', '');
+              removeItem('accessToken');
+              removeItem('user');
               userState().onLogout();
             });
         };

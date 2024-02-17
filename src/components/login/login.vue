@@ -51,7 +51,8 @@
 <script>
 import { defineComponent } from 'vue';
 import { userState } from '@/stores/user-state';
-import { setCookie } from '@/js/utils/cookie';
+import { getItem, setItem, removeItem } from '@/js/utils/localStorage.js';
+
 export default defineComponent({
   setup() {
     return {};
@@ -70,8 +71,8 @@ export default defineComponent({
   methods: {
     logout() {
       // userState().onLogout();
-      setCookie('accessToken', '');
-      setCookie('user', '');
+      removeItem('accessToken');
+      removeItem('user');
       location.reload();
     },
   },
