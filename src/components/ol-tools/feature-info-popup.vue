@@ -139,7 +139,110 @@
                 </div>
                 <div v-if="menuSelectedKeys[0] == 2">
                   <a-card class="detail-feature-modal-content" :bodyStyle="{ padding: 0 }">
-                    <a-flex v-for="(value, key, index) in featureNameDisplay.techInfo1" class="mb-2" :vertical="true">
+                    <a-menu v-model:selectedKeys="featureInfoSelectedKeys" mode="horizontal">
+                      <a-menu-item key="1">Toàn công trình</a-menu-item>
+                      <a-menu-item key="2">Đập chính</a-menu-item>
+                      <a-menu-item key="3">Cống lấy nước</a-menu-item>
+                      <a-menu-item key="4">Tràn xả lũ</a-menu-item>
+                    </a-menu>
+
+                    <div v-if="featureInfoSelectedKeys[0] == 1">
+                      <a-flex
+                        v-for="(value, key, index) in featureNameDisplay.techInfo1"
+                        class="mb-2 mt-2"
+                        :vertical="true">
+                        <p class="detail-feature-item--title">{{ value }}</p>
+                        <p v-if="featureDataFromDB.techInfo1[key]">
+                          {{ featureDataFromDB.techInfo1[key] }}
+                        </p>
+                        <p v-else>Đang cập nhật</p>
+                      </a-flex>
+                    </div>
+                    <div v-if="featureInfoSelectedKeys[0] == 2">
+                      <!-- Cái này nếu số lượng đập lớn hơn 2 thì dùng table  -->
+                      <div v-for="(item, itemIndex) in featureDataFromDB.techInfo2">
+                        <a-divider
+                          v-if="featureDataFromDB.techInfo2.length > 1"
+                          orientation="left"
+                          style="border-color: grey">
+                          <p style="font-size: 0.8rem">Đập chính {{ itemIndex + 1 }}</p>
+                        </a-divider>
+                        <a-flex
+                          v-for="(value, key, index) in featureNameDisplay.techInfo2"
+                          class="mb-2 mt-2"
+                          :vertical="true">
+                          <p class="detail-feature-item--title">{{ value }}</p>
+                          <p v-if="item[key]">
+                            {{ item[key] }}
+                          </p>
+                          <p v-else>Đang cập nhật</p>
+                          <!-- {{ featureDataFromDB.techInfo2[] }} -->
+                        </a-flex>
+                      </div>
+                    </div>
+                    <div v-if="featureInfoSelectedKeys[0] == 3">
+                      <!-- <div v-for="(item, itemIndex) in featureDataFromDB.techInfo3" class="mb-4">
+                        <a-divider
+                          v-if="featureDataFromDB.techInfo3.length > 1"
+                          orientation="left"
+                          style="border-color: grey">
+                          <p style="font-size: 0.8rem">Cống lấy nước {{ itemIndex + 1 }}</p>
+                        </a-divider>
+                        <a-flex
+                          v-for="(value, key, index) in featureNameDisplay.techInfo3"
+                          class="mb-2"
+                          :vertical="true">
+                          <p class="detail-feature-item--title">{{ value }}</p>
+                          <p v-if="item[key]">
+                            {{ item[key] }}
+                          </p>
+                          <p v-else="">Đang cập nhật</p>
+                        </a-flex>
+                      </div> -->
+                      <a-table
+                        :columns="featureNameDisplay.techInfo3"
+                        :data-source="featureDataFromDB.techInfo3"
+                        :pagination="false"
+                        style="font-size: 0.8rem">
+                      </a-table>
+                    </div>
+
+                    <div v-if="featureInfoSelectedKeys[0] == 4">
+                      <!-- <div v-for="(item, itemIndex) in featureDataFromDB.techInfo3" class="mb-4">
+                        <a-divider
+                          v-if="featureDataFromDB.techInfo3.length > 1"
+                          orientation="left"
+                          style="border-color: grey">
+                          <p style="font-size: 0.8rem">Tràn xả lũ {{ itemIndex + 1 }}</p>
+                        </a-divider>
+                        <a-flex
+                          v-for="(value, key, index) in featureNameDisplay.techInfo4"
+                          class="mb-2"
+                          :vertical="true">
+                          <p class="detail-feature-item--title">{{ value }}</p>
+                          <p v-if="item[key]">
+                            {{ item[key] }}
+                          </p>
+                          <p v-else="">Đang cập nhật</p>
+                        </a-flex>
+                      </div> -->
+                      <a-table
+                        :columns="featureNameDisplay.techInfo4"
+                        :data-source="featureDataFromDB.techInfo3"
+                        :pagination="false"
+                        style="font-size: 0.8rem">
+                        <template #bodyCell="{ column, text }">
+                          <template v-if="column.dataIndex === 'co_tran_su_co'">
+                            <p v-if="text == true">Có</p>
+                            <p v-else="text == true">Không</p>
+                          </template>
+                        </template>
+                      </a-table>
+                    </div>
+                    <!-- <a-flex
+                      v-for="(value, key, index) in featureNameDisplay.techInfo1"
+                      class="mb-2 mt-2"
+                      :vertical="true">
                       <p class="detail-feature-item--title">{{ value }}</p>
                       <p v-if="featureDataFromDB.techInfo1[key]">
                         {{ featureDataFromDB.techInfo1[key] }}
@@ -170,7 +273,7 @@
                           </template>
                         </template>
                       </a-table>
-                    </a-flex>
+                    </a-flex> -->
                   </a-card>
                 </div>
                 <div v-if="menuSelectedKeys[0] == 3">
@@ -378,7 +481,101 @@
       </template>
       <a-spin :spinning="editModalSpinning">
         <a-card style="height: 405px; overflow: auto">
-          <a-flex v-for="(value, key, index) in featureNameDisplay.generalInfo" class="mb-2" :vertical="true">
+          <a-menu
+            v-model:selectedKeys="editFeatureInfoSelectedKeys"
+            mode="horizontal"
+            :items="editFeatureInfoItems"
+            class="mb-2">
+          </a-menu>
+
+          <div v-if="editFeatureInfoSelectedKeys[0] == 1">
+            <a-flex v-for="(value, key, index) in featureNameDisplay.generalInfo" class="mb-2 mt-2" :vertical="true">
+              <div v-if="key === 'vi_tri'">
+                <p class="detail-feature-item--title">{{ value }}</p>
+                <div style="display: flex">
+                  <p>xã</p>
+                  <a-input
+                    v-model:value="temporaryEditData.generalInfo['vi_tri_xa']"
+                    size="small"
+                    style="font-size: 0.8rem; width: 150px; margin-left: 5px" />
+                  <p>, huyện</p>
+                  <a-input
+                    v-model:value="temporaryEditData.generalInfo['vi_tri_huyen']"
+                    size="small"
+                    style="font-size: 0.8rem; width: 150px; margin-left: 5px" />
+                </div>
+              </div>
+
+              <div v-else-if="key === 'co_quy_trinh_vh'">
+                <p class="detail-feature-item--title">{{ value }}</p>
+                <a-checkbox v-model:checked="temporaryEditData.generalInfo[key]">Có hoặc không</a-checkbox>
+              </div>
+
+              <div v-else>
+                <p class="detail-feature-item--title">{{ value }}</p>
+                <a-input v-model:value="temporaryEditData.generalInfo[key]" size="small" />
+              </div>
+            </a-flex>
+          </div>
+          <div v-if="editFeatureInfoSelectedKeys[0] == 2">
+            <a-flex v-for="(value, key, index) in featureNameDisplay.techInfo1" class="mb-2" :vertical="true">
+              <p class="detail-feature-item--title">{{ value }}</p>
+              <a-input v-model:value="temporaryEditData.techInfo1[key]" size="small" />
+            </a-flex>
+          </div>
+          <div v-if="editFeatureInfoSelectedKeys[0] == 3">
+            <div v-for="(item, itemIndex) in temporaryEditData.techInfo2">
+              <a-divider v-if="featureDataFromDB.techInfo2.length > 1" orientation="left" style="border-color: grey">
+                <p style="font-size: 0.8rem">Đập chính {{ itemIndex + 1 }}</p>
+              </a-divider>
+
+              <a-flex v-for="(value, key, index) in featureNameDisplay.techInfo2" class="mb-2 mt-2" :vertical="true">
+                <p class="detail-feature-item--title">{{ value }}</p>
+                <a-input v-model:value="item[key]" size="small" />
+              </a-flex>
+            </div>
+          </div>
+          <div v-if="editFeatureInfoSelectedKeys[0] == 4">
+            <a-table
+              :columns="featureNameDisplay.techInfo3"
+              :data-source="temporaryEditData.techInfo3"
+              :pagination="false"
+              style="font-size: 0.8rem">
+              <template #bodyCell="{ column, text, record, index }">
+                <template v-if="column.dataIndex === 'co_tran_su_co'">
+                  <a-checkbox v-model:checked="temporaryEditData.techInfo3[index][column.dataIndex]"></a-checkbox>
+                </template>
+
+                <template v-else>
+                  <a-input
+                    v-model:value="temporaryEditData.techInfo3[index][column.dataIndex]"
+                    size="small"
+                    style="font-size: 0.8rem" />
+                </template>
+              </template>
+            </a-table>
+          </div>
+          <div v-if="editFeatureInfoSelectedKeys[0] == 5">
+            <a-table
+              :columns="featureNameDisplay.techInfo4"
+              :data-source="temporaryEditData.techInfo3"
+              :pagination="false"
+              style="font-size: 0.8rem">
+              <template #bodyCell="{ column, text, record, index }">
+                <template v-if="column.dataIndex === 'co_tran_su_co'">
+                  <a-checkbox v-model:checked="temporaryEditData.techInfo3[index][column.dataIndex]"></a-checkbox>
+                </template>
+
+                <template v-else>
+                  <a-input
+                    v-model:value="temporaryEditData.techInfo3[index][column.dataIndex]"
+                    size="small"
+                    style="font-size: 0.8rem" />
+                </template>
+              </template>
+            </a-table>
+          </div>
+          <!-- <a-flex v-for="(value, key, index) in featureNameDisplay.generalInfo" class="mb-2" :vertical="true">
             <div v-if="key === 'vi_tri'">
               <p class="detail-feature-item--title">{{ value }}</p>
               <div style="display: flex">
@@ -423,11 +620,6 @@
               :pagination="false"
               style="font-size: 0.8rem">
               <template #bodyCell="{ column, text, record, index }">
-                <!-- <template v-if="column.dataIndex === 'co_tran_su_co'">
-                  <p v-if="text == true">Có</p>
-                  <p v-else="text == true">Không</p>
-                </template> -->
-                <!-- <div> -->
                 <template v-if="column.dataIndex === 'co_tran_su_co'">
                   <a-checkbox v-model:checked="temporaryEditData.techInfo3[index][column.dataIndex]"></a-checkbox>
                 </template>
@@ -438,16 +630,9 @@
                     size="small"
                     style="font-size: 0.8rem" />
                 </template>
-                <!-- <a-input
-                  
-            v-model:value="temporaryEditData[column]"
-            style="margin: -5px 0"
-          /> -->
-
-                <!-- </div> -->
               </template>
             </a-table>
-          </a-flex>
+          </a-flex> -->
         </a-card>
       </a-spin>
     </a-modal>
@@ -459,7 +644,7 @@ import { defineComponent, inject, ref } from 'vue';
 import { userState } from '@/stores/user-state';
 import { mapState } from '../../stores/map-state';
 import * as VueLayer from '../../js/openlayers/VueLayer.js';
-import { getItem, setItem,removeItem } from '@/js/utils/localStorage.js';
+import { getItem, setItem, removeItem } from '@/js/utils/localStorage.js';
 
 import VectorLayer from 'ol/layer/Vector';
 import { Vector as VectorSource } from 'ol/source';
@@ -488,11 +673,131 @@ export default defineComponent({
       modalOpen: false,
       editModalOpen: false,
       menuSelectedKeys: ['1'],
+      featureInfoSelectedKeys: ['1'],
+      editFeatureInfoSelectedKeys: ['1'],
       buttonType: 'primary',
       status: false,
       featureDataFromDB: { generalInfo: { ten: '' } },
       featureDetailsModalSpinning: false,
       currentFeature: '',
+      editFeatureInfoItems: [
+        {
+          key: '1',
+          label: 'Chung',
+          title: 'Chung',
+        },
+        {
+          key: '111',
+          label: 'Kỹ thuật',
+          title: 'Kỹ thuật',
+          children: [
+            {
+              label: 'Toàn công trình',
+              key: '2',
+            },
+            {
+              label: 'Đập chính',
+              key: '3',
+            },
+            {
+              label: 'Cống lấy nước',
+              key: '4',
+            },
+            {
+              label: 'Tràn xả lũ',
+              key: '5',
+            },
+          ],
+        },
+      ],
+      // featureNameDisplay: {
+      //   generalInfo: {
+      //     ten: 'Tên',
+      //     vi_tri: 'Vị trí',
+      //     nam_xd: 'Năm xây dựng',
+      //     don_vi_ql: 'Đơn vị quản lý',
+      //     co_quy_trinh_vh: 'Quy trình vận hành',
+      //   },
+      //   techInfo1: {
+      //     f_tuoi_tk: 'Diện tích tưới thiết kế (ha)',
+      //     f_tuoi_tk: 'Diện tích tưới thật tế (ha)',
+      //     f_lv: 'Diện tích lưu vực (km2)',
+      //     wmndb: 'W mndbt (10^6 m3)',
+      //     mnc: 'Mực nước chết (m)',
+      //     mndbt: 'Mực nước dâng bình thường (m)',
+      //     mnltk: 'Mực nước lũ thiết kế (m)',
+      //     so_dap_phu: 'Số đập phụ',
+      //     cao_trinh_dinh_tcs: 'Cao trình đỉnh tường chắn sóng (m)',
+      //   },
+      //   techInfo2: {
+      //     cao_trinh_dinh_dap: 'Cao trình đỉnh đập (m)',
+      //     H_max: 'H max (m)',
+      //     length: 'Chiều dài đập (m)',
+      //   },
+      //   techInfo3: [
+      //     {
+      //       title: 'Kích thước cống lấy nước (m)',
+      //       dataIndex: 'kich_thuoc_cong',
+      //     },
+      //     {
+      //       title: 'Hình thức cống lấy nước',
+      //       dataIndex: 'hinh_thuc_cong',
+      //     },
+      //     {
+      //       title: 'Cao trình ngưỡng tràn (m)',
+      //       dataIndex: 'cao_trinh_nguong_tran',
+      //     },
+      //     {
+      //       title: 'B tràn (m)',
+      //       dataIndex: 'B_tran',
+      //     },
+      //     {
+      //       title: 'Hình thức tràn',
+      //       dataIndex: 'hinh_thuc_tran',
+      //     },
+      //     {
+      //       title: 'Tràn sự cố',
+      //       dataIndex: 'co_tran_su_co',
+      //     },
+      //   ],
+      // },
+
+      // featureNameDisplay: {
+      //   generalInfo: {
+      //     ten: 'Tên',
+      //     vi_tri: 'Vị trí',
+      //     nam_xd: 'Năm xây dựng',
+      //     don_vi_ql: 'Đơn vị quản lý',
+      //     co_quy_trinh_vh: 'Quy trình vận hành',
+      //   },
+      //   techInfo1: {
+      //     f_tuoi_tk: 'Diện tích tưới thiết kế (ha)',
+      //     f_tuoi_tk: 'Diện tích tưới thực tế (ha)',
+      //     f_lv: 'Diện tích lưu vực (km2)',
+      //     wmndb: 'W mndbt (10^6 m3)',
+      //     mnc: 'Mực nước chết (m)',
+      //     mndbt: 'Mực nước dâng bình thường (m)',
+      //     mnltk: 'Mực nước lũ thiết kế (m)',
+      //     so_dap_phu: 'Số đập phụ',
+      //     cao_trinh_dinh_tcs: 'Cao trình đỉnh tường chắn sóng (m)',
+      //   },
+      //   techInfo2: {
+      //     cao_trinh_dinh_dap: 'Cao trình đỉnh đập (m)',
+      //     H_max: 'H max (m)',
+      //     length: 'Chiều dài đập (m)',
+      //   },
+      //   techInfo3: {
+      //     kich_thuoc_cong: 'Kích thước (m)',
+      //     hinh_thuc_cong: 'Hình thức',
+      //   },
+      //   techInfo4: {
+      //     cao_trinh_nguong_tran: 'Cao trình ngưỡng tràn (m)',
+      //     b_tran: 'B tràn (m)',
+      //     hinh_thuc_tran: 'Hình thức tràn',
+      //     co_tran_su_co: 'Tràn sự cố',
+      //   },
+      // },
+
       featureNameDisplay: {
         generalInfo: {
           ten: 'Tên',
@@ -503,18 +808,18 @@ export default defineComponent({
         },
         techInfo1: {
           f_tuoi_tk: 'Diện tích tưới thiết kế (ha)',
-          f_tuoi_tk: 'Diện tích tưới thật tế (ha)',
+          f_tuoi_tk: 'Diện tích tưới thực tế (ha)',
           f_lv: 'Diện tích lưu vực (km2)',
           wmndb: 'W mndbt (10^6 m3)',
           mnc: 'Mực nước chết (m)',
           mndbt: 'Mực nước dâng bình thường (m)',
           mnltk: 'Mực nước lũ thiết kế (m)',
           so_dap_phu: 'Số đập phụ',
-          cao_trinh_dinh_tcs: 'Cao trình đỉnh tường chắn sóng (m)',
         },
         techInfo2: {
+          cao_trinh_dinh_tcs: 'Cao trình đỉnh tường chắn sóng (m)',
           cao_trinh_dinh_dap: 'Cao trình đỉnh đập (m)',
-          H_max: 'H max (m)',
+          h_max: 'H max (m)',
           length: 'Chiều dài đập (m)',
         },
         techInfo3: [
@@ -526,13 +831,15 @@ export default defineComponent({
             title: 'Hình thức cống lấy nước',
             dataIndex: 'hinh_thuc_cong',
           },
+        ],
+        techInfo4: [
           {
             title: 'Cao trình ngưỡng tràn (m)',
             dataIndex: 'cao_trinh_nguong_tran',
           },
           {
             title: 'B tràn (m)',
-            dataIndex: 'B_tran',
+            dataIndex: 'b_tran',
           },
           {
             title: 'Hình thức tràn',
@@ -805,6 +1112,7 @@ export default defineComponent({
     openEditModal() {
       this.editModalOpen = true;
       this.temporaryEditData = JSON.parse(JSON.stringify(this.featureDataFromDB));
+      // console.log(this.temporaryEditData);
     },
 
     editCancel() {
@@ -819,7 +1127,6 @@ export default defineComponent({
 
     saveEditConfirm() {
       this.cancelUpdateFeatureInfo = axios.CancelToken.source();
-
       this.editModalSpinning = true;
       thuyLoiApi
         .post('/update-feature-info', this.temporaryEditData, {
