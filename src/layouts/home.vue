@@ -174,6 +174,9 @@ export default defineComponent({
     if (getItem('accessToken') === '' || from.name === 'login-page') {
       next((data) => {
         data.homeSpinning = false;
+        if (from.name === 'login-page') {
+          data.userProfile = JSON.parse(getItem('user'));
+        }
       });
     } else {
       next((data) => {
