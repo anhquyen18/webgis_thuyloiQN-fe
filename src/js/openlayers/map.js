@@ -11,16 +11,10 @@ import {
 import { Vector as VectorLayer, Tile as TileLayer, Group as LayerGroup, Image as ImageLayer } from 'ol/layer.js';
 import { Style, Icon, Stroke, Circle, Fill, Text } from 'ol/style.js';
 import { GeoJSON } from 'ol/format.js';
-import { LineString, Geometry, Polygon, Point } from 'ol/geom.js';
-import { Feature } from 'ol';
-import { Draw } from 'ol/interaction';
-import { WKB } from 'ol/format.js';
-import { ZoomSlider } from 'ol/control.js';
+import { ZoomSlider, ScaleLine, defaults as defaultControls } from 'ol/control.js';
 
 import ol_interaction_Hover from 'ol-ext/interaction/Hover.js';
-import ol_source_IDW from 'ol-ext/source/IDW.js';
-import ol_legend_Legend from 'ol-ext/legend/Legend.js';
-import ol_control_Legend from 'ol-ext/control/Legend.js';
+import Scale from 'ol-ext/control/Scale.js';
 const runMap = () => {
   // var map;
   // const GEOSERVER_DOMAIN = 'http://aqtran.name.vn:8080';
@@ -230,6 +224,30 @@ const runMap = () => {
   //   // collapsed: false,
   // });
   // map.addControl(legendCtrl);
+
+  // ---------------------------------
+  // ----------Scale Control--------------------------------------------------------------------------------------------------------
+  // ---------------------------------
+  // const scaleControl = new ScaleLine({
+  //   title: 'map scale',
+  //   // className: 'ol-scale-line',
+  //   units: 'metric',
+  //   bar: true,
+  //   steps: parseInt(0.1, 10),
+  //   text: true,
+  //   minWidth: 100,
+  // });
+
+  const scaleControl = new ScaleLine({
+    title: 'map scale',
+    // className: 'ol-scale-line',
+    units: 'metric',
+    bar: false,
+    steps: parseInt(0.1, 10),
+    text: true,
+    minWidth: 100,
+  });
+  map.addControl(scaleControl);
 
   return map;
 };
