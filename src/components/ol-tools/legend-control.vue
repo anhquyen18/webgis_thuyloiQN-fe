@@ -1,11 +1,13 @@
 <template>
   <a-popover
     :align="{
-      points: ['tl', 'tl'],
-      offset: [0, 0], // the offset sourceNode by 10px in x and 20px in y,
+      points: ['bl', 'tl'],
+      offset: [0, 20], // the offset sourceNode by 10px in x and 20px in y,
+      overflow: { adjustX: true, adjustY: true },
     }"
-    v-model:open="open"
+    v-bind:open="open"
     trigger=""
+    :autoAdjustOverflow="false"
     color="transparent">
     <template #content>
       <div style="position: relative; width: auto; text-wrap: wrap; word-wrap: break-word">
@@ -78,7 +80,7 @@ export default defineComponent({
 <style lang="scss">
 .legend-button {
   position: absolute;
-  bottom: 2vh;
+  bottom: 7vh;
   left: 1vw;
   padding: 0;
   line-height: normal;

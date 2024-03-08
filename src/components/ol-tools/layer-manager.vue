@@ -1,9 +1,28 @@
 <template>
   <a-popover trigger="click" placement="topRight" :arrowPointAtCenter="true">
     <template #content>
-      <div style="max-width: 70vw">
-        <a-divider style="border-color: black" orientation="left">
-          Layers
+      <div class="layer-image-container" style="max-width: 70vw">
+        <a-row align="middle" justify="space-around">
+          <a-col>
+            <p>Tỉ lệ</p>
+          </a-col>
+          <a-col :span="12">
+            <a-select
+              v-model:value="scaleValue"
+              min
+              :options="scaleOptions"
+              style="width: 100%"
+              @select="scaleChange"></a-select>
+          </a-col>
+        </a-row>
+        <a-divider style="border-color: black; font-size: 0.8rem" orientation="left">
+          <a-row style="width: 150px" justify="center" align="middle">
+            <a-col :span="6"> Layers </a-col>
+            <a-col :span="17" :offset="1">
+              <a-slider v-model:value="mainLayerOpacity" :tooltipOpen="false" @change="mainLayerOpacityChange" />
+            </a-col>
+          </a-row>
+
           <!-- <a-button @click="showLayersInfoModal" style="border: none; padding: 0; font-size: 0.8rem">
             <InfoCircleOutlined />
           </a-button> -->
@@ -31,6 +50,7 @@
               </div>
             </a-tooltip>
           </a-col>
+          <a-button @click="testClick">Tét</a-button>
         </a-row>
         <a-divider style="border-color: black" orientation="left"> Basemaps</a-divider>
         <a-row class="basemap-layer" :gutter="[0, 8]">
@@ -77,6 +97,7 @@ import { defineComponent, ref, reactive, toRefs, inject } from 'vue';
 import { mapState } from '../../stores/map-state';
 import * as VueLayer from '../../js/openlayers/VueLayer.js';
 import { InfoCircleOutlined } from '@ant-design/icons-vue';
+import { getPointResolution } from 'ol/proj.js';
 export default defineComponent({
   components: {
     InfoCircleOutlined,
@@ -156,6 +177,29 @@ export default defineComponent({
     // default basemap
     var layerManagerImage = ref(basemapLayerData[4].imagePath);
     const layersInfoOpen = ref(false);
+    const scaleValue = ref(10000);
+    const scaleOptions = ref([
+      {
+        value: 10000,
+        label: '1 : 10000',
+      },
+      {
+        value: 100000,
+        label: '1 : 100000',
+      },
+      {
+        value: 500000,
+        label: '1 : 500000',
+      },
+      {
+        value: 1000000,
+        label: '1 : 1000000',
+      },
+      {
+        value: 2000000,
+        label: '1 : 2000000',
+      },
+    ]);
     const test = ref(false);
 
     return {
@@ -163,6 +207,8 @@ export default defineComponent({
       layerManagerImage,
       mainLayerData,
       layersInfoOpen,
+      scaleOptions,
+      scaleValue,
       test,
     };
   },
@@ -178,6 +224,10 @@ export default defineComponent({
 
   data() {
     return {
+      // Các hằng số dựa trên source của openlayers ScaleLine.js
+      inchesPerMeter: 1000 / 25.4,
+      DEFAULT_DPI: 25.4 / 0.28,
+      mainLayerOpacity: 100,
       // signInState: true,
       // test: '123',
       // anhquyen: '321123',
@@ -190,10 +240,6 @@ export default defineComponent({
   },
 
   methods: {
-    test() {
-      // console.log('anhquyend');
-      // console.log(this.map);
-    },
     changeBaseMap(image, title) {
       this.layerManagerImage = image;
       // const baseLayerGroup = this.map.getLayers().getArray()[0];
@@ -225,6 +271,30 @@ export default defineComponent({
     layersInfoModalOk() {
       this.layersInfoOpen = false;
     },
+
+    scaleChange() {
+      const pointResolution = getPointResolution(
+        this.map.getView().getProjection(),
+        this.map.getView().getResolution(),
+        this.map.getView().getCenter(),
+        'm',
+      );
+      const resolutionFactor = pointResolution / this.map.getView().getResolution();
+      const resolution = this.scaleValue / this.inchesPerMeter / this.DEFAULT_DPI / resolutionFactor;
+      this.map.getView().animate({
+        center: this.map.getView().getCenter(),
+        resolution: resolution,
+        duration: 500,
+      });
+    },
+
+    mainLayerOpacityChange() {
+      VueLayer.getLayerByTitle(this.map, 'Main layers').setOpacity(this.mainLayerOpacity / 100);
+    },
+
+    testClick() {
+      VueLayer.getLayerByTitle(this.map, 'Main layers').setOpacity(0.5);
+    },
   },
 });
 </script>
@@ -243,6 +313,13 @@ export default defineComponent({
       // left: -1px;
       border: 3px solid #4eee60;
     }
+  }
+}
+
+.layer-image-container {
+  font-size: 0.8rem;
+  & * {
+    font-size: inherit;
   }
 }
 </style>
