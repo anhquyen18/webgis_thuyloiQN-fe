@@ -3,11 +3,12 @@
     <p class="text-white">Công cụ:</p>
     <PanToHome></PanToHome>
     <ZoomTool></ZoomTool>
-    <a-button class="white-border-ant-button" type="primary" size="small" @click="test">
+    <!-- <a-button class="white-border-ant-button" type="primary" size="small" @click="test">
       <i class="fa-solid fa-hand"></i>
-    </a-button>
+    </a-button> -->
     <MeasureTool></MeasureTool>
     <FeatureInfoPopup></FeatureInfoPopup>
+    <MapPrinter></MapPrinter>
     <!-- <a-button class="white-border-ant-button" type="primary" size="small">
       <i class="fa-solid fa-pencil"></i>
     </a-button> -->
@@ -20,6 +21,7 @@ import PanToHome from './pan-to-home.vue';
 import ZoomTool from './zoom-tool.vue';
 import MeasureTool from './measure-tool.vue';
 import FeatureInfoPopup from './feature-info-popup.vue';
+import MapPrinter from './map-printer.vue';
 
 export default defineComponent({
   components: {
@@ -27,6 +29,7 @@ export default defineComponent({
     ZoomTool,
     MeasureTool,
     FeatureInfoPopup,
+    MapPrinter,
   },
   setup() {
     return {};

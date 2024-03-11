@@ -50,7 +50,6 @@
               </div>
             </a-tooltip>
           </a-col>
-          <a-button @click="testClick">Tét</a-button>
         </a-row>
         <a-divider style="border-color: black" orientation="left"> Basemaps</a-divider>
         <a-row class="basemap-layer" :gutter="[0, 8]">
@@ -281,6 +280,11 @@ export default defineComponent({
       );
       const resolutionFactor = pointResolution / this.map.getView().getResolution();
       const resolution = this.scaleValue / this.inchesPerMeter / this.DEFAULT_DPI / resolutionFactor;
+      console.log(resolution);
+      console.log(
+        this.scaleValue /
+          getPointResolution(this.map.getView().getProjection(), 72 / 25.4, this.map.getView().getCenter(), 'm'),
+      );
       this.map.getView().animate({
         center: this.map.getView().getCenter(),
         resolution: resolution,

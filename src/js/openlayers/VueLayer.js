@@ -53,4 +53,15 @@ function getAllLayerTitle(map, layerGroupIndex) {
   return titleArray;
 }
 
-export { getLayerByTitle, getAllLayerTitle };
+function getControlByTitle(map, title) {
+  const controls = map.getControls();
+  let control;
+  controls.forEach((element) => {
+    if (element.get('title') == title) {
+      control = element;
+    }
+  });
+  return control;
+}
+
+export { getLayerByTitle, getAllLayerTitle, getControlByTitle };

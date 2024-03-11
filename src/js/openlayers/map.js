@@ -9,17 +9,29 @@ import {
   TileJSON as TileJSONSource,
 } from 'ol/source.js';
 import { Vector as VectorLayer, Tile as TileLayer, Group as LayerGroup, Image as ImageLayer } from 'ol/layer.js';
-import { Style, Icon, Stroke, Circle, Fill, Text } from 'ol/style.js';
+import { Style, Icon, Stroke, Circle, Fill, Text, RegularShape, Image } from 'ol/style.js';
 import { GeoJSON } from 'ol/format.js';
 import { ZoomSlider, ScaleLine, defaults as defaultControls } from 'ol/control.js';
+import Overlay from 'ol/Overlay.js';
 
 import ol_interaction_Hover from 'ol-ext/interaction/Hover.js';
 import Scale from 'ol-ext/control/Scale.js';
+import ol_control_Legend from 'ol-ext/control/Legend.js';
+import ol_legend_Legend from 'ol-ext/legend/Legend.js';
+import ol_control_CanvasAttribution from 'ol-ext/control/CanvasAttribution.js';
+import ol_control_CanvasTitle from 'ol-ext/control/CanvasTitle.js';
+import ol_control_PrintDialog from 'ol-ext/control/PrintDialog.js';
+import ol_control_CanvasScaleLine from 'ol-ext/control/CanvasScaleLine.js';
+import { get } from 'ol/proj.js';
+
+import jsPDF from 'jspdf';
+import { saveAs } from 'file-saver';
+
 const runMap = () => {
   // var map;
   // const GEOSERVER_DOMAIN = 'http://aqtran.name.vn:8080';
-  // const GEOSERVER_DOMAIN = 'https://geo.tamky.click';
-  const GEOSERVER_DOMAIN = 'http://localhost:8080';
+  const GEOSERVER_DOMAIN = 'https://geo.tamky.click';
+  // const GEOSERVER_DOMAIN = 'http://localhost:8080';
   const GEOSERVER_WORKSPACE = 'webgis_dev';
   const map = new Map({
     target: 'map',
@@ -214,40 +226,176 @@ const runMap = () => {
   // ---------------------------------
   // ----------Layer legend--------------------------------------------------------------------------------------------------------
   // ---------------------------------
-  // var legend = new ol_control_Legend({
-  //   title: 'Legend',
-  //   margin: 5,
-  //   maxWidth: 300,
-  // });
-  // var legendCtrl = new ol_control_Legend({
-  //   legend: legend,
-  //   // collapsed: false,
-  // });
-  // map.addControl(legendCtrl);
+  // map.addControl(new ol_control_CanvasAttribution({ canvas: true }));
+  // map.addControl(
+  //   new ol_control_CanvasTitle({
+  //     title: 'my title',
+  //     visible: false,
+  //     style: new Style({
+  //       text: new Text({ font: '20px "Lucida Grande",Verdana,Geneva,Lucida,Arial,Helvetica,sans-serif' }),
+  //     }),
+  //   }),
+  // );
+
+  var legend = new ol_legend_Legend({
+    title: 'Chú thích',
+    margin: 5,
+    maxWidth: 300,
+    items: [
+      {
+        title: 'Hồ chứa',
+        typeGeom: 'Point',
+        style: new Style({
+          image: new Icon({
+            anchor: [0.5, 15],
+            anchorXUnits: 'fraction',
+            anchorYUnits: 'pixels',
+            src: '/src/assets/legend-image/ho-chua.png',
+            scale: 0.5,
+          }),
+        }),
+      },
+      {
+        title: 'Đập',
+        typeGeom: 'Point',
+        style: new Style({
+          image: new Circle({
+            radius: 5,
+            fill: new Fill({
+              color: '#ffa500',
+            }),
+            stroke: new Stroke({
+              color: 'white',
+              width: 1,
+            }),
+          }),
+        }),
+      },
+      {
+        title: 'Kênh',
+        typeGeom: 'LineString',
+        style: new Style({
+          stroke: new Stroke({
+            color: '#00ab5b',
+            // lineDash: [10, 10],
+            width: 2,
+          }),
+        }),
+      },
+    ],
+  });
+
+  var legendCtrl = new ol_control_Legend({
+    target: document.getElementById('none'),
+    legend: legend,
+    // collapsed: false,
+  });
+  // legend.addItem({});
+  // legend.addItem({ t, height: 8 });
+  // legend.addItem({ properties: { pop: 1000000 }, typeGeom: 'Point', height: 8 });
+  // legend.addItem({ title: '100.000', properties: { pop: 100000 }, typeGeom: 'Point', height: 8 });
+  // legendCtrl.hide();
+  map.addControl(legendCtrl);
 
   // ---------------------------------
   // ----------Scale Control--------------------------------------------------------------------------------------------------------
   // ---------------------------------
+  map.addControl(new ol_control_CanvasScaleLine());
   // const scaleControl = new ScaleLine({
   //   title: 'map scale',
-  //   // className: 'ol-scale-line',
+  //   className: 'ol-scale-line',
   //   units: 'metric',
-  //   bar: true,
+  //   bar: false,
   //   steps: parseInt(0.1, 10),
   //   text: true,
   //   minWidth: 100,
   // });
+  // map.addControl(scaleControl);
 
-  const scaleControl = new ScaleLine({
-    title: 'map scale',
-    // className: 'ol-scale-line',
-    units: 'metric',
-    bar: false,
-    steps: parseInt(0.1, 10),
-    text: true,
-    minWidth: 100,
+  // ---------------------------------
+  // ----------Print Control--------------------------------------------------------------------------------------------------------
+  // ---------------------------------
+  ol_control_PrintDialog.addLang('vn', {
+    title: 'Print',
+    orientation: 'Orientation',
+    portrait: 'Portrait',
+    landscape: 'Landscape',
+    size: 'Page size',
+    custom: 'screen size',
+    margin: 'Margin',
+    scale: 'Tỷ lệ',
+    legend: 'Chú thích',
+    north: 'La bàn',
+    mapTitle: 'Map title',
+    saveas: 'Lưu bản đồ...',
+    saveLegend: 'Lưu chú thích...',
+    copied: '✔ Copied to clipboard',
+    errorMsg: "Can't save map canvas...",
+    printBt: 'Print...',
+    clipboardFormat: 'copy to clipboard...',
+    jpegFormat: 'save as jpeg',
+    pngFormat: 'save as png',
+    pdfFormat: 'save as pdf',
+    none: 'none',
+    small: 'small',
+    large: 'large',
+    cancel: 'Huỷ',
   });
-  map.addControl(scaleControl);
+  map.addControl(
+    new ol_control_CanvasTitle({
+      title: 'Map title',
+      visible: false,
+      style: new Style({
+        text: new Text({ font: '20px "Lucida Grande",Verdana,Geneva,Lucida,Arial,Helvetica,sans-serif' }),
+      }),
+    }),
+  );
+  var printControl = new ol_control_PrintDialog({
+    target: document.getElementById('none'),
+    lang: 'vn',
+    // targetDialog: map.getTargetElement()
+    // save: false,
+    // copy: false,
+    // pdf: false,
+  });
+  printControl.set('title', 'Print control');
+  printControl.setSize('A4');
+  /* On print > save image file */
+  printControl.on(['print', 'error'], function (e) {
+    // Print success
+    if (e.image) {
+      if (e.pdf) {
+        // Export pdf using the print info
+        var pdf = new jsPDF({
+          orientation: e.print.orientation,
+          unit: e.print.unit,
+          format: e.print.size,
+        });
+        pdf.addImage(
+          e.image,
+          'JPEG',
+          e.print.position[0],
+          e.print.position[0],
+          e.print.imageWidth,
+          e.print.imageHeight,
+        );
+        pdf.save(e.print.legend ? 'legend.pdf' : 'map.pdf');
+      } else {
+        // Save image as file
+        e.canvas.toBlob(
+          function (blob) {
+            var name = (e.print.legend ? 'legend.' : 'map.') + e.imageType.replace('image/', '');
+            saveAs(blob, name);
+          },
+          e.imageType,
+          e.quality,
+        );
+      }
+    } else {
+      console.warn('No canvas to export');
+    }
+  });
+  map.addControl(printControl);
 
   return map;
 };

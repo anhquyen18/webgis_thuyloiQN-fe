@@ -17,10 +17,10 @@
         <p class="fw-bold">Chú thích</p>
         <a-row :gutter="[4, 0]" justify="center" align="middle">
           <a-col :span="12">
-            <p class="small-p">Hồ chứa</p>
+            <img src="../../assets/legend-image/ho-chua.png" width="50" height="30" />
           </a-col>
           <a-col :span="12">
-            <img src="../../assets/legend-image/ho-chua.png" width="50" height="30" />
+            <p class="small-p">Hồ chứa</p>
           </a-col>
         </a-row>
       </div>
@@ -80,8 +80,8 @@ export default defineComponent({
 <style lang="scss">
 .legend-button {
   position: absolute;
-  bottom: 7vh;
-  left: 1vw;
+  bottom: 2vh;
+  left: 0.5vw;
   padding: 0;
   line-height: normal;
   height: auto;
