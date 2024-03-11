@@ -141,6 +141,7 @@
       </a-layout-footer> -->
 
       <Login></Login>
+      <div class="none" id="none" style="display: none"></div>
     </a-layout>
   </a-spin>
 </template>
@@ -291,6 +292,10 @@ export default defineComponent({
     const mapStore = mapState();
     const { getMap, setMap } = mapStore;
     setMap(runMap());
+
+    document.getElementsByClassName('ol-closebox')[1].addEventListener('click', function () {
+      // console.log('anhquyendeptraivcl');
+    });
   },
 });
 </script>
@@ -317,7 +322,7 @@ export default defineComponent({
 
 .bottom-right-nav {
   position: absolute;
-  bottom: 2vh;
+  bottom: 4vh;
   right: 1vw;
   display: flex;
   flex-direction: column;

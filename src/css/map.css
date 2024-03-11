@@ -51,3 +51,14 @@
 .ol-zoom-out.ol-has-tooltip:focus [role=tooltip] {
     top: 232px;
 }
+
+/* .ol-scale-line {
+    left: 10% !important;
+    position: absolute;
+} */
+
+.ol-scale-line {
+    right: 1vw;
+    left: auto !important;
+    bottom: 2em;
+}
