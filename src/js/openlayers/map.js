@@ -250,7 +250,7 @@ const runMap = () => {
             anchor: [0.5, 15],
             anchorXUnits: 'fraction',
             anchorYUnits: 'pixels',
-            src: '/src/assets/legend-image/ho-chua.png',
+            src: new URL('/src/assets/layer-image/googlemap.jpg', import.meta.url),
             scale: 0.5,
           }),
         }),
