@@ -80,7 +80,7 @@ export default defineComponent({
 <style lang="scss">
 .legend-button {
   position: absolute;
-  bottom: 2vh;
+  bottom: 1vh;
   left: 0.5vw;
   padding: 0;
   line-height: normal;
