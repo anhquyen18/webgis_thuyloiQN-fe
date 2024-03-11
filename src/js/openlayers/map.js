@@ -27,6 +27,8 @@ import { get } from 'ol/proj.js';
 import jsPDF from 'jspdf';
 import { saveAs } from 'file-saver';
 
+import hoChuaLegendImage from '@/assets/legend-image/ho-chua.png';
+
 const runMap = () => {
   // var map;
   // const GEOSERVER_DOMAIN = 'http://aqtran.name.vn:8080';
@@ -250,7 +252,9 @@ const runMap = () => {
             anchor: [0.5, 15],
             anchorXUnits: 'fraction',
             anchorYUnits: 'pixels',
-            src: '/src/assets/legend-image/ho-chua.png',
+            // src: new URL('/src/assets/legend-image/ho-chua.png', import.meta.url),
+            src: hoChuaLegendImage,
+
             scale: 0.5,
           }),
         }),
@@ -326,7 +330,7 @@ const runMap = () => {
     scale: 'Tỷ lệ',
     legend: 'Chú thích',
     north: 'La bàn',
-    mapTitle: 'Map title',
+    mapTitle: 'Tiêu đề bản đồ',
     saveas: 'Lưu bản đồ...',
     saveLegend: 'Lưu chú thích...',
     copied: '✔ Copied to clipboard',
@@ -343,7 +347,7 @@ const runMap = () => {
   });
   map.addControl(
     new ol_control_CanvasTitle({
-      title: 'Map title',
+      title: 'Quảng Nam',
       visible: false,
       style: new Style({
         text: new Text({ font: '20px "Lucida Grande",Verdana,Geneva,Lucida,Arial,Helvetica,sans-serif' }),
