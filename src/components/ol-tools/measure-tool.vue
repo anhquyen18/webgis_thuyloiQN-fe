@@ -4,7 +4,7 @@
       <template #title>
         <p>Đo đạc</p>
       </template>
-      <a-button class="white-border-ant-button" type="primary" size="small" @click="startMeasure">
+      <a-button class="white-border-ant-button" type="primary" :size="buttonSize" @click="startMeasure">
         <i class="fa-solid fa-draw-polygon"></i>
       </a-button>
     </a-tooltip>
@@ -53,7 +53,7 @@
 </template>
 
 <script>
-import { defineComponent, ref } from 'vue';
+import { defineComponent, inject, ref } from 'vue';
 import { mapState } from '../../stores/map-state.js';
 import { Vector as VectorSource } from 'ol/source.js';
 import { Circle, Fill, Stroke, Style, RegularShape, Text } from 'ol/style.js';
@@ -67,9 +67,11 @@ export default defineComponent({
   component: {},
   setup() {
     const modalOpen = ref(false);
+    const buttonSize = inject('buttonSize');
 
     return {
       modalOpen,
+      buttonSize,
     };
   },
   data() {

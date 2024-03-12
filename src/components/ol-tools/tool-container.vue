@@ -9,6 +9,7 @@
     <MeasureTool></MeasureTool>
     <FeatureInfoPopup></FeatureInfoPopup>
     <MapPrinter></MapPrinter>
+    <GeolocationTool></GeolocationTool>
     <!-- <a-button class="white-border-ant-button" type="primary" size="small">
       <i class="fa-solid fa-pencil"></i>
     </a-button> -->
@@ -16,12 +17,13 @@
 </template>
 
 <script>
-import { defineComponent } from 'vue';
+import { defineComponent, provide, ref, inject } from 'vue';
 import PanToHome from './pan-to-home.vue';
 import ZoomTool from './zoom-tool.vue';
 import MeasureTool from './measure-tool.vue';
 import FeatureInfoPopup from './feature-info-popup.vue';
 import MapPrinter from './map-printer.vue';
+import GeolocationTool from './geolocation-tool.vue';
 
 export default defineComponent({
   components: {
@@ -30,9 +32,14 @@ export default defineComponent({
     MeasureTool,
     FeatureInfoPopup,
     MapPrinter,
+    GeolocationTool,
   },
   setup() {
-    return {};
+    const buttonSize = inject('buttonSize');
+
+    return {
+      buttonSize,
+    };
   },
   data() {
     return {};
@@ -45,8 +52,15 @@ export default defineComponent({
     },
   },
   mounted() {
-    // console.log(document.getElementById('map-container'));
-    // console.log(this.$refs.mapContainerElement);
+    // console.log(window.innerWidth);
+    // if (window.innerWidth > 1600) this.buttonSize = 'medium';
+    // // console.log(window.screen.width);
+    // window.addEventListener('resize', function (event) {
+    //   if (window.innerWidth > 1600) {
+    //     console.log(this.buttonSize);
+    //     this.buttonSize = 'medium';
+    //   } else this.buttonSize = 'small';
+    // });
   },
 });
 </script>

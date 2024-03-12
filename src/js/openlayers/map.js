@@ -22,6 +22,7 @@ import ol_control_CanvasAttribution from 'ol-ext/control/CanvasAttribution.js';
 import ol_control_CanvasTitle from 'ol-ext/control/CanvasTitle.js';
 import ol_control_PrintDialog from 'ol-ext/control/PrintDialog.js';
 import ol_control_CanvasScaleLine from 'ol-ext/control/CanvasScaleLine.js';
+import ol_control_GeolocationButton from 'ol-ext/control/GeolocationButton.js';
 import { get } from 'ol/proj.js';
 
 import jsPDF from 'jspdf';
@@ -400,6 +401,48 @@ const runMap = () => {
     }
   });
   map.addControl(printControl);
+
+  // ---------------------------------
+  // ----------Geolocation control--------------------------------------------------------------------------------------------------------
+  // ---------------------------------
+  // var geoloc = new ol_control_GeolocationButton({
+  //   // title: 'Where am I?',
+  //   delay: 3000, // 2s
+  // });
+  // geoloc.set('title', 'Geolocation control');
+  // geoloc.setVisible(false);
+  // map.addControl(geoloc);
+  const geolocationStyle = {
+    Point: new Style({
+      image: new Circle({
+        radius: 6,
+        fill: new Fill({
+          color: '#00b4d8',
+        }),
+        stroke: new Stroke({
+          color: 'white',
+          width: 2,
+        }),
+      }),
+    }),
+    Circle: new Style({
+      stroke: new Stroke({
+        color: '#6ec531',
+        width: 1,
+      }),
+      fill: new Fill({
+        color: 'rgba(255,255,255, 0.5)',
+      }),
+    }),
+  };
+  const geolocationLayer = new VectorLayer({
+    title: 'Geolocation layer',
+    source: new VectorSource(),
+    style: (feature) => {
+      return geolocationStyle[feature.getGeometry().getType()];
+    },
+  });
+  map.addLayer(geolocationLayer);
 
   return map;
 };

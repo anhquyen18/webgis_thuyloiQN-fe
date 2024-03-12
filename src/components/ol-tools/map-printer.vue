@@ -3,7 +3,7 @@
     <template #title>
       <p>In bản đồ</p>
     </template>
-    <a-button id="print-button" class="white-border-ant-button" type="primary" size="small" @click="openPrintModal">
+    <a-button class="white-border-ant-button" type="primary" :size="buttonSize" @click="openPrintModal">
       <i class="fa-solid fa-print"></i>
     </a-button>
     <a-modal v-model:open="printOpen" :footer="null" style="width: 98vw; top: 2vh">
@@ -22,13 +22,17 @@
 </template>
 
 <script>
-import { defineComponent } from 'vue';
+import { defineComponent, inject, ref } from 'vue';
 import { mapState } from '../../stores/map-state';
 import * as VueLayer from '@/js/openlayers/VueLayer.js';
 
 export default defineComponent({
   setup() {
-    return {};
+    const buttonSize = inject('buttonSize');
+    // buttonSize.value = 'large';
+    return {
+      buttonSize,
+    };
   },
 
   data() {
