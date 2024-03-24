@@ -10,6 +10,7 @@
     <FeatureInfoPopup></FeatureInfoPopup>
     <MapPrinter></MapPrinter>
     <GeolocationTool></GeolocationTool>
+    <FeatureModifyTool></FeatureModifyTool>
     <!-- <a-button class="white-border-ant-button" type="primary" size="small">
       <i class="fa-solid fa-pencil"></i>
     </a-button> -->
@@ -24,6 +25,7 @@ import MeasureTool from './measure-tool.vue';
 import FeatureInfoPopup from './feature-info-popup.vue';
 import MapPrinter from './map-printer.vue';
 import GeolocationTool from './geolocation-tool.vue';
+import FeatureModifyTool from './feature-modify-tool.vue';
 
 export default defineComponent({
   components: {
@@ -33,6 +35,7 @@ export default defineComponent({
     FeatureInfoPopup,
     MapPrinter,
     GeolocationTool,
+    FeatureModifyTool,
   },
   setup() {
     const buttonSize = inject('buttonSize');

@@ -1,10 +1,15 @@
 <template>
   <div>
-    <a-tooltip overlayClassName="tool-container-tooltip">
+    <a-tooltip overlayClassName="tool-container-tooltip" :mouseEnterDelay="1">
       <template #title>
         <p>Đo đạc</p>
       </template>
-      <a-button class="white-border-ant-button" type="primary" :size="buttonSize" @click="startMeasure">
+      <a-button
+        class="white-border-ant-button"
+        :type="buttonType"
+        :ghost="buttonStatus"
+        :size="buttonSize"
+        @click="startMeasure">
         <i class="fa-solid fa-draw-polygon"></i>
       </a-button>
     </a-tooltip>
@@ -214,8 +219,10 @@ export default defineComponent({
           label: 'Tạm dừng',
         },
       ],
-      measureStatus: true,
+      measureStatus: false,
       measureControlPanelDisplay: 'none',
+      buttonType: 'primary',
+      buttonStatus: false,
     };
   },
   computed: {
@@ -347,8 +354,11 @@ export default defineComponent({
       this.measureSource.clear();
       this.map.removeInteraction(this.drawMeasure);
       this.map.removeInteraction(this.measureModify);
-
       this.drawMeasure = null;
+      this.measureStatus = false;
+
+      this.buttonType = 'primary';
+      this.buttonStatus = false;
       // console.log(this.map.getInteractions());
       // this.measureModify.setActive(false);
     },
@@ -359,6 +369,10 @@ export default defineComponent({
       if (!this.drawMeasure) {
         // console.log(this.map.getInteractions());
         this.measureControlPanelDisplay = 'block';
+
+        this.buttonType = 'default';
+        this.buttonStatus = true;
+
         this.measureStatus = true;
         VueLayer.getLayerByTitle(this.map, 'Measure layer').setSource(this.measureSource);
         VueLayer.getLayerByTitle(this.map, 'Measure layer').setStyle(this.getMeasureStyle);

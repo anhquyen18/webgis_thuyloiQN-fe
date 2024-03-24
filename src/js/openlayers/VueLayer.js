@@ -64,4 +64,15 @@ function getControlByTitle(map, title) {
   return control;
 }
 
-export { getLayerByTitle, getAllLayerTitle, getControlByTitle };
+function getInteractionByTitle(map, title) {
+  const interactions = map.getInteractions();
+  let interaction;
+  interactions.forEach((element) => {
+    if (element.get('title') == title) {
+      interaction = element;
+    }
+  });
+  return interaction;
+}
+
+export { getLayerByTitle, getAllLayerTitle, getControlByTitle, getInteractionByTitle };

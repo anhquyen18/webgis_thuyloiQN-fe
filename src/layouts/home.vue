@@ -67,7 +67,7 @@
                 </a-row>
               </a-col>
 
-              <a-col :span="5" class="h-100">
+              <a-col :span="6" class="h-100">
                 <ToolContainer></ToolContainer>
               </a-col>
 

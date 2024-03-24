@@ -1,5 +1,5 @@
 <template>
-  <a-tooltip overlayClassName="tool-container-tooltip">
+  <a-tooltip overlayClassName="tool-container-tooltip" :mouseEnterDelay="1">
     <template #title>
       <p>Phóng to</p>
     </template>
@@ -7,7 +7,7 @@
       <i class="fa-solid fa-magnifying-glass-plus"></i>
     </a-button>
   </a-tooltip>
-  <a-tooltip overlayClassName="tool-container-tooltip">
+  <a-tooltip overlayClassName="tool-container-tooltip" :mouseEnterDelay="1">
     <template #title>
       <p>Thu nhỏ</p>
     </template>

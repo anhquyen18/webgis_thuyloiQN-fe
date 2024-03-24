@@ -1,5 +1,5 @@
 <template>
-  <a-tooltip overlayClassName="tool-container-tooltip">
+  <a-tooltip overlayClassName="tool-container-tooltip" :mouseEnterDelay="1">
     <template #title>
       <p>In bản đồ</p>
     </template>

@@ -1,10 +1,15 @@
 <template>
   <div>
-    <a-tooltip overlayClassName="tool-container-tooltip">
+    <a-tooltip overlayClassName="tool-container-tooltip" :mouseEnterDelay="1">
       <template #title>
         <p>Bật/tắt click popup</p>
       </template>
-      <a-button class="white-border-ant-button" :type="buttonType" :size="buttonSize" @click="statusSwitch" :ghost="status">
+      <a-button
+        class="white-border-ant-button"
+        :type="buttonType"
+        :size="buttonSize"
+        @click="statusSwitch"
+        :ghost="status">
         <i class="fa-solid fa-window-restore"></i>
       </a-button>
     </a-tooltip>
@@ -667,7 +672,7 @@ export default defineComponent({
       featurePropShow,
       userProfile,
       cancelUpdateFeatureInfo,
-      buttonSize
+      buttonSize,
     };
   },
 

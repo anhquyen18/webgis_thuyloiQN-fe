@@ -13,6 +13,9 @@ import { Style, Icon, Stroke, Circle, Fill, Text, RegularShape, Image } from 'ol
 import { GeoJSON } from 'ol/format.js';
 import { ZoomSlider, ScaleLine, defaults as defaultControls } from 'ol/control.js';
 import Overlay from 'ol/Overlay.js';
+import { Draw, Modify, Snap, Select } from 'ol/interaction.js';
+import { doubleClick as doubleClickMapEvent } from 'ol/events/condition.js';
+import { MultiPoint } from 'ol/geom.js';
 
 import ol_interaction_Hover from 'ol-ext/interaction/Hover.js';
 import Scale from 'ol-ext/control/Scale.js';
@@ -23,6 +26,11 @@ import ol_control_CanvasTitle from 'ol-ext/control/CanvasTitle.js';
 import ol_control_PrintDialog from 'ol-ext/control/PrintDialog.js';
 import ol_control_CanvasScaleLine from 'ol-ext/control/CanvasScaleLine.js';
 import ol_control_GeolocationButton from 'ol-ext/control/GeolocationButton.js';
+import ol_interaction_ModifyTouch from 'ol-ext/interaction/ModifyTouch.js';
+import ol_control_Bar from 'ol-ext/control/Bar.js';
+import ol_control_Toggle from 'ol-ext/control/Toggle.js';
+import ol_control_TextButton from 'ol-ext/control/TextButton.js';
+
 import { get } from 'ol/proj.js';
 
 import jsPDF from 'jspdf';
@@ -33,8 +41,8 @@ import hoChuaLegendImage from '@/assets/legend-image/ho-chua.png';
 const runMap = () => {
   // var map;
   // const GEOSERVER_DOMAIN = 'http://aqtran.name.vn:8080';
-  const GEOSERVER_DOMAIN = 'https://geo.tamky.click';
-  // const GEOSERVER_DOMAIN = 'http://localhost:8080';
+  // const GEOSERVER_DOMAIN = 'https://geo.tamky.click';
+  const GEOSERVER_DOMAIN = 'http://localhost:8080';
   const GEOSERVER_WORKSPACE = 'webgis_dev';
   const map = new Map({
     target: 'map',
@@ -443,6 +451,123 @@ const runMap = () => {
     },
   });
   map.addLayer(geolocationLayer);
+
+  // ---------------------------------
+  // ----------Edit feature control--------------------------------------------------------------------------------------------------------
+  // ---------------------------------
+
+  const vertexPolygonStyle = new Style({
+    image: new Circle({
+      radius: 3,
+      fill: new Fill({
+        color: '#f5425a',
+      }),
+    }),
+    geometry: function (feature) {
+      const coordinates = feature.getGeometry().getCoordinates()[0];
+      let totalPoint = [];
+      for (var i = 0; i < coordinates.length; i++) {
+        totalPoint = [...totalPoint, ...coordinates[i]];
+      }
+      return new MultiPoint(totalPoint);
+    },
+  });
+
+  const vertexLineStyle = new Style({
+    image: new Circle({
+      radius: 3,
+      fill: new Fill({
+        color: '#f5425a',
+      }),
+    }),
+    geometry: function (feature) {
+      const coordinates = feature.getGeometry().getCoordinates()[0];
+      return new MultiPoint(coordinates);
+    },
+  });
+
+  let modifyLabelStyles = {
+    MultiLineString: [
+      new Style({
+        stroke: new Stroke({
+          color: 'blue',
+          width: 2,
+        }),
+      }),
+      vertexLineStyle,
+    ],
+    LineString: [
+      new Style({
+        stroke: new Stroke({
+          color: 'blue',
+          width: 2,
+        }),
+      }),
+      vertexLineStyle,
+    ],
+    Point: new Style({
+      image: new Circle({
+        radius: 10,
+        fill: new Fill({
+          color: 'pink',
+        }),
+        stroke: new Stroke({
+          color: 'white',
+          width: 1,
+        }),
+      }),
+    }),
+    MultiPolygon: [
+      new Style({
+        stroke: new Stroke({
+          color: 'blue',
+          width: 3,
+        }),
+        fill: new Fill({
+          color: 'rgba(0, 0, 255, 0.1)',
+        }),
+      }),
+      vertexPolygonStyle,
+    ],
+    Polygon: [
+      new Style({
+        stroke: new Stroke({
+          color: 'blue',
+          width: 3,
+        }),
+        fill: new Fill({
+          color: 'rgba(0, 0, 255, 0.1)',
+        }),
+      }),
+      vertexPolygonStyle,
+    ],
+    Circle: new Style({
+      stroke: new Stroke({
+        color: 'cyan',
+        width: 1,
+      }),
+      fill: new Fill({
+        color: 'rgba(243, 138, 138, 0.5)',
+      }),
+    }),
+  };
+  var modifyStyleFunction = function (feature) {
+    return modifyLabelStyles[feature.getGeometry().getType()];
+  };
+
+  const featureModifySelect = new Select({
+    wrapX: false,
+    style: modifyStyleFunction,
+    hitTolerance: 5,
+  });
+  featureModifySelect.set('title', 'Feature modify select');
+  featureModifySelect.setActive(false);
+  var featureModify = new ol_interaction_ModifyTouch({
+    wrapX: false,
+    features: featureModifySelect.getFeatures(),
+  });
+  featureModify.set('title', 'Feature modify');
+  // map.addInteraction(featureModifySelect);
 
   return map;
 };
