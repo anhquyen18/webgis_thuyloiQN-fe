@@ -756,7 +756,7 @@ export default defineComponent({
             }
           }
           // console.log(that.featureCollections.modify);
-          that.featureCollections.modify.push({ layer: featureLayer, gid: featureGid, geom: geom });
+          that.featureCollections.modify.push({ layer: featureLayer, gid: featureGid, geom: geom, properties: null });
           // console.log(that.featureModifySelect.getFeatures());
         } else if (feature && !feature.getId()) {
           const featureGid = feature.get('tempId');
@@ -1032,7 +1032,7 @@ export default defineComponent({
         // Properties ở đây chỉ gửi thử data mẫu
         // Khi dữ liệu các layer được rõ ràng hơn thì chỉnh sửa sau
         // Dữ liệu đối tượng đã được tạo thì lấy từ database
-        // Dữ liệu đối tượng mới sẽ được lấy từ featureCollections.modify[i].properties
+        // Dữ liệu đối tượng mới sẽ được lấy từ featureCollections.new[i].properties
         const properties = this.selectedFeature.getProperties();
 
         for (let i = 0; i < this.featureCollections.modify.length; i++) {
