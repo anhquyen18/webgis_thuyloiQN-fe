@@ -18,20 +18,12 @@ import { doubleClick as doubleClickMapEvent } from 'ol/events/condition.js';
 import { MultiPoint } from 'ol/geom.js';
 
 import ol_interaction_Hover from 'ol-ext/interaction/Hover.js';
-import Scale from 'ol-ext/control/Scale.js';
 import ol_control_Legend from 'ol-ext/control/Legend.js';
 import ol_legend_Legend from 'ol-ext/legend/Legend.js';
-import ol_control_CanvasAttribution from 'ol-ext/control/CanvasAttribution.js';
 import ol_control_CanvasTitle from 'ol-ext/control/CanvasTitle.js';
 import ol_control_PrintDialog from 'ol-ext/control/PrintDialog.js';
 import ol_control_CanvasScaleLine from 'ol-ext/control/CanvasScaleLine.js';
-import ol_control_GeolocationButton from 'ol-ext/control/GeolocationButton.js';
 import ol_interaction_ModifyTouch from 'ol-ext/interaction/ModifyTouch.js';
-import ol_control_Bar from 'ol-ext/control/Bar.js';
-import ol_control_Toggle from 'ol-ext/control/Toggle.js';
-import ol_control_TextButton from 'ol-ext/control/TextButton.js';
-
-import { get } from 'ol/proj.js';
 
 import jsPDF from 'jspdf';
 import { saveAs } from 'file-saver';
@@ -149,6 +141,7 @@ const runMap = () => {
     layers: [
       new VectorLayer({
         title: 'Hồ chứa layer',
+        dbName: 'ho_chua_quang_nam_epsg5899',
         preview: '/src/assets/luffy-chilling-gear5-round.png',
         // preview: 'F:/Programming project/Personal/web-gis-dev/front-end/src/assets/luffy-chilling-gear5-round.png',
         source: new VectorSource({
@@ -172,6 +165,7 @@ const runMap = () => {
 
       new VectorLayer({
         title: 'Kênh layer',
+        dbName: 'kenh',
         source: new VectorSource({
           // url: 'http://localhost:8080/geoserver/webgis_dev/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=webgis_dev%3Akenh&outputFormat=application%2Fjson',
           // url:
@@ -193,6 +187,7 @@ const runMap = () => {
 
       new VectorLayer({
         title: 'Cửa xả layer',
+        dbName: 'cuaxa',
         source: new VectorSource({
           // url: 'http://localhost:8080/geoserver/webgis_dev/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=webgis_dev%3Acua_xa&outputFormat=application%2Fjson',
           // url: 'http://localhost:8080/geoserver/webgis_dev/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=webgis_dev%3Acua_xa_postgresql&outputFormat=application%2Fjson',

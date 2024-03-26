@@ -26,9 +26,10 @@
           <a class="close-button" @click="stopModify"><i class="fa-solid fa-xmark"></i></a>
         </template>
         <a-select
+          v-model="layerOptions"
+          :options="layerOptions"
           v-model:value="layerSelected"
           style="width: 100%"
-          :options="layerOptions"
           @change="layerChange"
           size="small"
           :dropdownMatchSelectWidth="false"></a-select>
@@ -48,7 +49,9 @@
               <template #title>
                 <p>Thêm đối tượng</p>
               </template>
-              <a-button type="primary" size="small" ghost><i class="fa-solid fa-plus"></i></a-button>
+              <a-button type="primary" size="small" :ghost="!newFeatureDrawStatus" @click="toggleNewFeatureDraw">
+                <i class="fa-solid fa-plus"></i>
+              </a-button>
             </a-tooltip>
           </a-col>
           <a-col>
@@ -66,7 +69,7 @@
               <template #title>
                 <p>Chọn đối tượng</p>
               </template>
-              <a-button type="primary" size="small" ghost @click="testClick2">
+              <a-button type="primary" size="small" :ghost="!selectStatus" @click="toggleSelect">
                 <i class="fa-solid fa-hand-pointer"></i>
               </a-button>
             </a-tooltip>
@@ -76,21 +79,39 @@
           <a-col>
             <a-tooltip overlayClassName="tool-container-tooltip" :mouseEnterDelay="1">
               <template #title>
+                <p>Thuộc tính đối tượng</p>
+              </template>
+              <a-button type="primary" size="small" ghost :disabled="!selectedFeature" @click="editFeatureInfo">
+                <i class="fa-solid fa-list-ul"></i>
+              </a-button>
+            </a-tooltip>
+          </a-col>
+
+          <a-col>
+            <a-tooltip overlayClassName="tool-container-tooltip" :mouseEnterDelay="1">
+              <template #title>
                 <p>Xoá đối tượng</p>
               </template>
-              <a-button type="primary" size="small" ghost danger :disabled="true" @click="removeFeature">
+              <a-button
+                type="primary"
+                size="small"
+                ghost
+                danger
+                :disabled="!selectedFeature"
+                @click="removeSelectedFeature">
                 <i class="fa-solid fa-trash-can"></i>
               </a-button>
             </a-tooltip>
           </a-col>
-          <a-col>
+
+          <!-- <a-col>
             <a-tooltip overlayClassName="tool-container-tooltip" :mouseEnterDelay="1">
               <template #title>
                 <p>Xoá đối tượng</p>
               </template>
               <a-button type="primary" size="small" ghost danger @click="testClick"> Tét </a-button>
             </a-tooltip>
-          </a-col>
+          </a-col> -->
         </a-row>
       </a-card>
     </div>
@@ -102,6 +123,229 @@
         <template #icon><i class="fa-solid fa-xmark"></i></template>
       </a-button>
     </div>
+
+    <a-modal v-model:open="newFeatureModalOpen" :maskClosable="false" :closable="false">
+      <template #title>
+        <a-flex justify="space-between">
+          <span class="fs-6"> Tạo đối tượng mới </span>
+          <!-- <a class="close-button me-2" @click="closeEditModal"><i class="fa-solid fa-xmark"></i></a> -->
+        </a-flex>
+      </template>
+      <template #footer>
+        <!-- <a-button key="back" @click="newFeatureModalCancel">Huỷ</a-button> -->
+
+        <a-button key="submit" type="primary" @click="newFeatureModalSave" style="padding: 0 30px"> Lưu </a-button>
+
+        <!-- <a-button key="submit" type="primary" :loading="editModalSpinning" @click="editSave" style="padding: 0 30px">
+            Lưu
+          </a-button> -->
+      </template>
+      <a-spin :spinning="false">
+        <a-card style="height: 405px; overflow: auto">
+          <a-menu v-model:selectedKeys="newFeatureSelectedKeys" mode="horizontal" :items="newFeatureItems" class="mb-2">
+          </a-menu>
+
+          <div v-if="newFeatureSelectedKeys[0] == 1">
+            <a-flex v-for="(value, key, index) in featureNameDisplay.generalInfo" class="mb-2 mt-2" :vertical="true">
+              <div v-if="key === 'vi_tri'">
+                <p class="detail-feature-item--title">{{ value }}</p>
+                <div style="display: flex">
+                  <p>xã</p>
+                  <a-input
+                    v-model:value="newFeatureData.generalInfo['vi_tri_xa']"
+                    size="small"
+                    style="font-size: 0.8rem; width: 150px; margin-left: 5px" />
+                  <p>, huyện</p>
+                  <a-input
+                    v-model:value="newFeatureData.generalInfo['vi_tri_huyen']"
+                    size="small"
+                    style="font-size: 0.8rem; width: 150px; margin-left: 5px" />
+                </div>
+              </div>
+
+              <div v-else-if="key === 'co_quy_trinh_vh'">
+                <p class="detail-feature-item--title">{{ value }}</p>
+                <a-checkbox v-model:checked="newFeatureData.generalInfo[key]">Có hoặc không</a-checkbox>
+              </div>
+
+              <div v-else>
+                <p class="detail-feature-item--title">{{ value }}</p>
+                <a-input v-model:value="newFeatureData.generalInfo[key]" size="small" />
+              </div>
+            </a-flex>
+          </div>
+          <div v-if="newFeatureSelectedKeys[0] == 2">
+            <a-flex v-for="(value, key, index) in featureNameDisplay.techInfo1" class="mb-2" :vertical="true">
+              <p class="detail-feature-item--title">{{ value }}</p>
+              <a-input v-model:value="newFeatureData.techInfo1[key]" size="small" />
+            </a-flex>
+          </div>
+          <!-- <div v-if="newFeatureSelectedKeys[0] == 3">
+            <div v-for="(item, itemIndex) in newFeatureData.techInfo2">
+              <a-divider v-if="featureDataFromDB.techInfo2.length > 1" orientation="left" style="border-color: grey">
+                <p style="font-size: 0.8rem">Đập chính {{ itemIndex + 1 }}</p>
+              </a-divider>
+
+              <a-flex v-for="(value, key, index) in featureNameDisplay.techInfo2" class="mb-2 mt-2" :vertical="true">
+                <p class="detail-feature-item--title">{{ value }}</p>
+                <a-input v-model:value="item[key]" size="small" />
+              </a-flex>
+            </div>
+          </div>
+          <div v-if="newFeatureSelectedKeys[0] == 4">
+            <a-table
+              :columns="featureNameDisplay.techInfo3"
+              :data-source="newFeatureData.techInfo3"
+              :pagination="false"
+              style="font-size: 0.8rem">
+              <template #bodyCell="{ column, text, record, index }">
+                <template v-if="column.dataIndex === 'co_tran_su_co'">
+                  <a-checkbox v-model:checked="newFeatureData.techInfo3[index][column.dataIndex]"></a-checkbox>
+                </template>
+
+                <template v-else>
+                  <a-input
+                    v-model:value="newFeatureData.techInfo3[index][column.dataIndex]"
+                    size="small"
+                    style="font-size: 0.8rem" />
+                </template>
+              </template>
+            </a-table>
+          </div>
+          <div v-if="newFeatureSelectedKeys[0] == 5">
+            <a-table
+              :columns="featureNameDisplay.techInfo4"
+              :data-source="newFeatureData.techInfo3"
+              :pagination="false"
+              style="font-size: 0.8rem">
+              <template #bodyCell="{ column, text, record, index }">
+                <template v-if="column.dataIndex === 'co_tran_su_co'">
+                  <a-checkbox v-model:checked="newFeatureData.techInfo3[index][column.dataIndex]"></a-checkbox>
+                </template>
+
+                <template v-else>
+                  <a-input
+                    v-model:value="newFeatureData.techInfo3[index][column.dataIndex]"
+                    size="small"
+                    style="font-size: 0.8rem" />
+                </template>
+              </template>
+            </a-table>
+          </div> -->
+        </a-card>
+      </a-spin>
+    </a-modal>
+
+    <a-modal v-model:open="editFeatureInfoModalOpen" :maskClosable="false" :closable="false">
+      <template #title>
+        <a-flex justify="space-between">
+          <span class="fs-6"> Thay đổi thông tin đối tượng </span>
+        </a-flex>
+      </template>
+      <template #footer>
+        <a-button key="back" @click="editFeatureInfoModalCancel">Huỷ</a-button>
+
+        <a-button key="submit" type="primary" @click="editFeatureInfoModalSave" style="padding: 0 30px"> Lưu </a-button>
+      </template>
+      <a-spin :spinning="false">
+        <a-card style="height: 405px; overflow: auto">
+          <a-menu
+            v-model:selectedKeys="editFeatureInfoSelectedKeys"
+            mode="horizontal"
+            :items="newFeatureItems"
+            class="mb-2">
+          </a-menu>
+
+          <div v-if="editFeatureInfoSelectedKeys[0] == 1">
+            <a-flex v-for="(value, key, index) in featureNameDisplay.generalInfo" class="mb-2 mt-2" :vertical="true">
+              <div v-if="key === 'vi_tri'">
+                <p class="detail-feature-item--title">{{ value }}</p>
+                <div style="display: flex">
+                  <p>xã</p>
+                  <a-input
+                    v-model:value="newFeatureData.generalInfo['vi_tri_xa']"
+                    size="small"
+                    style="font-size: 0.8rem; width: 150px; margin-left: 5px" />
+                  <p>, huyện</p>
+                  <a-input
+                    v-model:value="newFeatureData.generalInfo['vi_tri_huyen']"
+                    size="small"
+                    style="font-size: 0.8rem; width: 150px; margin-left: 5px" />
+                </div>
+              </div>
+
+              <div v-else-if="key === 'co_quy_trinh_vh'">
+                <p class="detail-feature-item--title">{{ value }}</p>
+                <a-checkbox v-model:checked="newFeatureData.generalInfo[key]">Có hoặc không</a-checkbox>
+              </div>
+
+              <div v-else>
+                <p class="detail-feature-item--title">{{ value }}</p>
+                <a-input v-model:value="newFeatureData.generalInfo[key]" size="small" />
+              </div>
+            </a-flex>
+          </div>
+          <div v-if="editFeatureInfoSelectedKeys[0] == 2">
+            <a-flex v-for="(value, key, index) in featureNameDisplay.techInfo1" class="mb-2" :vertical="true">
+              <p class="detail-feature-item--title">{{ value }}</p>
+              <a-input v-model:value="newFeatureData.techInfo1[key]" size="small" />
+            </a-flex>
+          </div>
+          <!-- <div v-if="editFeatureInfoSelectedKeys[0] == 3">
+            <div v-for="(item, itemIndex) in newFeatureData.techInfo2">
+              <a-divider v-if="featureDataFromDB.techInfo2.length > 1" orientation="left" style="border-color: grey">
+                <p style="font-size: 0.8rem">Đập chính {{ itemIndex + 1 }}</p>
+              </a-divider>
+
+              <a-flex v-for="(value, key, index) in featureNameDisplay.techInfo2" class="mb-2 mt-2" :vertical="true">
+                <p class="detail-feature-item--title">{{ value }}</p>
+                <a-input v-model:value="item[key]" size="small" />
+              </a-flex>
+            </div>
+          </div>
+          <div v-if="editFeatureInfoSelectedKeys[0] == 4">
+            <a-table
+              :columns="featureNameDisplay.techInfo3"
+              :data-source="newFeatureData.techInfo3"
+              :pagination="false"
+              style="font-size: 0.8rem">
+              <template #bodyCell="{ column, text, record, index }">
+                <template v-if="column.dataIndex === 'co_tran_su_co'">
+                  <a-checkbox v-model:checked="newFeatureData.techInfo3[index][column.dataIndex]"></a-checkbox>
+                </template>
+
+                <template v-else>
+                  <a-input
+                    v-model:value="newFeatureData.techInfo3[index][column.dataIndex]"
+                    size="small"
+                    style="font-size: 0.8rem" />
+                </template>
+              </template>
+            </a-table>
+          </div>
+          <div v-if="editFeatureInfoSelectedKeys[0] == 5">
+            <a-table
+              :columns="featureNameDisplay.techInfo4"
+              :data-source="newFeatureData.techInfo3"
+              :pagination="false"
+              style="font-size: 0.8rem">
+              <template #bodyCell="{ column, text, record, index }">
+                <template v-if="column.dataIndex === 'co_tran_su_co'">
+                  <a-checkbox v-model:checked="newFeatureData.techInfo3[index][column.dataIndex]"></a-checkbox>
+                </template>
+
+                <template v-else>
+                  <a-input
+                    v-model:value="newFeatureData.techInfo3[index][column.dataIndex]"
+                    size="small"
+                    style="font-size: 0.8rem" />
+                </template>
+              </template>
+            </a-table>
+          </div> -->
+        </a-card>
+      </a-spin>
+    </a-modal>
   </div>
 </template>
 
@@ -113,7 +357,7 @@ import thuyLoiApi from '@/js/axios/thuyLoiApi.js';
 
 import { WKB } from 'ol/format';
 import Overlay from 'ol/Overlay.js';
-import { Select, Modify } from 'ol/interaction';
+import { Select, Modify, Draw } from 'ol/interaction';
 import { Style, Icon, Stroke, Circle, Fill, Text, RegularShape, Image } from 'ol/style.js';
 import ol_interaction_ModifyTouch from 'ol-ext/interaction/ModifyTouch.js';
 import { MultiPoint } from 'ol/geom.js';
@@ -135,15 +379,15 @@ export default defineComponent({
       layerSelected: '',
       layerOptions: [
         {
-          value: 'Hồ chứa layer',
+          value: 'ho_chua_quang_nam_epsg5899',
           label: 'Hồ chứa',
         },
         {
-          value: 'Cửa xả layer',
+          value: 'cuaxa',
           label: 'Cửa xả',
         },
         {
-          value: 'Kênh layer',
+          value: 'kenh',
           label: 'Kênh',
         },
       ],
@@ -152,9 +396,53 @@ export default defineComponent({
         new: [],
         modify: [],
         remove: [],
+        properties: [],
       },
       vertexSelected: null,
       saveStatus: true,
+      newFeatureDraw: null,
+      newFeatureDrawStatus: false,
+      newFeatureModalOpen: false,
+      newFeatureSelectedKeys: [1],
+      selectStatus: false,
+      selectedFeature: null,
+
+      editFeatureInfoModalOpen: false,
+      editFeatureInfoSelectedKeys: [1],
+
+      newFeature: {
+        layer: '',
+        gid: '',
+        geom: '',
+        data: '',
+      },
+      newFeatureData: {
+        generalInfo: {
+          ten: '',
+          vi_tri: '',
+          nam_xd: '',
+          don_vi_ql: '',
+          co_quy_trinh_vh: false,
+        },
+        techInfo1: {
+          f_tuoi_tk: '',
+          f_tuoi_tk: '',
+          f_lv: '',
+          wmndb: '',
+          mnc: '',
+          mndbt: '',
+          mnltk: '',
+          so_dap_phu: '',
+        },
+        techInfo2: {
+          cao_trinh_dinh_tcs: '',
+          cao_trinh_dinh_dap: '',
+          h_max: '',
+          length: '',
+        },
+        techInfo3: [],
+        techInfo4: [],
+      },
 
       vertexPolygonStyle: new Style({
         image: new Circle({
@@ -185,6 +473,91 @@ export default defineComponent({
           return new MultiPoint(coordinates);
         },
       }),
+
+      featureNameDisplay: {
+        generalInfo: {
+          ten: 'Tên',
+          vi_tri: 'Vị trí',
+          nam_xd: 'Năm xây dựng',
+          don_vi_ql: 'Đơn vị quản lý',
+          co_quy_trinh_vh: 'Quy trình vận hành',
+        },
+        techInfo1: {
+          f_tuoi_tk: 'Diện tích tưới thiết kế (ha)',
+          f_tuoi_tk: 'Diện tích tưới thực tế (ha)',
+          f_lv: 'Diện tích lưu vực (km2)',
+          wmndb: 'W mndbt (10^6 m3)',
+          mnc: 'Mực nước chết (m)',
+          mndbt: 'Mực nước dâng bình thường (m)',
+          mnltk: 'Mực nước lũ thiết kế (m)',
+          so_dap_phu: 'Số đập phụ',
+        },
+        techInfo2: {
+          cao_trinh_dinh_tcs: 'Cao trình đỉnh tường chắn sóng (m)',
+          cao_trinh_dinh_dap: 'Cao trình đỉnh đập (m)',
+          h_max: 'H max (m)',
+          length: 'Chiều dài đập (m)',
+        },
+        techInfo3: [
+          {
+            title: 'Kích thước cống lấy nước (m)',
+            dataIndex: 'kich_thuoc_cong',
+          },
+          {
+            title: 'Hình thức cống lấy nước',
+            dataIndex: 'hinh_thuc_cong',
+          },
+        ],
+        techInfo4: [
+          {
+            title: 'Cao trình ngưỡng tràn (m)',
+            dataIndex: 'cao_trinh_nguong_tran',
+          },
+          {
+            title: 'B tràn (m)',
+            dataIndex: 'b_tran',
+          },
+          {
+            title: 'Hình thức tràn',
+            dataIndex: 'hinh_thuc_tran',
+          },
+          {
+            title: 'Tràn sự cố',
+            dataIndex: 'co_tran_su_co',
+          },
+        ],
+      },
+
+      newFeatureItems: [
+        {
+          key: '1',
+          label: 'Chung',
+          title: 'Chung',
+        },
+        {
+          key: '111',
+          label: 'Kỹ thuật',
+          title: 'Kỹ thuật',
+          children: [
+            {
+              label: 'Toàn công trình',
+              key: '2',
+            },
+            {
+              label: 'Đập chính',
+              key: '3',
+            },
+            {
+              label: 'Cống lấy nước',
+              key: '4',
+            },
+            {
+              label: 'Tràn xả lũ',
+              key: '5',
+            },
+          ],
+        },
+      ],
     };
   },
 
@@ -315,12 +688,23 @@ export default defineComponent({
 
       return modify;
     },
+    featureSelect() {
+      const featureSelect = new Select({
+        wrapX: false,
+        hitTolerance: 5,
+      });
+      featureSelect.set('title', 'Feature select (modify)');
+      featureSelect.setActive(false);
+
+      return featureSelect;
+    },
   },
 
   watch: {
     map: {
       handler() {
         this.addModifyEvent();
+        this.addFeatureSelectEvent();
       },
       deep: false,
       once: true,
@@ -346,18 +730,17 @@ export default defineComponent({
 
       this.featureModify.on('modifystart', (e) => {
         // Chạy thử có phải cái này sẽ cho ra geom trước khi thay đổi không
-
         // Đã thử và có khác
         // Khi start ta sẽ có geom của feature trước khi được modify
-        console.log(e.features.getArray()[0].getGeometry().getCoordinates());
+        // console.log(e.features.getArray()[0].getGeometry().getCoordinates());
       });
 
       this.featureModify.on('modifyend', (e) => {
         const feature = e.features.getArray()[0];
-        console.log(feature.getGeometry().getCoordinates());
+        // console.log(feature.getGeometry().getCoordinates());
         // console.log(this.featureModifySelect.getFeatures());
         // console.log(e.features.getArray());
-        if (feature) {
+        if (feature && feature.getId()) {
           const featureLayer = feature.getId().split('.')[0];
           const featureGid = feature.getId().split('.')[1];
 
@@ -375,24 +758,123 @@ export default defineComponent({
           // console.log(that.featureCollections.modify);
           that.featureCollections.modify.push({ layer: featureLayer, gid: featureGid, geom: geom });
           // console.log(that.featureModifySelect.getFeatures());
+        } else if (feature && !feature.getId()) {
+          const featureGid = feature.get('tempId');
+          const featureGeometry = feature.getGeometry();
+          const wkbFormat = new WKB();
+          const geom = wkbFormat.writeGeometry(featureGeometry);
+
+          for (let i = 0; i < that.featureCollections.new.length; i++) {
+            if (that.featureCollections.new[i].gid === featureGid) {
+              that.featureCollections.new[i].geom = geom;
+              console.log(that.featureCollections.new[i].geom);
+              return;
+            }
+          }
         }
       });
     },
 
-    addDrawNewFeatureEvent() {},
+    addFeatureSelectEvent() {
+      // Nhớ làm multi select
+      this.map.addInteraction(this.featureSelect);
+
+      this.featureSelect.on('select', (e) => {
+        // console.log(e);
+        const feature = e.selected[0];
+        // console.log(e);
+        if (feature) {
+          this.selectedFeature = feature;
+          // if (feature.getId()) {
+          //   console.log(feature.getId());
+          //   // VueLayer.getLayerByDbName(this.map, this.layerSelected, 1).getSource().removeFeature(feature);
+          // } else {
+          //   console.log(feature);
+          //   // VueLayer.getLayerByDbName(this.map, this.layerSelected, 1).getSource().removeFeature(feature);
+          // }
+        } else {
+          this.selectedFeature = null;
+        }
+      });
+    },
+
+    startNewFeatureDraw() {
+      let that = this;
+      if (!this.layerSelected || this.newFeatureDraw) {
+        // this.$message.warning('Vui lòng chọn lớp bản đồ cần thêm vào');
+        return;
+      }
+      const source = VueLayer.getLayerByDbName(this.map, this.layerSelected, 1).getSource();
+      const type = source.getFeatures()[0].getGeometry().getType();
+
+      this.newFeatureDraw = new Draw({
+        source: source,
+        type: type,
+      });
+      this.newFeatureDraw.on('drawend', (e) => {
+        const feature = e.feature;
+        const featureGeometry = feature.getGeometry();
+        const wkbFormat = new WKB();
+        const geom = wkbFormat.writeGeometry(featureGeometry);
+        const tempId = Math.floor(Math.random() * 1000) + 1;
+        feature.set('tempId', tempId);
+        // console.log(this.layer);
+        this.newFeatureModalOpen = true;
+        this.newFeature = {
+          layer: this.layerSelected,
+          gid: tempId,
+          geom: geom,
+          properties: this.newFeatureData,
+        };
+        // console.log(geom);
+        // that.featureCollections.new.push({ layer: this.layerSelected, gid: tempId, geom: geom, this. });
+        // console.log(VueLayer.getLayerByDbName(this.map, this.layerSelected, 1).get('dbName'));
+      });
+
+      this.map.addInteraction(this.newFeatureDraw);
+      this.newFeatureDrawStatus = true;
+    },
+
+    stopNewFeatureDraw() {
+      this.map.removeInteraction(this.newFeatureDraw);
+      this.newFeatureDraw = null;
+      this.newFeatureDrawStatus = false;
+    },
+
+    toggleNewFeatureDraw() {
+      // this.newFeatureDrawStatus = !this.newFeatureDrawStatus;
+      // console.log(this.newFeatureDrawStatus);
+      this.changeModifyStatus(false);
+      this.changeSelectStatus(false);
+      if (this.newFeatureDrawStatus) {
+        this.stopNewFeatureDraw();
+      } else {
+        this.startNewFeatureDraw();
+      }
+    },
 
     layerChange() {
       this.featureModifySelect.layerFilter_ = (layer) => {
-        if (layer.get('title') == this.layerSelected) return true;
+        if (layer.get('dbName') == this.layerSelected) return true;
+      };
+      this.featureSelect.layerFilter_ = (layer) => {
+        if (layer.get('dbName') == this.layerSelected) return true;
       };
       this.changeModifyStatus(false);
+      this.stopNewFeatureDraw();
+      this.changeSelectStatus(false);
+      // console.log(this.);
       // this.featureModifySelect.setActive(true);
       // this.featureModify.setActive(true);
     },
+
     closeModifyPanel() {
       this.controlPanelDisplay = 'none';
       this.buttonStatus = false;
       this.buttonType = 'primary';
+      this.changeModifyStatus(false);
+      this.stopNewFeatureDraw();
+      this.changeSelectStatus(false);
     },
     openModifyPanel() {
       if (!this.buttonStatus) {
@@ -404,7 +886,6 @@ export default defineComponent({
       }
     },
 
-    removeFeature() {},
     changeModifyStatus(boolean) {
       this.modifyStatus = boolean;
       this.featureModifySelect.setActive(this.modifyStatus);
@@ -412,9 +893,40 @@ export default defineComponent({
       this.featureModifySelect.getFeatures().clear();
     },
     toggleModify() {
-      //Thử làm thêm Drag
       if (!this.layerSelected) return;
       this.changeModifyStatus(!this.modifyStatus);
+      this.stopNewFeatureDraw();
+      this.changeSelectStatus(false);
+    },
+
+    changeSelectStatus(boolean) {
+      this.selectStatus = boolean;
+      this.featureSelect.setActive(this.selectStatus);
+      this.featureSelect.getFeatures().clear();
+      this.selectedFeature = null;
+      // console.log(this.featureSelect.getActive());
+    },
+
+    toggleSelect() {
+      if (!this.layerSelected) return;
+      this.changeSelectStatus(!this.selectStatus);
+      this.changeModifyStatus(false);
+      this.stopNewFeatureDraw();
+    },
+
+    removeSelectedFeature() {
+      if (this.selectedFeature) {
+        VueLayer.getLayerByDbName(this.map, this.layerSelected, 1).getSource().removeFeature(this.selectedFeature);
+        if (this.selectedFeature.getId()) {
+          const featureLayer = this.selectedFeature.getId().split('.')[0];
+          const featureGid = this.selectedFeature.getId().split('.')[1];
+          this.featureCollections.remove.push({ layer: featureLayer, gid: featureGid });
+        } else {
+          const gid = this.selectedFeature.get('tempId');
+          this.featureCollections.new = this.featureCollections.new.filter((item) => item.gid != gid);
+        }
+        this.selectedFeature = null;
+      }
     },
 
     save() {
@@ -427,7 +939,7 @@ export default defineComponent({
             modify: [],
             remove: [],
           };
-          VueLayer.getLayerByTitle(this.map, this.layerSelected, 1).getSource().refresh();
+          VueLayer.getLayerByDbName(this.map, this.layerSelected, 1).getSource().refresh();
           this.$message.success(response.data.message, 3);
         })
         .catch((error) => {
@@ -440,8 +952,121 @@ export default defineComponent({
       this.featureModify.removePoint();
     },
 
+    newFeatureModalCancel() {
+      this.newFeatureModalOpen = false;
+
+      this.newFeatureData = {
+        generalInfo: {
+          ten: '',
+          vi_tri: '',
+          nam_xd: '',
+          don_vi_ql: '',
+          co_quy_trinh_vh: false,
+        },
+        techInfo1: {
+          f_tuoi_tk: '',
+          f_tuoi_tk: '',
+          f_lv: '',
+          wmndb: '',
+          mnc: '',
+          mndbt: '',
+          mnltk: '',
+          so_dap_phu: '',
+        },
+        techInfo2: {
+          cao_trinh_dinh_tcs: '',
+          cao_trinh_dinh_dap: '',
+          h_max: '',
+          length: '',
+        },
+        techInfo3: [],
+        techInfo4: [],
+      };
+      this.featureCollections.new.push(this.newFeature);
+      this.newFeature = null;
+    },
+
+    newFeatureModalSave() {
+      // console.log(this.newFeatureData);
+      this.featureCollections.new.push(this.newFeature);
+      this.newFeature = null;
+      this.newFeatureData = {
+        generalInfo: {
+          ten: '',
+          vi_tri: '',
+          nam_xd: '',
+          don_vi_ql: '',
+          co_quy_trinh_vh: false,
+        },
+        techInfo1: {
+          f_tuoi_tk: '',
+          f_tuoi_tk: '',
+          f_lv: '',
+          wmndb: '',
+          mnc: '',
+          mndbt: '',
+          mnltk: '',
+          so_dap_phu: '',
+        },
+        techInfo2: {
+          cao_trinh_dinh_tcs: '',
+          cao_trinh_dinh_dap: '',
+          h_max: '',
+          length: '',
+        },
+        techInfo3: [],
+        techInfo4: [],
+      };
+      this.newFeatureModalOpen = false;
+    },
+
+    editFeatureInfoModalCancel() {
+      this.editFeatureInfoModalOpen = false;
+    },
+
+    editFeatureInfoModalSave() {
+      if (this.selectedFeature.getId()) {
+        const featureLayer = this.selectedFeature.getId().split('.')[0];
+        const featureGid = this.selectedFeature.getId().split('.')[1];
+
+        // Properties ở đây chỉ gửi thử data mẫu
+        // Khi dữ liệu các layer được rõ ràng hơn thì chỉnh sửa sau
+        // Dữ liệu đối tượng đã được tạo thì lấy từ database
+        // Dữ liệu đối tượng mới sẽ được lấy từ featureCollections.modify[i].properties
+        const properties = this.selectedFeature.getProperties();
+
+        for (let i = 0; i < this.featureCollections.modify.length; i++) {
+          if (that.featureCollections.modify[i].gid === featureGid) {
+            this.featureCollections.modify[i].properties = properties;
+            return;
+          }
+        }
+
+        this.featureCollections.modify.push({ layer: featureLayer, gid: featureGid, properties: properties });
+      } else {
+        const featureGid = this.selectedFeature.get('tempId');
+        const properties = this.selectedFeature.getProperties();
+
+        for (let i = 0; i < this.featureCollections.new.length; i++) {
+          if (this.featureCollections.new[i].gid === featureGid) {
+            this.featureCollections.new[i].properties = properties;
+            this.editFeatureInfoModalOpen = false;
+            return;
+          }
+        }
+      }
+
+      this.editFeatureInfoModalOpen = false;
+    },
+
+    editFeatureInfo() {
+      this.editFeatureInfoModalOpen = true;
+    },
+
     testClick() {
-      this.featureModify.setActive(false);
+      // this.featureModify.setActive(false);
+      // this.addDrawNewFeatureEvent();
+      // console.log(this.layerSelected);
     },
     testClick2() {
       this.featureModify.setActive(true);
@@ -455,21 +1080,4 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
-.ol-popup.modifytouch a:before {
-  content: '\274C';
-  margin-right: 0.2em;
-}
-
-#remove-point-overlay {
-  // border: 1px black solid;
-  // border-radius: 5px;
-  // padding: 2px;
-  // &:hover {
-  //   color: red;
-  //   border: 1px red solid;
-  //   cursor: pointer;
-  //   user-select: none;
-  // }
-}
-</style>
+<style lang="scss"></style>

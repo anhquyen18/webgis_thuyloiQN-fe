@@ -10,7 +10,7 @@
     <FeatureInfoPopup></FeatureInfoPopup>
     <MapPrinter></MapPrinter>
     <GeolocationTool></GeolocationTool>
-    <FeatureModifyTool></FeatureModifyTool>
+    <FeatureModifyTool v-if="loginState"</FeatureModifyTool>
     <!-- <a-button class="white-border-ant-button" type="primary" size="small">
       <i class="fa-solid fa-pencil"></i>
     </a-button> -->
@@ -19,6 +19,8 @@
 
 <script>
 import { defineComponent, provide, ref, inject } from 'vue';
+import { userState } from '@/stores/user-state';
+
 import PanToHome from './pan-to-home.vue';
 import ZoomTool from './zoom-tool.vue';
 import MeasureTool from './measure-tool.vue';
@@ -47,7 +49,11 @@ export default defineComponent({
   data() {
     return {};
   },
-  computed: {},
+  computed: {
+    loginState(){
+    return userState().getLogin;
+  },
+  },
   methods: {
     test() {
       // console.log(this.mapContainerElement);

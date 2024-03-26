@@ -39,6 +39,24 @@ function getLayerByTitle(map, title, layerGroupIndex) {
   return layer;
 }
 
+function getLayerByDbName(map, dbName, layerGroupIndex) {
+  let mainLayer;
+  let layer;
+  if (layerGroupIndex) {
+    mainLayer = map.getLayers().getArray()[layerGroupIndex].getLayers().getArray();
+  } else {
+    mainLayer = map.getLayers().getArray();
+  }
+
+  mainLayer.some((element, index) => {
+    if (element.get('dbName') === dbName) {
+      layer = element;
+      return true;
+    }
+  });
+  return layer;
+}
+
 function getAllLayerTitle(map, layerGroupIndex) {
   let mainLayer;
   let titleArray = [];
@@ -75,4 +93,4 @@ function getInteractionByTitle(map, title) {
   return interaction;
 }
 
-export { getLayerByTitle, getAllLayerTitle, getControlByTitle, getInteractionByTitle };
+export { getLayerByTitle, getLayerByDbName, getAllLayerTitle, getControlByTitle, getInteractionByTitle };
