@@ -21,9 +21,9 @@
       <a-card
         title="Chỉnh sửa"
         size="small"
-        :bodyStyle="{ padding: '5px', width: '150px', maxHeight: '150px', overflow: 'hidden' }">
+        :bodyStyle="{ padding: '5px', width: '170px', maxHeight: '150px', overflow: 'hidden' }">
         <template #extra>
-          <a class="close-button" @click="stopModify"><i class="fa-solid fa-xmark"></i></a>
+          <a class="close-button" @click="closeModifyPanel"><i class="fa-solid fa-xmark"></i></a>
         </template>
         <a-select
           v-model="layerOptions"
@@ -34,48 +34,87 @@
           size="small"
           :dropdownMatchSelectWidth="false"></a-select>
         <a-row class="mt-1" align="middle" justify="space-around">
-          <a-col :span="6">
-            <a-tooltip overlayClassName="tool-container-tooltip" :mouseEnterDelay="1">
-              <template #title>
-                <p>Lưu thay đổi</p>
-              </template>
-              <a-button type="primary" size="small" ghost :disabled="saveStatus" @click="save">
-                <i class="fa-solid fa-file-export"></i>
-              </a-button>
-            </a-tooltip>
-          </a-col>
-          <a-col>
-            <a-tooltip overlayClassName="tool-container-tooltip" :mouseEnterDelay="1">
-              <template #title>
-                <p>Thêm đối tượng</p>
-              </template>
-              <a-button type="primary" size="small" :ghost="!newFeatureDrawStatus" @click="toggleNewFeatureDraw">
-                <i class="fa-solid fa-plus"></i>
-              </a-button>
-            </a-tooltip>
-          </a-col>
-          <a-col>
-            <a-tooltip overlayClassName="tool-container-tooltip" :mouseEnterDelay="1">
-              <template #title>
-                <p>Điều chỉnh đối tượng</p>
-              </template>
-              <a-button type="primary" size="small" :ghost="!modifyStatus" @click="toggleModify">
-                <i class="fa-solid fa-bezier-curve"></i>
-              </a-button>
-            </a-tooltip>
-          </a-col>
-          <a-col>
-            <a-tooltip overlayClassName="tool-container-tooltip" :mouseEnterDelay="1">
-              <template #title>
-                <p>Chọn đối tượng</p>
-              </template>
-              <a-button type="primary" size="small" :ghost="!selectStatus" @click="toggleSelect">
-                <i class="fa-solid fa-hand-pointer"></i>
-              </a-button>
-            </a-tooltip>
-          </a-col>
+          <a-config-provider
+            :theme="{
+              token: {
+                colorPrimary: '#00c3c3',
+              },
+            }">
+            <a-col :span="6">
+              <a-tooltip overlayClassName="tool-container-tooltip" :mouseEnterDelay="1">
+                <template #title>
+                  <p>Lưu thay đổi</p>
+                </template>
+                <a-button type="primary" size="small" ghost :disabled="saveStatus" @click="save">
+                  <i class="fa-solid fa-file-export"></i>
+                </a-button>
+              </a-tooltip>
+            </a-col>
+            <a-col>
+              <a-tooltip overlayClassName="tool-container-tooltip" :mouseEnterDelay="1">
+                <template #title>
+                  <p>Thêm đối tượng</p>
+                </template>
+                <a-button type="primary" size="small" :ghost="!newFeatureDrawStatus" @click="toggleNewFeatureDraw">
+                  <i class="fa-solid fa-plus"></i>
+                </a-button>
+              </a-tooltip>
+            </a-col>
+            <a-col>
+              <a-tooltip overlayClassName="tool-container-tooltip" :mouseEnterDelay="1">
+                <template #title>
+                  <p>Điều chỉnh đối tượng</p>
+                </template>
+                <a-button type="primary" size="small" :ghost="!modifyStatus" @click="toggleModify">
+                  <i class="fa-solid fa-bezier-curve"></i>
+                </a-button>
+              </a-tooltip>
+            </a-col>
+            <a-col>
+              <a-tooltip overlayClassName="tool-container-tooltip" :mouseEnterDelay="1">
+                <template #title>
+                  <p>Chọn đối tượng</p>
+                </template>
+                <a-button type="primary" size="small" :ghost="!selectStatus" @click="toggleSelect">
+                  <i class="fa-solid fa-hand-pointer"></i>
+                </a-button>
+              </a-tooltip>
+            </a-col>
+          </a-config-provider>
         </a-row>
         <a-row class="mt-1" align="middle" justify="space-around">
+          <a-col>
+            <a-tooltip overlayClassName="tool-container-tooltip" :mouseEnterDelay="1">
+              <template #title>
+                <p>Ghép đối tượng</p>
+              </template>
+              <a-button
+                type="primary"
+                size="small"
+                :ghost="true"
+                :disabled="!modifyStatus"
+                @click="mergeSelectedPolygons">
+                <i class="fa-regular fa-clone"></i>
+              </a-button>
+            </a-tooltip>
+          </a-col>
+
+          <a-col>
+            <a-tooltip overlayClassName="tool-container-tooltip" :mouseEnterDelay="1">
+              <template #title>
+                <p>Cắt đối tượng</p>
+              </template>
+              <a-button
+                type="primary"
+                size="small"
+                :ghost="!splitDraw"
+                :disabled="!modifyStatus"
+                @click="toggleSplitDraw">
+                <i class="fa-solid fa-scissors"></i>
+              </a-button>
+            </a-tooltip>
+          </a-col>
+
           <a-col>
             <a-tooltip overlayClassName="tool-container-tooltip" :mouseEnterDelay="1">
               <template #title>
@@ -103,15 +142,26 @@
               </a-button>
             </a-tooltip>
           </a-col>
+        </a-row>
 
-          <!-- <a-col>
+        <a-row class="mt-1" align="middle" justify="space-around">
+          <a-col>
             <a-tooltip overlayClassName="tool-container-tooltip" :mouseEnterDelay="1">
               <template #title>
                 <p>Xoá đối tượng</p>
               </template>
-              <a-button type="primary" size="small" ghost danger @click="testClick"> Tét </a-button>
+              <a-button type="primary" size="small" ghost danger @click="testClick"> Tét 1 </a-button>
             </a-tooltip>
-          </a-col> -->
+          </a-col>
+
+          <a-col>
+            <a-tooltip overlayClassName="tool-container-tooltip" :mouseEnterDelay="1">
+              <template #title>
+                <p>Xoá đối tượng</p>
+              </template>
+              <a-button type="primary" size="small" ghost danger @click="testClick"> Tét 2 </a-button>
+            </a-tooltip>
+          </a-col>
         </a-row>
       </a-card>
     </div>
@@ -357,10 +407,23 @@ import thuyLoiApi from '@/js/axios/thuyLoiApi.js';
 
 import { WKB } from 'ol/format';
 import Overlay from 'ol/Overlay.js';
-import { Select, Modify, Draw } from 'ol/interaction';
-import { Style, Icon, Stroke, Circle, Fill, Text, RegularShape, Image } from 'ol/style.js';
+import { Select, Modify, Draw, Translate, Snap } from 'ol/interaction';
+import { Style, Stroke, Circle, Fill } from 'ol/style.js';
 import ol_interaction_ModifyTouch from 'ol-ext/interaction/ModifyTouch.js';
-import { MultiPoint } from 'ol/geom.js';
+import {
+  LineString,
+  MultiLineString,
+  MultiPoint,
+  MultiPolygon,
+  Point,
+  Polygon,
+  GeometryCollection,
+  LinearRing,
+} from 'ol/geom.js';
+import { Feature } from 'ol';
+import { altKeyOnly } from 'ol/events/condition';
+
+import * as turf from '@turf/turf';
 
 export default defineComponent({
   setup() {
@@ -410,6 +473,10 @@ export default defineComponent({
       editFeatureInfoModalOpen: false,
       editFeatureInfoSelectedKeys: [1],
 
+      splitDraw: null,
+
+      modifySnap: null,
+
       newFeature: {
         layer: '',
         gid: '',
@@ -444,7 +511,7 @@ export default defineComponent({
         techInfo4: [],
       },
 
-      vertexPolygonStyle: new Style({
+      vertexStyle: new Style({
         image: new Circle({
           radius: 3,
           fill: new Fill({
@@ -452,27 +519,36 @@ export default defineComponent({
           }),
         }),
         geometry: function (feature) {
-          const coordinates = feature.getGeometry().getCoordinates()[0];
-          let totalPoint = [];
-          for (var i = 0; i < coordinates.length; i++) {
-            totalPoint = [...totalPoint, ...coordinates[i]];
+          const type = feature.getGeometry().getType();
+          if (type == 'MultiPolygon') {
+            const multiCoordinates = feature.getGeometry().getCoordinates();
+            let totalPoint = [];
+            multiCoordinates.forEach((coordinates) => {
+              for (var i = 0; i < coordinates.length; i++) {
+                totalPoint = [...totalPoint, ...coordinates[i]];
+              }
+            });
+
+            return new MultiPoint(totalPoint);
+          } else {
+            const coordinates = feature.getGeometry().getCoordinates()[0];
+            return new MultiPoint(coordinates);
           }
-          return new MultiPoint(totalPoint);
         },
       }),
 
-      vertexLineStyle: new Style({
-        image: new Circle({
-          radius: 3,
-          fill: new Fill({
-            color: '#f5425a',
-          }),
-        }),
-        geometry: function (feature) {
-          const coordinates = feature.getGeometry().getCoordinates()[0];
-          return new MultiPoint(coordinates);
-        },
-      }),
+      // vertexLineStyle: new Style({
+      //   image: new Circle({
+      //     radius: 3,
+      //     fill: new Fill({
+      //       color: '#f5425a',
+      //     }),
+      //   }),
+      //   geometry: function (feature) {
+      //     const coordinates = feature.getGeometry().getCoordinates()[0];
+      //     return new MultiPoint(coordinates);
+      //   },
+      // }),
 
       featureNameDisplay: {
         generalInfo: {
@@ -585,7 +661,7 @@ export default defineComponent({
               width: 2,
             }),
           }),
-          this.vertexLineStyle,
+          this.vertexStyle,
         ],
         LineString: [
           new Style({
@@ -594,7 +670,7 @@ export default defineComponent({
               width: 2,
             }),
           }),
-          this.vertexLineStyle,
+          this.vertexStyle,
         ],
         Point: new Style({
           image: new Circle({
@@ -618,7 +694,7 @@ export default defineComponent({
               color: 'rgba(0, 0, 255, 0.1)',
             }),
           }),
-          this.vertexPolygonStyle,
+          this.vertexStyle,
         ],
         Polygon: [
           new Style({
@@ -627,10 +703,11 @@ export default defineComponent({
               width: 3,
             }),
             fill: new Fill({
-              color: 'rgba(0, 0, 255, 0.1)',
+              // color: 'rgba(0, 0, 255, 0.1)',
+              color: 'red',
             }),
           }),
-          this.vertexPolygonStyle,
+          this.vertexStyle,
         ],
         Circle: new Style({
           stroke: new Stroke({
@@ -645,6 +722,7 @@ export default defineComponent({
 
       const featureModifySelect = new Select({
         wrapX: false,
+        // multi: true,
         style: function (feature) {
           return modifyLabelStyles[feature.getGeometry().getType()];
         },
@@ -680,6 +758,8 @@ export default defineComponent({
 
       modify.on('showpopup', function (e) {
         const removePointCoordinate = e.coordinate;
+        const type = e.feature.getGeometry().getType();
+        if (type == 'Point') return;
         removePointOverlay.setPosition(removePointCoordinate);
       });
       modify.on('hidepopup', function (e) {
@@ -687,6 +767,17 @@ export default defineComponent({
       });
 
       return modify;
+    },
+    featureModifyDrag() {
+      const translate = new Translate({
+        condition: (e) => {
+          return altKeyOnly(e);
+        },
+
+        features: this.featureModifySelect.getFeatures(),
+      });
+
+      return translate;
     },
     featureSelect() {
       const featureSelect = new Select({
@@ -723,10 +814,71 @@ export default defineComponent({
   },
 
   methods: {
+    openModifyPanel() {
+      if (!this.buttonStatus) {
+        this.controlPanelDisplay = 'block';
+        this.buttonStatus = true;
+        this.buttonType = 'default';
+      } else {
+        this.closeModifyPanel();
+      }
+    },
+
+    closeModifyPanel() {
+      this.controlPanelDisplay = 'none';
+      this.buttonStatus = false;
+      this.buttonType = 'primary';
+      this.changeModifyStatus(false);
+      this.stopNewFeatureDraw();
+      this.changeSelectStatus(false);
+      this.stopSplitDraw();
+    },
+
+    layerChange() {
+      this.featureModifySelect.layerFilter_ = (layer) => {
+        if (layer.get('dbName') == this.layerSelected) return true;
+      };
+      this.featureSelect.layerFilter_ = (layer) => {
+        if (layer.get('dbName') == this.layerSelected) return true;
+      };
+
+      this.changeModifyStatus(false);
+      this.stopNewFeatureDraw();
+      this.changeSelectStatus(false);
+      this.stopSplitDraw();
+      // console.log(this.);
+      // this.featureModifySelect.setActive(true);
+      // this.featureModify.setActive(true);
+    },
+
+    save() {
+      thuyLoiApi
+        .post('/update-feature-geom', this.featureCollections)
+        .then((response) => {
+          console.log(response);
+          this.featureCollections = {
+            new: [],
+            modify: [],
+            remove: [],
+          };
+          VueLayer.getLayerByDbName(this.map, this.layerSelected, 1).getSource().refresh();
+          this.$message.success(response.data.message, 3);
+        })
+        .catch((error) => {
+          console.log(error);
+          this.$message.success(error.response.data.message, 3);
+        });
+    },
+
+    // --------------------------------------------------------------------------------------
+    // Modify ----------------------------------------------------------------------
+    // --------------------------------------------------------------------------------------
+
     addModifyEvent() {
       let that = this;
       this.map.addInteraction(this.featureModifySelect);
       this.map.addInteraction(this.featureModify);
+      this.map.addInteraction(this.featureModifyDrag);
 
       this.featureModify.on('modifystart', (e) => {
         // Chạy thử có phải cái này sẽ cho ra geom trước khi thay đổi không
@@ -775,6 +927,263 @@ export default defineComponent({
       });
     },
 
+    changeModifyStatus(boolean) {
+      this.modifyStatus = boolean;
+      this.featureModifySelect.setActive(this.modifyStatus);
+      this.featureModify.setActive(this.modifyStatus);
+      this.featureModifySelect.getFeatures().clear();
+      if (boolean) {
+        this.modifySnap = new Snap({
+          source: VueLayer.getLayerByDbName(this.map, this.layerSelected, 1).getSource(),
+        });
+        this.map.addInteraction(this.modifySnap);
+      } else {
+        this.map.removeInteraction(this.modifySnap);
+        this.modifySnap = null;
+      }
+    },
+
+    toggleModify() {
+      if (!this.layerSelected) return;
+      this.changeModifyStatus(!this.modifyStatus);
+      this.stopNewFeatureDraw();
+      this.changeSelectStatus(false);
+      this.stopSplitDraw();
+    },
+
+    removePoint() {
+      this.featureModify.removePoint();
+    },
+
+    startSplitDraw() {
+      let that = this;
+      const feature = this.featureModifySelect.getFeatures().getArray()[0];
+      // console.log(target.length);
+      if (!feature) {
+        return;
+      }
+      let parser = new jsts.io.OL3Parser();
+      parser.inject(
+        Point,
+        LineString,
+        LinearRing,
+        Polygon,
+        MultiPoint,
+        MultiLineString,
+        MultiPolygon,
+        GeometryCollection,
+      );
+      // Hiện tại chỉ cho cắt Polygon và MyltiPolygon có 1 Polygon, còn MultiPolygon thật chưa cho
+      if (parser.read(feature.getGeometry())._geometries.length > 1) return;
+
+      let layerSource = VueLayer.getLayerByDbName(this.map, this.layerSelected, 1).getSource();
+      let type = feature.getGeometry().getType();
+      this.splitDraw = new Draw({
+        type: 'LineString',
+        maxPoints: 2,
+      });
+
+      const stop = () => {
+        layerSource.removeFeature(feature);
+        this.stopSplitDraw();
+        this.featureModifySelect.getFeatures().clear();
+        this.featureModifySelect.setActive(true);
+        this.featureModify.setActive(true);
+      };
+
+      // Chỉ cho cắt thành 2, với một đường cắt thành nhiều mảnh hơn không cho
+      if (type == 'MultiPolygon_Test') {
+        // Chấp nhận chỉ cho cắt polygon
+        // Hiện tại muốn cắt polygon thì các polygon trong multi phải được rã ra theo
+
+        // if (type == 'MultiPolygon') target = parser.read(feature.getGeometry())._geometries;
+        // else target = parser.read(feature.getGeometry());
+        // parser;
+        const geometries = parser.read(feature.getGeometry())._geometries;
+        let target = [];
+        let holes = [];
+        // parser.read(.forEach((geom, index) => {
+        //   console.log(index);
+        //   target.push(geom.getExteriorRing());
+        //   holes = [...holes, ...geom._holes];
+        // });
+        for (let i = 0; i < geometries.length; i++) {
+          // target.push(geometries[i]);
+          target.push(geometries[i].getExteriorRing());
+          // console.log(geometries[0].getExteriorRing().geometries[i].getExteriorRing());
+          // console.log();
+          holes = [...holes, ...geometries[i]._holes];
+          // result = target.union(geometries[i].getExteriorRing());
+        }
+        // console.log(geometries);
+        // console.log(result);
+
+        // let holes = target._holes;
+        this.splitDraw.on('drawend', (e) => {
+          let splitLine = parser.read(e.feature.getGeometry());
+          // let union = target.union(splitLine);
+          // let union = result.union(splitLine);
+          let polygonizer = new jsts.operation.polygonize.Polygonizer();
+          target.forEach((element) => {
+            // console.log(element.union(splitLine));
+            polygonizer.add(element.union(splitLine));
+          });
+
+          // polygonizer.add(union);
+          let polygons = polygonizer.getPolygons();
+          console.log(polygons);
+          // if (polygons.array.length === 1) {
+          //   polygons.array.forEach((geom) => {
+          //     holes.forEach((hole) => {
+          //       let arr = [];
+          //       for (let i in hole.getCoordinates()) {
+          //         arr.push([hole.getCoordinates()[i].x, hole.getCoordinates()[i].y]);
+          //       }
+
+          //       hole = parser.read(new Polygon([arr]));
+          //       geom = geom.difference(hole);
+          //     });
+
+          //     let splittedPolygon = new Feature({
+          //       // geometry: new Polygon(parser.write(geom).getCoordinates()),
+          //       geometry: new MultiPolygon([parser.write(geom).getCoordinates()]),
+          //     });
+          //     layerSource.addFeature(splittedPolygon);
+          //   });
+          //   stop();
+          // }
+        });
+      } else if (type == 'Polygon' || type == 'MultiPolygon') {
+        let target;
+        if (type == 'MultiPolygon') target = parser.read(feature.getGeometry())._geometries[0];
+        else target = parser.read(feature.getGeometry());
+        // let target = parser.read(feature.getGeometry());
+
+        let holes = target._holes;
+        this.splitDraw.on('drawend', (e) => {
+          let splitLine = parser.read(e.feature.getGeometry());
+          let union = target.getExteriorRing().union(splitLine);
+          let polygonizer = new jsts.operation.polygonize.Polygonizer();
+          polygonizer.add(union);
+          let polygons = polygonizer.getPolygons();
+          console.log(polygons);
+          if (polygons.array.length == 2) {
+            polygons.array.forEach((geom) => {
+              holes.forEach((hole) => {
+                let arr = [];
+                for (let i in hole.getCoordinates()) {
+                  arr.push([hole.getCoordinates()[i].x, hole.getCoordinates()[i].y]);
+                }
+
+                hole = parser.read(new Polygon([arr]));
+                geom = geom.difference(hole);
+              });
+
+              let geometry;
+              if (type == 'MultiPolygon') geometry = new MultiPolygon([parser.write(geom).getCoordinates()]);
+              else geometry = new Polygon(parser.write(geom).getCoordinates());
+
+              let splittedPolygon = new Feature({
+                geometry: geometry,
+              });
+              layerSource.addFeature(splittedPolygon);
+            });
+            stop();
+          }
+        });
+      } else if (type == 'MultiLineString' || type == 'LineString') {
+        let target;
+        if (type == 'MultiLineString') target = turf.lineString(feature.getGeometry().getCoordinates()[0]);
+        else target = turf.lineString(feature.getGeometry().getCoordinates());
+        this.splitDraw.on('drawend', (e) => {
+          // console.log(feature.getId());
+          // feature.setId(105);
+          // console.log(feature.getId());
+
+          let splitLine = turf.lineString(e.feature.getGeometry().getCoordinates());
+          let lines = turf.lineSplit(target, splitLine);
+
+          if (lines.features.length == 2) {
+            lines.features.forEach((element) => {
+              let geometry;
+              if (type == 'MultiLineString') geometry = new MultiLineString(element.geometry.coordinates);
+              else geometry = new LineString(element.geometry.coordinates);
+              let splittedLineString = new Feature({
+                geometry: geometry,
+              });
+              layerSource.addFeature(splittedLineString);
+            });
+            stop();
+          }
+        });
+      }
+
+      this.map.addInteraction(this.splitDraw);
+      this.featureModifySelect.setActive(false);
+      this.featureModify.setActive(false);
+    },
+
+    stopSplitDraw() {
+      this.map.removeInteraction(this.splitDraw);
+      this.splitDraw = null;
+    },
+
+    toggleSplitDraw() {
+      if (this.splitDraw) {
+        this.stopSplitDraw();
+        this.featureModifySelect.setActive(true);
+        this.featureModify.setActive(true);
+      } else {
+        this.startSplitDraw();
+      }
+    },
+
+    uncap(str) {
+      return str.charAt(0).toLowerCase() + str.slice(1);
+    },
+
+    mergeSelectedPolygons() {
+      let layerSource = VueLayer.getLayerByDbName(this.map, this.layerSelected, 1).getSource();
+      let type = layerSource.getFeatures()[0].getGeometry().getType();
+      let uncapType = this.uncap(type);
+
+      if (type === 'MultiPolygon' || type === 'Polygon') {
+        if (this.featureModifySelect.getFeatures().getArray().length > 1) {
+          let polygons = this.featureModifySelect.getFeatures().getArray();
+          let target = turf[uncapType](polygons[0].getGeometry().getCoordinates());
+          let mergeCount = [polygons[0]];
+
+          for (let i = 1; i < polygons.length; i++) {
+            let selected = turf[uncapType](polygons[i].getGeometry().getCoordinates());
+            let result = turf.intersect(target, selected);
+            if (result) {
+              target = turf.union(target, selected);
+              mergeCount.push(polygons[i]);
+            }
+          }
+
+          if (mergeCount.length > 1) {
+            let geometry;
+            if (type == 'MultiPolygon') geometry = new MultiPolygon(target.geometry.coordinates);
+            else geometry = new Polygon(target.geometry.coordinates);
+            const feature = new Feature({
+              geometry: geometry,
+            });
+            console.log(feature.getGeometry());
+            layerSource.addFeature(feature);
+            mergeCount.forEach((element) => {
+              layerSource.removeFeature(element);
+            });
+            this.featureModifySelect.getFeatures().clear();
+          }
+        }
+      }
+    },
+
+    // --------------------------------------------------------------------------------------
+    // Add new feature ----------------------------------------------------------------------
+    // --------------------------------------------------------------------------------------
+
     addFeatureSelectEvent() {
       // Nhớ làm multi select
       this.map.addInteraction(this.featureSelect);
@@ -806,11 +1215,15 @@ export default defineComponent({
       }
       const source = VueLayer.getLayerByDbName(this.map, this.layerSelected, 1).getSource();
       const type = source.getFeatures()[0].getGeometry().getType();
+      this.modifySnap = new Snap({
+        source: VueLayer.getLayerByDbName(this.map, this.layerSelected, 1).getSource(),
+      });
 
       this.newFeatureDraw = new Draw({
         source: source,
         type: type,
       });
+
       this.newFeatureDraw.on('drawend', (e) => {
         const feature = e.feature;
         const featureGeometry = feature.getGeometry();
@@ -832,11 +1245,17 @@ export default defineComponent({
       });
 
       this.map.addInteraction(this.newFeatureDraw);
+      this.map.addInteraction(this.modifySnap);
+      console.log(this.map.getInteractions());
       this.newFeatureDrawStatus = true;
     },
 
     stopNewFeatureDraw() {
       this.map.removeInteraction(this.newFeatureDraw);
+
+      // Dùng compute không xoá kiểu này được, dùng data và set value mới được
+      this.map.removeInteraction(this.modifySnap);
+      this.modifySnap = null;
       this.newFeatureDraw = null;
       this.newFeatureDrawStatus = false;
     },
@@ -851,105 +1270,6 @@ export default defineComponent({
       } else {
         this.startNewFeatureDraw();
       }
-    },
-
-    layerChange() {
-      this.featureModifySelect.layerFilter_ = (layer) => {
-        if (layer.get('dbName') == this.layerSelected) return true;
-      };
-      this.featureSelect.layerFilter_ = (layer) => {
-        if (layer.get('dbName') == this.layerSelected) return true;
-      };
-      this.changeModifyStatus(false);
-      this.stopNewFeatureDraw();
-      this.changeSelectStatus(false);
-      // console.log(this.);
-      // this.featureModifySelect.setActive(true);
-      // this.featureModify.setActive(true);
-    },
-
-    closeModifyPanel() {
-      this.controlPanelDisplay = 'none';
-      this.buttonStatus = false;
-      this.buttonType = 'primary';
-      this.changeModifyStatus(false);
-      this.stopNewFeatureDraw();
-      this.changeSelectStatus(false);
-    },
-    openModifyPanel() {
-      if (!this.buttonStatus) {
-        this.controlPanelDisplay = 'block';
-        this.buttonStatus = true;
-        this.buttonType = 'default';
-      } else {
-        this.closeModifyPanel();
-      }
-    },
-
-    changeModifyStatus(boolean) {
-      this.modifyStatus = boolean;
-      this.featureModifySelect.setActive(this.modifyStatus);
-      this.featureModify.setActive(this.modifyStatus);
-      this.featureModifySelect.getFeatures().clear();
-    },
-    toggleModify() {
-      if (!this.layerSelected) return;
-      this.changeModifyStatus(!this.modifyStatus);
-      this.stopNewFeatureDraw();
-      this.changeSelectStatus(false);
-    },
-
-    changeSelectStatus(boolean) {
-      this.selectStatus = boolean;
-      this.featureSelect.setActive(this.selectStatus);
-      this.featureSelect.getFeatures().clear();
-      this.selectedFeature = null;
-      // console.log(this.featureSelect.getActive());
-    },
-
-    toggleSelect() {
-      if (!this.layerSelected) return;
-      this.changeSelectStatus(!this.selectStatus);
-      this.changeModifyStatus(false);
-      this.stopNewFeatureDraw();
-    },
-
-    removeSelectedFeature() {
-      if (this.selectedFeature) {
-        VueLayer.getLayerByDbName(this.map, this.layerSelected, 1).getSource().removeFeature(this.selectedFeature);
-        if (this.selectedFeature.getId()) {
-          const featureLayer = this.selectedFeature.getId().split('.')[0];
-          const featureGid = this.selectedFeature.getId().split('.')[1];
-          this.featureCollections.remove.push({ layer: featureLayer, gid: featureGid });
-        } else {
-          const gid = this.selectedFeature.get('tempId');
-          this.featureCollections.new = this.featureCollections.new.filter((item) => item.gid != gid);
-        }
-        this.selectedFeature = null;
-      }
-    },
-
-    save() {
-      thuyLoiApi
-        .post('/update-feature-geom', this.featureCollections)
-        .then((response) => {
-          console.log(response);
-          this.featureCollections = {
-            new: [],
-            modify: [],
-            remove: [],
-          };
-          VueLayer.getLayerByDbName(this.map, this.layerSelected, 1).getSource().refresh();
-          this.$message.success(response.data.message, 3);
-        })
-        .catch((error) => {
-          console.log(error);
-          this.$message.success(error.response.data.message, 3);
-        });
-    },
-
-    removePoint() {
-      this.featureModify.removePoint();
     },
 
     newFeatureModalCancel() {
@@ -1020,6 +1340,40 @@ export default defineComponent({
       this.newFeatureModalOpen = false;
     },
 
+    // --------------------------------------------------------------------------------------
+    // Select feature ----------------------------------------------------------------------
+    // --------------------------------------------------------------------------------------
+
+    changeSelectStatus(boolean) {
+      this.selectStatus = boolean;
+      this.featureSelect.setActive(this.selectStatus);
+      this.featureSelect.getFeatures().clear();
+      this.selectedFeature = null;
+      // console.log(this.featureSelect.getActive());
+    },
+
+    toggleSelect() {
+      if (!this.layerSelected) return;
+      this.changeSelectStatus(!this.selectStatus);
+      this.changeModifyStatus(false);
+      this.stopNewFeatureDraw();
+    },
+
+    removeSelectedFeature() {
+      if (this.selectedFeature) {
+        VueLayer.getLayerByDbName(this.map, this.layerSelected, 1).getSource().removeFeature(this.selectedFeature);
+        if (this.selectedFeature.getId()) {
+          const featureLayer = this.selectedFeature.getId().split('.')[0];
+          const featureGid = this.selectedFeature.getId().split('.')[1];
+          this.featureCollections.remove.push({ layer: featureLayer, gid: featureGid });
+        } else {
+          const gid = this.selectedFeature.get('tempId');
+          this.featureCollections.new = this.featureCollections.new.filter((item) => item.gid != gid);
+        }
+        this.selectedFeature = null;
+      }
+    },
+
     editFeatureInfoModalCancel() {
       this.editFeatureInfoModalOpen = false;
     },
@@ -1064,13 +1418,11 @@ export default defineComponent({
     },
 
     testClick() {
-      // this.featureModify.setActive(false);
-      // this.addDrawNewFeatureEvent();
-      // console.log(this.layerSelected);
+      // console.log(this.featureModifySelect.getFeatures().getArray()[0].getGeometry().getCoordinates());
+      // console.log(this.title);
+      // this.featureModify.setActive(true);
     },
-    testClick2() {
-      this.featureModify.setActive(true);
-    },
+    testClick2() {},
   },
 
   mounted() {
