@@ -144,7 +144,7 @@
           </a-col>
         </a-row>
 
-        <a-row class="mt-1" align="middle" justify="space-around">
+        <!-- <a-row class="mt-1" align="middle" justify="space-around">
           <a-col>
             <a-tooltip overlayClassName="tool-container-tooltip" :mouseEnterDelay="1">
               <template #title>
@@ -162,14 +162,21 @@
               <a-button type="primary" size="small" ghost danger @click="testClick"> Tét 2 </a-button>
             </a-tooltip>
           </a-col>
-        </a-row>
+        </a-row> -->
       </a-card>
     </div>
 
     <div id="remove-point-overlay">
       <!-- <i class="fa-solid fa-xmark"></i>
       xoá đỉnh -->
-      <a-button type="primary" size="small" ghost danger @click="removePoint">
+      <a-button
+        ref="removeVertexButton"
+        id="removeVertextButton"
+        type="primary"
+        size="small"
+        ghost
+        danger
+        @click="removePoint">
         <template #icon><i class="fa-solid fa-xmark"></i></template>
       </a-button>
     </div>
@@ -396,14 +403,61 @@
         </a-card>
       </a-spin>
     </a-modal>
+
+    <a-modal v-model:open="removeConfirmModalOpen" :maskClosable="false" :closable="false" width="25%">
+      <template #title>
+        <a-row>
+          <a-col :span="2">
+            <ExclamationCircleOutlined class="fs-4 me-2 text-warning"></ExclamationCircleOutlined>
+          </a-col>
+
+          <span class="fs-6"> Bạn có chắc muốn xoá đối tượng này? </span>
+        </a-row>
+      </template>
+      <template #footer>
+        <a-button key="back" @click="removeConfirmModalCancel">Huỷ</a-button>
+
+        <a-button key="submit" type="primary" @click="removeConfirmModalSave" style="padding: 0 30px"> Lưu </a-button>
+      </template>
+      <a-row>
+        <a-col :span="2"> </a-col>
+
+        <span class="text-danger">Những dữ liệu được thay đổi sẽ không thể trở lại.</span>
+      </a-row>
+    </a-modal>
+
+    <a-modal v-model:open="saveModalOpen" :maskClosable="false" :closable="false" width="25%">
+      <template #title>
+        <a-row>
+          <a-col :span="2">
+            <ExclamationCircleOutlined class="fs-4 me-2 text-warning"></ExclamationCircleOutlined>
+          </a-col>
+
+          <span class="fs-6"> Bạn có chắc muốn muốn lưu những thay đổi? </span>
+        </a-row>
+      </template>
+      <template #footer>
+        <a-button key="back" @click="saveModalCancel">Huỷ</a-button>
+
+        <a-button key="submit" type="primary" @click="saveModalSave" :loading="saveLoading" style="padding: 0 30px">
+          Lưu
+        </a-button>
+      </template>
+      <a-row>
+        <a-col :span="2"> </a-col>
+        <span class="text-danger">Những dữ liệu được thay đổi sẽ không thể trở lại.</span>
+      </a-row>
+    </a-modal>
   </div>
 </template>
 
 <script>
-import { defineComponent, inject } from 'vue';
+import { defineComponent, inject, ref } from 'vue';
+import { ExclamationCircleOutlined } from '@ant-design/icons-vue';
 import { mapState } from '@/stores/map-state';
 import * as VueLayer from '@/js/openlayers/VueLayer.js';
 import thuyLoiApi from '@/js/axios/thuyLoiApi.js';
+import { getItem, setItem, removeItem } from '@/js/utils/localStorage.js';
 
 import { WKB } from 'ol/format';
 import Overlay from 'ol/Overlay.js';
@@ -426,11 +480,17 @@ import { altKeyOnly } from 'ol/events/condition';
 import * as turf from '@turf/turf';
 
 export default defineComponent({
+  components: {
+    ExclamationCircleOutlined,
+  },
+
   setup() {
     const buttonSize = inject('buttonSize');
+    const cancelSave = ref('');
 
     return {
       buttonSize,
+      cancelSave,
     };
   },
 
@@ -459,7 +519,6 @@ export default defineComponent({
         new: [],
         modify: [],
         remove: [],
-        properties: [],
       },
       vertexSelected: null,
       saveStatus: true,
@@ -467,6 +526,9 @@ export default defineComponent({
       newFeatureDrawStatus: false,
       newFeatureModalOpen: false,
       newFeatureSelectedKeys: [1],
+      removeConfirmModalOpen: false,
+      saveModalOpen: false,
+      saveLoading: false,
       selectStatus: false,
       selectedFeature: null,
 
@@ -789,6 +851,14 @@ export default defineComponent({
 
       return featureSelect;
     },
+    layerSourceSelected() {
+      return VueLayer.getLayerByDbName(this.map, this.layerSelected, 1).getSource();
+    },
+    wkbFormat() {
+      return new WKB({
+        geometryLayout: 'XYZM',
+      });
+    },
   },
 
   watch: {
@@ -846,14 +916,27 @@ export default defineComponent({
       this.stopNewFeatureDraw();
       this.changeSelectStatus(false);
       this.stopSplitDraw();
-      // console.log(this.);
-      // this.featureModifySelect.setActive(true);
-      // this.featureModify.setActive(true);
     },
 
     save() {
+      this.saveModalOpen = true;
+    },
+
+    saveModalCancel() {
+      this.saveModalOpen = false;
+      this.cancelUpdateFeatureInfo.cancel('Cập nhật feature không thành công');
+    },
+
+    saveModalSave() {
+      this.cancelUpdateFeatureInfo = axios.CancelToken.source();
+      this.saveLoading = true;
       thuyLoiApi
-        .post('/update-feature-geom', this.featureCollections)
+        .post('/update-feature-geom', this.featureCollections, {
+          cancelToken: this.cancelUpdateFeatureInfo.token,
+          headers: {
+            Authorization: `Bearer ${getItem('accessToken')}`,
+          },
+        })
         .then((response) => {
           console.log(response);
           this.featureCollections = {
@@ -862,18 +945,54 @@ export default defineComponent({
             remove: [],
           };
           VueLayer.getLayerByDbName(this.map, this.layerSelected, 1).getSource().refresh();
+
           this.$message.success(response.data.message, 3);
+          this.saveLoading = false;
+          this.saveModalOpen = false;
         })
         .catch((error) => {
           console.log(error);
-          this.$message.success(error.response.data.message, 3);
+          if (error.code == 'ERR_CANCELED') {
+            this.$message.error(error.message, 3);
+          } else {
+            this.$message.error(error.response.data.message, 3);
+          }
+          this.saveModalOpen = false;
         });
     },
 
     // --------------------------------------------------------------------------------------
     // Modify ----------------------------------------------------------------------
     // --------------------------------------------------------------------------------------
+    addModifiedFeature(feature) {
+      if (feature.getId()) {
+        const featureLayer = feature.getId().split('.')[0];
+        const featureGid = feature.getId().split('.')[1];
 
+        const featureGeometry = feature.getGeometry();
+        const geom = this.wkbFormat.writeGeometry(featureGeometry);
+
+        for (let i = 0; i < this.featureCollections.modify.length; i++) {
+          if (this.featureCollections.modify[i].gid === featureGid) {
+            this.featureCollections.modify[i].geom = geom;
+            // console.log(this.featureCollections.modify);
+            return;
+          }
+        }
+        this.featureCollections.modify.push({ layer: featureLayer, gid: featureGid, geom: geom, properties: null });
+      } else if (!feature.getId()) {
+        const featureGid = feature.get('tempId');
+        const featureGeometry = feature.getGeometry();
+        const geom = this.wkbFormat.writeGeometry(featureGeometry);
+
+        for (let i = 0; i < this.featureCollections.new.length; i++) {
+          if (this.featureCollections.new[i].gid === featureGid) {
+            this.featureCollections.new[i].geom = geom;
+            return;
+          }
+        }
+      }
+    },
     addModifyEvent() {
       let that = this;
       this.map.addInteraction(this.featureModifySelect);
@@ -888,41 +1007,20 @@ export default defineComponent({
       });
 
       this.featureModify.on('modifyend', (e) => {
-        const feature = e.features.getArray()[0];
-        // console.log(feature.getGeometry().getCoordinates());
-        // console.log(this.featureModifySelect.getFeatures());
-        // console.log(e.features.getArray());
-        if (feature && feature.getId()) {
-          const featureLayer = feature.getId().split('.')[0];
-          const featureGid = feature.getId().split('.')[1];
+        const features = e.features.getArray();
+        if (features) {
+          features.forEach((feature) => {
+            this.addModifiedFeature(feature);
+          });
+        }
+      });
 
-          const featureGeometry = feature.getGeometry();
-          const wkbFormat = new WKB();
-          const geom = wkbFormat.writeGeometry(featureGeometry);
-
-          for (let i = 0; i < that.featureCollections.modify.length; i++) {
-            if (that.featureCollections.modify[i].gid === featureGid) {
-              that.featureCollections.modify[i].geom = geom;
-              // console.log(that.featureCollections.modify);
-              return;
-            }
-          }
-          // console.log(that.featureCollections.modify);
-          that.featureCollections.modify.push({ layer: featureLayer, gid: featureGid, geom: geom, properties: null });
-          // console.log(that.featureModifySelect.getFeatures());
-        } else if (feature && !feature.getId()) {
-          const featureGid = feature.get('tempId');
-          const featureGeometry = feature.getGeometry();
-          const wkbFormat = new WKB();
-          const geom = wkbFormat.writeGeometry(featureGeometry);
-
-          for (let i = 0; i < that.featureCollections.new.length; i++) {
-            if (that.featureCollections.new[i].gid === featureGid) {
-              that.featureCollections.new[i].geom = geom;
-              console.log(that.featureCollections.new[i].geom);
-              return;
-            }
-          }
+      this.featureModifyDrag.on('translateend', (e) => {
+        const features = e.features.getArray();
+        if (features) {
+          features.forEach((feature) => {
+            this.addModifiedFeature(feature);
+          });
         }
       });
     },
@@ -945,14 +1043,30 @@ export default defineComponent({
 
     toggleModify() {
       if (!this.layerSelected) return;
-      this.changeModifyStatus(!this.modifyStatus);
       this.stopNewFeatureDraw();
-      this.changeSelectStatus(false);
       this.stopSplitDraw();
+      this.changeSelectStatus(false);
+      this.changeModifyStatus(!this.modifyStatus);
     },
 
     removePoint() {
       this.featureModify.removePoint();
+    },
+
+    addNewFeature(oldFeature, newFeature, geometry) {
+      this.layerSourceSelected.addFeature(newFeature);
+      const properties = oldFeature.getProperties();
+      delete properties['geometry'];
+      newFeature.setProperties(properties);
+      const wkb = this.wkbFormat.writeGeometry(geometry);
+      const tempId = Math.floor(Math.random() * 1000) + 1;
+      newFeature.set('tempId', tempId);
+      this.featureCollections.new.push({
+        layer: this.layerSelected,
+        gid: tempId,
+        geom: wkb,
+        properties: newFeature.getProperties(),
+      });
     },
 
     startSplitDraw() {
@@ -984,7 +1098,7 @@ export default defineComponent({
       });
 
       const stop = () => {
-        layerSource.removeFeature(feature);
+        this.removeFeature(feature);
         this.stopSplitDraw();
         this.featureModifySelect.getFeatures().clear();
         this.featureModifySelect.setActive(true);
@@ -1066,7 +1180,7 @@ export default defineComponent({
           let polygonizer = new jsts.operation.polygonize.Polygonizer();
           polygonizer.add(union);
           let polygons = polygonizer.getPolygons();
-          console.log(polygons);
+
           if (polygons.array.length == 2) {
             polygons.array.forEach((geom) => {
               holes.forEach((hole) => {
@@ -1086,9 +1200,11 @@ export default defineComponent({
               let splittedPolygon = new Feature({
                 geometry: geometry,
               });
-              layerSource.addFeature(splittedPolygon);
+
+              this.addNewFeature(feature, splittedPolygon, geometry);
             });
             stop();
+            console.log(this.featureCollections);
           }
         });
       } else if (type == 'MultiLineString' || type == 'LineString') {
@@ -1111,9 +1227,11 @@ export default defineComponent({
               let splittedLineString = new Feature({
                 geometry: geometry,
               });
-              layerSource.addFeature(splittedLineString);
+
+              this.addNewFeature(feature, splittedLineString, geometry);
             });
             stop();
+            console.log(this.featureCollections);
           }
         });
       }
@@ -1164,17 +1282,27 @@ export default defineComponent({
 
           if (mergeCount.length > 1) {
             let geometry;
-            if (type == 'MultiPolygon') geometry = new MultiPolygon(target.geometry.coordinates);
-            else geometry = new Polygon(target.geometry.coordinates);
+            if (type == 'MultiPolygon') {
+              // Kiểm tra Multi chỉ có một polygon và Multi có nhiều polygon
+              // Type trên là của feature còn type dưới này là của feature mới sau khi union
+
+              if (target.geometry.type == 'MultiPolygon') {
+                geometry = new MultiPolygon(target.geometry.coordinates);
+              } else {
+                geometry = new MultiPolygon([target.geometry.coordinates]);
+              }
+            } else geometry = new Polygon(target.geometry.coordinates);
             const feature = new Feature({
               geometry: geometry,
             });
-            console.log(feature.getGeometry());
-            layerSource.addFeature(feature);
+
+            this.addNewFeature(polygons[0], feature, geometry);
+
             mergeCount.forEach((element) => {
-              layerSource.removeFeature(element);
+              this.removeFeature(element);
             });
-            this.featureModifySelect.getFeatures().clear();
+
+            console.log(this.featureCollections);
           }
         }
       }
@@ -1189,9 +1317,8 @@ export default defineComponent({
       this.map.addInteraction(this.featureSelect);
 
       this.featureSelect.on('select', (e) => {
-        // console.log(e);
         const feature = e.selected[0];
-        // console.log(e);
+
         if (feature) {
           this.selectedFeature = feature;
           // if (feature.getId()) {
@@ -1227,11 +1354,11 @@ export default defineComponent({
       this.newFeatureDraw.on('drawend', (e) => {
         const feature = e.feature;
         const featureGeometry = feature.getGeometry();
-        const wkbFormat = new WKB();
-        const geom = wkbFormat.writeGeometry(featureGeometry);
+        const geom = this.wkbFormat.writeGeometry(featureGeometry);
         const tempId = Math.floor(Math.random() * 1000) + 1;
         feature.set('tempId', tempId);
         // console.log(this.layer);
+
         this.newFeatureModalOpen = true;
         this.newFeature = {
           layer: this.layerSelected,
@@ -1246,7 +1373,6 @@ export default defineComponent({
 
       this.map.addInteraction(this.newFeatureDraw);
       this.map.addInteraction(this.modifySnap);
-      console.log(this.map.getInteractions());
       this.newFeatureDrawStatus = true;
     },
 
@@ -1349,7 +1475,6 @@ export default defineComponent({
       this.featureSelect.setActive(this.selectStatus);
       this.featureSelect.getFeatures().clear();
       this.selectedFeature = null;
-      // console.log(this.featureSelect.getActive());
     },
 
     toggleSelect() {
@@ -1359,18 +1484,39 @@ export default defineComponent({
       this.stopNewFeatureDraw();
     },
 
+    removeFeature(feature) {
+      if (feature.getId()) {
+        const featureLayer = feature.getId().split('.')[0];
+        const featureGid = feature.getId().split('.')[1];
+        this.featureCollections.modify = this.featureCollections.modify.filter((item) => item.gid != featureGid);
+        this.featureCollections.remove.push({ layer: featureLayer, gid: featureGid });
+      } else {
+        const gid = feature.get('tempId');
+        this.featureCollections.new = this.featureCollections.new.filter((item) => item.gid != gid);
+      }
+      this.layerSourceSelected.removeFeature(feature);
+    },
+
     removeSelectedFeature() {
+      this.removeConfirmModalOpen = true;
+    },
+
+    removeConfirmModalCancel() {
+      this.removeConfirmModalOpen = false;
+    },
+
+    removeConfirmModalSave() {
       if (this.selectedFeature) {
-        VueLayer.getLayerByDbName(this.map, this.layerSelected, 1).getSource().removeFeature(this.selectedFeature);
-        if (this.selectedFeature.getId()) {
-          const featureLayer = this.selectedFeature.getId().split('.')[0];
-          const featureGid = this.selectedFeature.getId().split('.')[1];
-          this.featureCollections.remove.push({ layer: featureLayer, gid: featureGid });
-        } else {
-          const gid = this.selectedFeature.get('tempId');
-          this.featureCollections.new = this.featureCollections.new.filter((item) => item.gid != gid);
-        }
+        // console.log(this.selectedFeature);
+        this.featureSelect
+          .getFeatures()
+          .getArray()
+          .forEach((feature) => {
+            this.removeFeature(feature);
+          });
+
         this.selectedFeature = null;
+        this.removeConfirmModalOpen = false;
       }
     },
 
@@ -1379,38 +1525,38 @@ export default defineComponent({
     },
 
     editFeatureInfoModalSave() {
-      if (this.selectedFeature.getId()) {
-        const featureLayer = this.selectedFeature.getId().split('.')[0];
-        const featureGid = this.selectedFeature.getId().split('.')[1];
-
-        // Properties ở đây chỉ gửi thử data mẫu
-        // Khi dữ liệu các layer được rõ ràng hơn thì chỉnh sửa sau
-        // Dữ liệu đối tượng đã được tạo thì lấy từ database
-        // Dữ liệu đối tượng mới sẽ được lấy từ featureCollections.new[i].properties
-        const properties = this.selectedFeature.getProperties();
-
-        for (let i = 0; i < this.featureCollections.modify.length; i++) {
-          if (that.featureCollections.modify[i].gid === featureGid) {
-            this.featureCollections.modify[i].properties = properties;
-            return;
-          }
-        }
-
-        this.featureCollections.modify.push({ layer: featureLayer, gid: featureGid, properties: properties });
-      } else {
-        const featureGid = this.selectedFeature.get('tempId');
-        const properties = this.selectedFeature.getProperties();
-
-        for (let i = 0; i < this.featureCollections.new.length; i++) {
-          if (this.featureCollections.new[i].gid === featureGid) {
-            this.featureCollections.new[i].properties = properties;
-            this.editFeatureInfoModalOpen = false;
-            return;
-          }
-        }
-      }
-
-      this.editFeatureInfoModalOpen = false;
+      // if (this.selectedFeature.getId()) {
+      //   const featureLayer = this.selectedFeature.getId().split('.')[0];
+      //   const featureGid = this.selectedFeature.getId().split('.')[1];
+      //   // Properties ở đây chỉ gửi thử data mẫu
+      //   // Khi dữ liệu các layer được rõ ràng hơn thì chỉnh sửa sau
+      //   // Dữ liệu đối tượng đã được tạo thì lấy từ database
+      //   // Dữ liệu đối tượng mới sẽ được lấy từ featureCollections.new[i].properties
+      //   const properties = this.selectedFeature.getProperties();
+      //   for (let i = 0; i < this.featureCollections.modify.length; i++) {
+      //     if (that.featureCollections.modify[i].gid === featureGid) {
+      //       this.featureCollections.modify[i].properties = properties;
+      //       return;
+      //     }
+      //   }
+      //   this.featureCollections.modify.push({
+      //     layer: featureLayer,
+      //     gid: featureGid,
+      //     geom: null,
+      //     properties: properties,
+      //   });
+      // } else {
+      //   const featureGid = this.selectedFeature.get('tempId');
+      //   const properties = this.selectedFeature.getProperties();
+      //   for (let i = 0; i < this.featureCollections.new.length; i++) {
+      //     if (this.featureCollections.new[i].gid === featureGid) {
+      //       this.featureCollections.new[i].properties = properties;
+      //       this.editFeatureInfoModalOpen = false;
+      //       return;
+      //     }
+      //   }
+      // }
+      // this.editFeatureInfoModalOpen = false;
     },
 
     editFeatureInfo() {
@@ -1428,6 +1574,7 @@ export default defineComponent({
   mounted() {
     const container = document.getElementById('map-container');
     container.appendChild(this.$refs.controlPanel);
+    // this.removePoint();
   },
 });
 </script>

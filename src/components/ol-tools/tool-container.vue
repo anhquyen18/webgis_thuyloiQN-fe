@@ -10,8 +10,8 @@
     <FeatureInfoPopup></FeatureInfoPopup>
     <MapPrinter></MapPrinter>
     <GeolocationTool></GeolocationTool>
-    <FeatureModifyTool></FeatureModifyTool>
-    <!-- <FeatureModifyTool v-if="loginState"</FeatureModifyTool> -->
+    <!-- <FeatureModifyTool></FeatureModifyTool> -->
+    <FeatureModifyTool v-show="loginState"></FeatureModifyTool>
     <!-- <a-button class="white-border-ant-button" type="primary" size="small">
       <i class="fa-solid fa-pencil"></i>
     </a-button> -->
