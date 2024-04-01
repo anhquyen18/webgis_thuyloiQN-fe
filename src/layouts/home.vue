@@ -52,7 +52,7 @@
                     class="white-border-ant-button ms-2"
                     type="primary"
                     @click="danhMucClick"
-                    size="small"
+                    :size="buttonSize"
                     style="padding-left: 15px; padding-right: 15px">
                     Danh Mục
                   </a-button>
@@ -60,14 +60,14 @@
                     class="white-border-ant-button"
                     type="primary"
                     @click="truyVanClick"
-                    size="small"
+                    :size="buttonSize"
                     style="padding-left: 15px; padding-right: 15px">
                     Truy vấn
                   </a-button>
                 </a-row>
               </a-col>
 
-              <a-col :span="5" class="h-100">
+              <a-col :span="6" class="h-100">
                 <ToolContainer></ToolContainer>
               </a-col>
 
@@ -250,10 +250,14 @@ export default defineComponent({
     });
     provide('featurePropShow', featurePropShow);
 
+    const buttonSize = ref('small');
+    provide('buttonSize', buttonSize);
+    if (window.innerWidth > 1600) buttonSize.value = 'medium';
     return {
       sliderValue,
       siderLayerManagerState,
       userProfile,
+      buttonSize,
     };
   },
   data() {

@@ -13,16 +13,17 @@ import { Style, Icon, Stroke, Circle, Fill, Text, RegularShape, Image } from 'ol
 import { GeoJSON } from 'ol/format.js';
 import { ZoomSlider, ScaleLine, defaults as defaultControls } from 'ol/control.js';
 import Overlay from 'ol/Overlay.js';
+import { Draw, Modify, Snap, Select } from 'ol/interaction.js';
+import { doubleClick as doubleClickMapEvent } from 'ol/events/condition.js';
+import { MultiPoint } from 'ol/geom.js';
 
 import ol_interaction_Hover from 'ol-ext/interaction/Hover.js';
-import Scale from 'ol-ext/control/Scale.js';
 import ol_control_Legend from 'ol-ext/control/Legend.js';
 import ol_legend_Legend from 'ol-ext/legend/Legend.js';
-import ol_control_CanvasAttribution from 'ol-ext/control/CanvasAttribution.js';
 import ol_control_CanvasTitle from 'ol-ext/control/CanvasTitle.js';
 import ol_control_PrintDialog from 'ol-ext/control/PrintDialog.js';
 import ol_control_CanvasScaleLine from 'ol-ext/control/CanvasScaleLine.js';
-import { get } from 'ol/proj.js';
+import ol_interaction_ModifyTouch from 'ol-ext/interaction/ModifyTouch.js';
 
 import jsPDF from 'jspdf';
 import { saveAs } from 'file-saver';
@@ -32,8 +33,8 @@ import hoChuaLegendImage from '@/assets/legend-image/ho-chua.png';
 const runMap = () => {
   // var map;
   // const GEOSERVER_DOMAIN = 'http://aqtran.name.vn:8080';
-  const GEOSERVER_DOMAIN = 'https://geo.tamky.click';
-  // const GEOSERVER_DOMAIN = 'http://localhost:8080';
+  // const GEOSERVER_DOMAIN = 'https://geo.tamky.click';
+  const GEOSERVER_DOMAIN = 'http://localhost:8080';
   const GEOSERVER_WORKSPACE = 'webgis_dev';
   const map = new Map({
     target: 'map',
@@ -140,6 +141,7 @@ const runMap = () => {
     layers: [
       new VectorLayer({
         title: 'Hồ chứa layer',
+        dbName: 'ho_chua_quang_nam_epsg5899',
         preview: '/src/assets/luffy-chilling-gear5-round.png',
         // preview: 'F:/Programming project/Personal/web-gis-dev/front-end/src/assets/luffy-chilling-gear5-round.png',
         source: new VectorSource({
@@ -163,6 +165,7 @@ const runMap = () => {
 
       new VectorLayer({
         title: 'Kênh layer',
+        dbName: 'kenh',
         source: new VectorSource({
           // url: 'http://localhost:8080/geoserver/webgis_dev/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=webgis_dev%3Akenh&outputFormat=application%2Fjson',
           // url:
@@ -184,6 +187,7 @@ const runMap = () => {
 
       new VectorLayer({
         title: 'Cửa xả layer',
+        dbName: 'cuaxa',
         source: new VectorSource({
           // url: 'http://localhost:8080/geoserver/webgis_dev/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=webgis_dev%3Acua_xa&outputFormat=application%2Fjson',
           // url: 'http://localhost:8080/geoserver/webgis_dev/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=webgis_dev%3Acua_xa_postgresql&outputFormat=application%2Fjson',
@@ -401,6 +405,47 @@ const runMap = () => {
   });
   map.addControl(printControl);
 
+  // ---------------------------------
+  // ----------Geolocation control--------------------------------------------------------------------------------------------------------
+  // ---------------------------------
+  // var geoloc = new ol_control_GeolocationButton({
+  //   // title: 'Where am I?',
+  //   delay: 3000, // 2s
+  // });
+  // geoloc.set('title', 'Geolocation control');
+  // geoloc.setVisible(false);
+  // map.addControl(geoloc);
+  const geolocationStyle = {
+    Point: new Style({
+      image: new Circle({
+        radius: 6,
+        fill: new Fill({
+          color: '#00b4d8',
+        }),
+        stroke: new Stroke({
+          color: 'white',
+          width: 2,
+        }),
+      }),
+    }),
+    Circle: new Style({
+      stroke: new Stroke({
+        color: '#6ec531',
+        width: 1,
+      }),
+      fill: new Fill({
+        color: 'rgba(255,255,255, 0.5)',
+      }),
+    }),
+  };
+  const geolocationLayer = new VectorLayer({
+    title: 'Geolocation layer',
+    source: new VectorSource(),
+    style: (feature) => {
+      return geolocationStyle[feature.getGeometry().getType()];
+    },
+  });
+  map.addLayer(geolocationLayer);
   return map;
 };
 

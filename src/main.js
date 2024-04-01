@@ -29,19 +29,13 @@ import {
 } from 'ant-design-vue';
 import App from './App.vue';
 import axios from 'axios';
-// import Cesium as Cesium from '../node_modules/cesium/Build/Cesium/Cesium.js';
-// window.Cesium = Cesium;
 window.axios = axios;
 
 import '../node_modules/bootstrap/dist/css/bootstrap-grid.min.css';
 import '../node_modules/bootstrap/dist/css/bootstrap-utilities.min.css';
-// import '../node_modules/chart.js/dist/chart.umd.js';
-import '../node_modules/dayjs/dayjs.min.js';
-import '../node_modules/ol/dist/ol.js';
-// import '../node_modules/ol/ol.css';
-// import '../node_modules/cesium/Build/Cesium/Cesium.js';
 import '../node_modules/ol/ol.css';
 import '../node_modules/ol-ext/dist/ol-ext.css';
+import '../node_modules/jsts/dist/jsts.min.js';
 
 const app = createApp(App);
 app.config.productionTip = false;

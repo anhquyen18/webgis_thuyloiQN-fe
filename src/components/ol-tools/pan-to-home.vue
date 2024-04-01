@@ -1,20 +1,23 @@
 <template>
-  <a-tooltip overlayClassName="tool-container-tooltip">
+  <a-tooltip overlayClassName="tool-container-tooltip" :mouseEnterDelay="1">
     <template #title>
       <p>Trở về</p>
     </template>
-    <a-button class="white-border-ant-button" type="primary" size="small" @click="panToHome">
+    <a-button class="white-border-ant-button" type="primary" :size="buttonSize" @click="panToHome">
       <i class="fa-solid fa-house"></i>
     </a-button>
   </a-tooltip>
 </template>
 
 <script>
-import { defineComponent } from 'vue';
+import { defineComponent, inject, ref } from 'vue';
 import { mapState } from '../../stores/map-state.js';
 export default defineComponent({
   setup() {
-    return {};
+    const buttonSize = inject('buttonSize');
+    return {
+      buttonSize,
+    };
   },
   data() {
     return {};

@@ -290,6 +290,7 @@ export default defineComponent({
 .layers-visible-menu .ant-menu-item {
   padding-left: 2rem !important;
 }
+
 .icon {
   background: url('luffy-chilling-gear5-round.png');
   height: 20px;

@@ -1,28 +1,31 @@
 <template>
-  <a-tooltip overlayClassName="tool-container-tooltip">
+  <a-tooltip overlayClassName="tool-container-tooltip" :mouseEnterDelay="1">
     <template #title>
       <p>Phóng to</p>
     </template>
-    <a-button class="white-border-ant-button" type="primary" size="small" @click="zoomIn">
+    <a-button class="white-border-ant-button" type="primary" :size="buttonSize" @click="zoomIn">
       <i class="fa-solid fa-magnifying-glass-plus"></i>
     </a-button>
   </a-tooltip>
-  <a-tooltip overlayClassName="tool-container-tooltip">
+  <a-tooltip overlayClassName="tool-container-tooltip" :mouseEnterDelay="1">
     <template #title>
       <p>Thu nhỏ</p>
     </template>
-    <a-button class="white-border-ant-button" type="primary" size="small" @click="zoomOut">
+    <a-button class="white-border-ant-button" type="primary" :size="buttonSize" @click="zoomOut">
       <i class="fa-solid fa-magnifying-glass-minus"></i>
     </a-button>
   </a-tooltip>
 </template>
 
 <script>
-import { defineComponent } from 'vue';
+import { defineComponent, inject, ref } from 'vue';
 import { mapState } from '../../stores/map-state.js';
 export default defineComponent({
   setup() {
-    return {};
+    const buttonSize = inject('buttonSize');
+    return {
+      buttonSize,
+    };
   },
   data() {
     return {};
