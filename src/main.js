@@ -26,6 +26,7 @@ import {
   Form,
   Checkbox,
   Popconfirm,
+  Result,
 } from 'ant-design-vue';
 import App from './App.vue';
 import axios from 'axios';
@@ -41,6 +42,10 @@ const app = createApp(App);
 app.config.productionTip = false;
 app.use(createPinia());
 app.use(router);
+router.beforeEach((to, from, next) => {
+  if (to.name !== 'home-page') document.title = to.meta.title;
+  next();
+});
 
 app.use(Button);
 app.use(Row);
@@ -65,6 +70,7 @@ app.use(Carousel);
 app.use(Form);
 app.use(Checkbox);
 app.use(Popconfirm);
+app.use(Result);
 
 app.mount('#app');
 

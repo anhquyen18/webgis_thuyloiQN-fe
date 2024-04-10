@@ -5,7 +5,7 @@
         colorPrimary: '#2a83ff',
         sizeStep: 4,
         sizeUnit: 2,
-        borderRadius: 8,
+        borderRadius: 6,
         wireframe: false,
       },
     }">

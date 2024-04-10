@@ -90,6 +90,7 @@
                 <div ref="mapContainer" id="map-container" class="content-container h-100" style="position: relative">
                   <div id="map" class="map h-100"></div>
                   <div class="bottom-right-nav align-items-center">
+                    <IrrigationToolContainer></IrrigationToolContainer>
                     <LayerManager class="mt-5"></LayerManager>
                   </div>
                   <LegendControl></LegendControl>
@@ -161,6 +162,8 @@ import LayerManager from '../components/ol-tools/layer-manager.vue';
 import SearchByNameTool from '../components/sider/search-by-name-tool.vue';
 import LegendControl from '@/components/ol-tools/legend-control.vue';
 import Login from '@/components/login/login.vue';
+import IrrigationToolContainer from '@/components/irrigation-tools/tool-container.vue';
+
 export default defineComponent({
   components: {
     ToolContainer,
@@ -169,6 +172,7 @@ export default defineComponent({
     SearchByNameTool,
     LegendControl,
     Login,
+    IrrigationToolContainer,
   },
 
   beforeRouteEnter(to, from, next) {
@@ -176,7 +180,8 @@ export default defineComponent({
       next((data) => {
         data.homeSpinning = false;
         if (from.name === 'login-page') {
-          data.userProfile = JSON.parse(getItem('user'));
+          const item = getItem('user');
+          if (item) data.userProfile = JSON.parse(item);
         }
       });
     } else {
