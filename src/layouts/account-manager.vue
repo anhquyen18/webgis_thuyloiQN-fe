@@ -6,23 +6,45 @@
     ">
     <a-layout-header class="account-manager-header">
       <a-row style="height: 80%">
-        <a-col :span="6" :offset="2" class="center-col" style="justify-content: left">
-          <a href="/" style="height: 80%">
-            <img class="ms-4" src="../assets/Logo_BoNongNghiep.ico" alt="" style="width: auto; height: 100%" />
-          </a>
+        <a-col class="all-h-100" :xs="0" :sm="{ span: 0, offset: 0 }" :xl="{ span: 3, offset: 2 }">
+          <a-flex justify="left" align="center">
+            <a href="/">
+              <img class="ms-4" src="../assets/Logo_BoNongNghiep.ico" alt="" style="width: auto" />
+            </a>
+          </a-flex>
         </a-col>
-        <a-col :span="6" :offset="6" class="center-col" style="justify-content: right">
-          <a-flex>
+
+        <a-col
+          class="all-h-100"
+          :xs="{ span: 16, offset: 0 }"
+          :sm="{ span: 6, offset: 0 }"
+          :xl="{ span: 0, offset: 0 }">
+          <a-flex justify="left" align="center">
+            <a href="/" style="height: 80%">
+              <img class="ms-4" src="../assets/Logo_BoNongNghiep.ico" alt="" style="width: auto; height: 100%" />
+            </a>
+          </a-flex>
+        </a-col>
+
+        <a-col :xs="0" :sm="{ span: 10, offset: 2 }" :xl="{ span: 6, offset: 9 }">
+          <a-flex class="h-100" justify="right" align="center">
             <a-button class="no-border-ant-button fw-bold fs-6 me-4" href="" ghost>Trang chủ</a-button>
             <a-button class="no-border-ant-button fw-bold fs-6 me-4" href="" ghost>Hỗ trợ</a-button>
             <a-button class="no-border-ant-button fw-bold fs-6" href="" ghost>Yêu cầu</a-button>
           </a-flex>
         </a-col>
-        <a-col :span="1" class="center-col">
-          <a-divider type="vertical" style="height: 20%; background-color: #fff; margin-top: 5px" />
+        <a-col class="all-h-100" :xs="{ span: 0, offset: 0 }" :sm="{ span: 1, offset: 0 }" :xl="{ span: 1, offset: 0 }">
+          <a-flex justify="center" align="center">
+            <a-divider type="vertical" style="height: 20%; background-color: #fff; margin-top: 5px" />
+          </a-flex>
         </a-col>
 
-        <a-col :span="3" class="center-col" style="justify-content: left">
+        <a-col
+          :xs="{ span: 8, offset: 0 }"
+          :sm="{ span: 3, offset: 0 }"
+          :xl="{ span: 3, offset: 0 }"
+          class="center-col"
+          style="justify-content: left; padding-left: 25px">
           <a-popover
             trigger="click"
             :arrowPointAtCenter="true"
@@ -65,7 +87,7 @@
         <a-card :bordered="false" class="account-manager-card">
           <p class="fs-3 fw-bold mb-1 text-white">Trần Anh Quyền</p>
           <a-row>
-            <a-col :span="15">
+            <a-col :xs="{ span: 24 }" :sm="{ span: 15 }">
               <span>
                 <p class="fw-bold mt-1">Đơn vị:</p>
                 <p>Trung tâm Nghiên cứu tài nguyên nước - Đại học Bách khoa Đà Nẵng</p>
@@ -80,64 +102,163 @@
                 <p>Chuyên viên kỹ thuật</p>
               </span>
             </a-col>
-            <!-- 
-            <a-col :span="14">
-              <p>Trung tâm Nghiên cứu tài nguyên nước - Đại học Bách khoa Đà Nẵng</p>
-              <p>Kỹ thuật</p>
-              <p>Chuyên viên kỹ thuật</p>
-            </a-col> -->
 
-            <a-col :span="9" class="center-col">
+            <a-col :span="9" style="padding: 10px 0 0 20px">
               <img style="width: 180px; height: 250px" src="../assets/20230522_144015000_iOS.jpg" />
             </a-col>
           </a-row>
         </a-card>
         <a-card :bordered="false" class="account-manager-card">
           <p class="fs-3 fw-bold mb-4">Tài khoản</p>
-          <p>Chỉnh sửa hồ sơ</p>
-          <p>Đổi ảnh đại diện</p>
-          <p>Địa chỉ</p>
-          <p>Mật khẩu</p>
-        </a-card>
-        <a-card :bordered="false" class="account-manager-card">
-          <p class="fs-3 fw-bold mb-4">Tài khoản</p>
-          <a-button class="no-border-ant-button fw-bold fs-6" ghost>Yêu cầu</a-button>
+          <a-flex vertical :gap="8">
+            <a-button
+              class="no-border-ant-button background-hover-button fs-6"
+              ghost
+              block
+              style="height: auto; padding: 15px">
+              <a-row justify="space-between" align="middle">
+                <a-col class="center-col">
+                  <i class="fa-solid fa-pen me-3 fs-4" style="width: 30px"></i>
 
-          <p>card content</p>
+                  <p class="fw-bold">Chỉnh sửa hồ sơ</p>
+                </a-col>
+                <a-col class="center-col">
+                  <i class="fa-solid fa-angles-right"></i>
+                </a-col>
+              </a-row>
+            </a-button>
+            <a-button
+              class="no-border-ant-button background-hover-button fs-6"
+              ghost
+              block
+              style="height: auto; padding: 15px">
+              <a-row justify="space-between" align="middle">
+                <a-col class="center-col">
+                  <i class="fa-solid fa-location-dot me-3 fs-4" style="width: 30px"></i>
+                  <p class="fw-bold">Địa chỉ</p>
+                </a-col>
+                <a-col class="center-col">
+                  <i class="fa-solid fa-angles-right"></i>
+                </a-col>
+              </a-row>
+            </a-button>
+            <a-button
+              class="no-border-ant-button background-hover-button fs-6"
+              ghost
+              block
+              style="height: auto; padding: 15px">
+              <a-row justify="space-between" align="middle">
+                <a-col class="center-col">
+                  <i class="fa-solid fa-lock me-3 fs-4" style="width: 30px"></i>
+                  <p class="fw-bold">Đổi mật khẩu</p>
+                </a-col>
+                <a-col class="center-col">
+                  <i class="fa-solid fa-angles-right"></i>
+                </a-col>
+              </a-row>
+            </a-button>
+          </a-flex>
         </a-card>
         <a-card :bordered="false" class="account-manager-card">
           <p class="fs-3 fw-bold mb-4">Tài khoản</p>
-          <p>card content</p>
-          <a-button class="no-border-ant-button fw-bold fs-6" ghost
-            >Lorem ipsum dolor sit amet consectetur adipisicing elit. Rerum, voluptates tempora! Sequi odit veniam in,
-          </a-button>
+          <a-flex vertical :gap="8">
+            <a-button
+              class="no-border-ant-button background-hover-button fs-6"
+              ghost
+              block
+              style="height: auto; padding: 15px">
+              <a-row justify="space-between" align="middle">
+                <a-col class="center-col">
+                  <i class="fa-solid fa-pen me-3 fs-4" style="width: 30px"></i>
+
+                  <p class="fw-bold">Chỉnh sửa hồ sơ</p>
+                </a-col>
+                <a-col class="center-col">
+                  <i class="fa-solid fa-angles-right"></i>
+                </a-col>
+              </a-row>
+            </a-button>
+            <a-button
+              class="no-border-ant-button background-hover-button fs-6"
+              ghost
+              block
+              style="height: auto; padding: 15px">
+              <a-row justify="space-between" align="middle">
+                <a-col class="center-col">
+                  <i class="fa-solid fa-location-dot me-3 fs-4" style="width: 30px"></i>
+                  <p class="fw-bold">Địa chỉ</p>
+                </a-col>
+                <a-col class="center-col">
+                  <i class="fa-solid fa-angles-right"></i>
+                </a-col>
+              </a-row>
+            </a-button>
+            <a-button
+              class="no-border-ant-button background-hover-button fs-6"
+              ghost
+              block
+              style="height: auto; padding: 15px">
+              <a-row justify="space-between" align="middle">
+                <a-col class="center-col">
+                  <i class="fa-solid fa-lock me-3 fs-4" style="width: 30px"></i>
+                  <p class="fw-bold">Đổi mật khẩu</p>
+                </a-col>
+                <a-col class="center-col">
+                  <i class="fa-solid fa-angles-right"></i>
+                </a-col>
+              </a-row>
+            </a-button>
+          </a-flex>
         </a-card>
         <a-card :bordered="false" class="account-manager-card">
           <p class="fs-3 fw-bold mb-4">Tài khoản</p>
-          <p>card content</p>
-          <p>card content</p>
-        </a-card>
-        <a-card :bordered="false" class="account-manager-card">
-          <p class="fs-3 fw-bold mb-4">Tài khoản</p>
-          <p>card content</p>
-          <p>card content</p>
-        </a-card>
-        <a-card :bordered="false" class="account-manager-card">
-          <p class="fs-3 fw-bold mb-4">Tài khoản</p>
-          <p>card content</p>
-          <p>card content</p>
-        </a-card>
-        <a-card :bordered="false" class="account-manager-card">
-          <p class="fs-3 fw-bold mb-4">Tài khoản</p>
-          <p>card content</p>
-          <p>card content</p>
-        </a-card>
-        <a-card :bordered="false" class="account-manager-card">
-          <p class="fs-3 fw-bold mb-4">Tài khoản</p>
-          <p>card content</p>
-          <a-button class="no-border-ant-button fw-bold fs-6" ghost
-            >Lorem ipsum dolor sit amet consectetur adipisicing elit. Rerum, voluptates tempora! Sequi odit veniam in,
-          </a-button>
+          <a-flex vertical :gap="8">
+            <a-button
+              class="no-border-ant-button background-hover-button fs-6"
+              ghost
+              block
+              style="height: auto; padding: 15px">
+              <a-row justify="space-between" align="middle">
+                <a-col class="center-col">
+                  <i class="fa-solid fa-pen me-3 fs-4" style="width: 30px"></i>
+                  <p class="fw-bold">Chỉnh sửa hồ sơ</p>
+                </a-col>
+                <a-col class="center-col">
+                  <i class="fa-solid fa-angles-right"></i>
+                </a-col>
+              </a-row>
+            </a-button>
+            <a-button
+              class="no-border-ant-button background-hover-button fs-6"
+              ghost
+              block
+              style="height: auto; padding: 15px">
+              <a-row justify="space-between" align="middle">
+                <a-col class="center-col">
+                  <i class="fa-solid fa-location-dot me-3 fs-4" style="width: 30px"></i>
+                  <p class="fw-bold">Địa chỉ</p>
+                </a-col>
+                <a-col class="center-col">
+                  <i class="fa-solid fa-angles-right"></i>
+                </a-col>
+              </a-row>
+            </a-button>
+            <a-button
+              class="no-border-ant-button background-hover-button fs-6"
+              ghost
+              block
+              style="height: auto; padding: 15px">
+              <a-row justify="space-between" align="middle">
+                <a-col class="center-col">
+                  <i class="fa-solid fa-lock me-3 fs-4" style="width: 30px"></i>
+                  <p class="fw-bold">Đổi mật khẩu</p>
+                </a-col>
+                <a-col class="center-col">
+                  <i class="fa-solid fa-angles-right"></i>
+                </a-col>
+              </a-row>
+            </a-button>
+          </a-flex>
         </a-card>
       </a-flex>
     </a-layout-content>
@@ -179,7 +300,7 @@ export default defineComponent({
 }
 
 .account-manager-card {
-  width: 50%;
+  margin: 0 10px;
   background: rgb(27, 79, 175);
   background: linear-gradient(90deg, rgba(27, 79, 175, 1) 0%, rgba(58, 108, 200, 1) 100%); //#1b4faf, #3a6cc8
   color: white;
@@ -188,9 +309,48 @@ export default defineComponent({
 .account-manager-avatar {
   position: absolute;
   top: -2px;
-  left: -40px;
+  left: -45px;
   border-radius: 50%;
   width: 40px;
   height: 40px;
+}
+
+.background-hover-button {
+  transition: 0.3s;
+  &:hover {
+    background-color: rgb(255, 255, 255) !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .account-manager-card {
+    // width: 90%;
+    // background-color: red;
+    width: calc(100% - 15px);
+
+    // width: auto;
+    margin: 0 10px;
+    // width: fit-content;
+  }
+}
+
+@media (min-width: 576px) {
+  .account-manager-card {
+    // width: 90%;
+    // background-color: red;
+    width: 80%;
+  }
+}
+
+// @media only screen and (min-width: 768px) {
+//   .account-manager-card {
+//     max-width: calc(100% / 2 - 10px); /* -10 px accounts for margin: 5px; */
+//   }
+// }
+
+@media (min-width: 1200px) {
+  .account-manager-card {
+    width: 50%;
+  }
 }
 </style>

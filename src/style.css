@@ -13,8 +13,7 @@
   padding: 0;
   margin: 0;
   box-sizing: border-box;
-  font-family: 'Roboto', sans-serif;
-
+  font-family: 'Circular', sans-serif;
   list-style: none;
 }
 
@@ -38,6 +37,16 @@ input::-webkit-inner-spin-button {
   justify-content: center;
   text-align: center;
   height: 100%;
+}
+
+.all-h-100 {
+  height: 100%;
+
+  & * {
+    height: 100%;
+
+
+  }
 }
 
 .no-border-ant-button {
