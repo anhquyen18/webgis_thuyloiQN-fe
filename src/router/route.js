@@ -3,7 +3,7 @@ const home = [
     path: '/',
     name: 'home-page',
     component: () => import('../layouts/home.vue'),
-    meta: { title: 'Home' },
+    meta: { title: 'Hệ thống quản lý công trình thủy lợi Quảng Nam' },
   },
   {
     path: '/login',

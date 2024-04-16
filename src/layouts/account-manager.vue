@@ -16,7 +16,7 @@
 
         <a-col
           class="all-h-100"
-          :xs="{ span: 16, offset: 0 }"
+          :xs="{ span: 15, offset: 0 }"
           :sm="{ span: 6, offset: 0 }"
           :xl="{ span: 0, offset: 0 }">
           <a-flex justify="left" align="center">
@@ -26,21 +26,27 @@
           </a-flex>
         </a-col>
 
-        <a-col :xs="0" :sm="{ span: 10, offset: 2 }" :xl="{ span: 6, offset: 9 }">
+        <a-col v-show="!pageLoading" :xs="0" :sm="{ span: 10, offset: 2 }" :xl="{ span: 6, offset: 9 }">
           <a-flex class="h-100" justify="right" align="center">
             <a-button class="no-border-ant-button fw-bold fs-6 me-4" href="" ghost>Trang chủ</a-button>
             <a-button class="no-border-ant-button fw-bold fs-6 me-4" href="" ghost>Hỗ trợ</a-button>
             <a-button class="no-border-ant-button fw-bold fs-6" href="" ghost>Yêu cầu</a-button>
           </a-flex>
         </a-col>
-        <a-col class="all-h-100" :xs="{ span: 0, offset: 0 }" :sm="{ span: 1, offset: 0 }" :xl="{ span: 1, offset: 0 }">
+        <a-col
+          v-show="!pageLoading"
+          class="all-h-100"
+          :xs="{ span: 0, offset: 0 }"
+          :sm="{ span: 1, offset: 0 }"
+          :xl="{ span: 1, offset: 0 }">
           <a-flex justify="center" align="center">
             <a-divider type="vertical" style="height: 20%; background-color: #fff; margin-top: 5px" />
           </a-flex>
         </a-col>
 
         <a-col
-          :xs="{ span: 8, offset: 0 }"
+          v-show="!pageLoading"
+          :xs="{ span: 9, offset: 0 }"
           :sm="{ span: 3, offset: 0 }"
           :xl="{ span: 3, offset: 0 }"
           class="center-col"
@@ -57,7 +63,8 @@
               class="no-border-ant-button no-wave fw-bold fs-6 ms-4"
               ghost
               style="position: relative; box-shadow: none !important">
-              <img class="account-manager-avatar" src="../assets/20230522_144015000_iOS.jpg" />
+              <!-- <img class="account-manager-avatar" src="../assets/20230522_144015000_iOS.jpg" /> -->
+              <img class="account-manager-avatar" :src="avatar" />
               Hồ sơ
               <i class="fa-solid fa-caret-down ms-2"></i>
             </a-button>
@@ -85,28 +92,29 @@
     <a-layout-content>
       <a-flex vertical gap="20" align="center">
         <a-card :bordered="false" class="account-manager-card">
-          <p class="fs-3 fw-bold mb-1 text-white">Trần Anh Quyền</p>
-          <a-row>
-            <a-col :xs="{ span: 24 }" :sm="{ span: 15 }">
-              <span>
-                <p class="fw-bold mt-1">Đơn vị:</p>
-                <p>Trung tâm Nghiên cứu tài nguyên nước - Đại học Bách khoa Đà Nẵng</p>
-              </span>
-              <span>
-                <p class="fw-bold mt-1">Phòng ban:</p>
-                <p>Kỹ thuật</p>
-              </span>
-
-              <span>
-                <p class="fw-bold mt-1">Chức vụ:</p>
-                <p>Chuyên viên kỹ thuật</p>
-              </span>
-            </a-col>
-
-            <a-col :span="9" style="padding: 10px 0 0 20px">
-              <img style="width: 180px; height: 250px" src="../assets/20230522_144015000_iOS.jpg" />
-            </a-col>
-          </a-row>
+          <a-skeleton :loading="pageLoading" active>
+            <p class="fs-3 fw-bold mb-1 text-white">{{ userProfile.name }}</p>
+            <a-row>
+              <a-col flex="1 1 300px">
+                <a-skeleton :loading="pageLoading" active>
+                  <span>
+                    <p class="fw-bold mt-1">Đơn vị:</p>
+                    <p>{{ userProfile.organization_name }}</p>
+                  </span>
+                  <span>
+                    <p class="fw-bold mt-1">Phòng ban:</p>
+                    <p>{{ userProfile.department_name }}</p>
+                  </span>
+                </a-skeleton>
+              </a-col>
+              <a-col flex="1 0 200px" style="padding: 10px 0 0 20px">
+                <a-skeleton :loading="pageLoading" active avatar>
+                  <!-- <img style="width: 250px; height: auto" src="../assets/20230522_144015000_iOS.jpg" /> -->
+                  <img style="width: 250px; height: auto" :src="avatar" />
+                </a-skeleton>
+              </a-col>
+            </a-row>
+          </a-skeleton>
         </a-card>
         <a-card :bordered="false" class="account-manager-card">
           <p class="fs-3 fw-bold mb-4">Tài khoản</p>
@@ -119,7 +127,6 @@
               <a-row justify="space-between" align="middle">
                 <a-col class="center-col">
                   <i class="fa-solid fa-pen me-3 fs-4" style="width: 30px"></i>
-
                   <p class="fw-bold">Chỉnh sửa hồ sơ</p>
                 </a-col>
                 <a-col class="center-col">
@@ -127,6 +134,7 @@
                 </a-col>
               </a-row>
             </a-button>
+
             <a-button
               class="no-border-ant-button background-hover-button fs-6"
               ghost
@@ -134,14 +142,15 @@
               style="height: auto; padding: 15px">
               <a-row justify="space-between" align="middle">
                 <a-col class="center-col">
-                  <i class="fa-solid fa-location-dot me-3 fs-4" style="width: 30px"></i>
-                  <p class="fw-bold">Địa chỉ</p>
+                  <i class="fa-solid fa-image-portrait me-3 fs-4" style="width: 30px"></i>
+                  <p class="fw-bold">Đổi ảnh đại diện</p>
                 </a-col>
                 <a-col class="center-col">
                   <i class="fa-solid fa-angles-right"></i>
                 </a-col>
               </a-row>
             </a-button>
+
             <a-button
               class="no-border-ant-button background-hover-button fs-6"
               ghost
@@ -157,8 +166,24 @@
                 </a-col>
               </a-row>
             </a-button>
+            <a-button
+              class="no-border-ant-button background-hover-button fs-6"
+              ghost
+              block
+              style="height: auto; padding: 15px">
+              <a-row justify="space-between" align="middle">
+                <a-col class="center-col">
+                  <i class="fa-solid fa-comment-dots me-3 fs-4" style="width: 30px"></i>
+                  <p class="fw-bold">Yêu cầu quyền truy cập</p>
+                </a-col>
+                <a-col class="center-col">
+                  <i class="fa-solid fa-angles-right"></i>
+                </a-col>
+              </a-row>
+            </a-button>
           </a-flex>
         </a-card>
+
         <a-card :bordered="false" class="account-manager-card">
           <p class="fs-3 fw-bold mb-4">Tài khoản</p>
           <a-flex vertical :gap="8">
@@ -266,18 +291,81 @@
 </template>
 
 <script>
-import { defineComponent } from 'vue';
+import { defineComponent, ref, inject } from 'vue';
+import { userState } from '@/stores/user-state';
+import { getItem, setItem, removeItem } from '@/js/utils/localStorage.js';
+import thuyLoiApi from '@/js/axios/thuyLoiApi';
 
 export default defineComponent({
+  beforeRouteEnter(to, from, next) {
+    if (userState().getLogin) {
+      next((data) => {
+        data.pageLoading = false;
+        data.userProfile = userState().getUserProfile;
+        console.log(data.userProfile);
+      });
+    } else if (!userState().getLogin) {
+      if (getItem('accessToken') === '') {
+        next({ name: 'login-page' });
+      } else {
+        next((data) => {
+          const getAuthenticatedUser = () => {
+            thuyLoiApi
+              .post(
+                '/get-authenticated-user',
+                {},
+                {
+                  headers: {
+                    Authorization: `Bearer ${getItem('accessToken')}`,
+                  },
+                },
+              )
+              .then((response) => {
+                if (response) {
+                  setItem('user', JSON.stringify(response.data.user));
+                  userState().onAuthentication(JSON.parse(getItem('user')), response.data.avatar);
+                  data.userProfile = userState().getUserProfile;
+                  console.log(data.userProfile);
+                  data.avatar = 'data:image/jpg;base64,' + data.userProfile.avatar_base64;
+                  data.pageLoading = false;
+                }
+              })
+              .catch((error) => {
+                console.log(error);
+                removeItem('accessToken');
+                removeItem('user');
+                userState().onLogout();
+                // location.reload();
+              });
+          };
+
+          if (getItem('accessToken') === '') data.pageLoading = false;
+          else getAuthenticatedUser();
+        });
+      }
+    }
+  },
+
   setup() {
-    return {};
+    const userProfile = ref();
+    const pageLoading = ref(true);
+    const avatar = ref();
+    return {
+      userProfile,
+      pageLoading,
+      avatar,
+    };
   },
 
   data() {
     return {};
   },
 
-  computed: {},
+  computed: {
+    loginState: function () {
+      return userState().getLogin;
+    },
+  },
 
   methods: {
     logout() {
@@ -288,7 +376,14 @@ export default defineComponent({
     },
   },
 
-  mounted() {},
+  mounted() {
+    var image = new Image();
+    image.onload = function () {
+      console.log(image.width); // image is loaded and we have image width
+    };
+    image.src = this.avatar;
+    document.body.appendChild(image);
+  },
 });
 </script>
 

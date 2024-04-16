@@ -27,6 +27,7 @@ import {
   Checkbox,
   Popconfirm,
   Result,
+  Skeleton,
 } from 'ant-design-vue';
 import App from './App.vue';
 import axios from 'axios';
@@ -43,7 +44,7 @@ app.config.productionTip = false;
 app.use(createPinia());
 app.use(router);
 router.beforeEach((to, from, next) => {
-  if (to.name !== 'home-page') document.title = to.meta.title;
+  document.title = to.meta.title;
   next();
 });
 
@@ -71,6 +72,7 @@ app.use(Form);
 app.use(Checkbox);
 app.use(Popconfirm);
 app.use(Result);
+app.use(Skeleton);
 
 app.mount('#app');
 

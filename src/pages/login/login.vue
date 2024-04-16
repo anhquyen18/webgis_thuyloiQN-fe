@@ -282,11 +282,8 @@ export default defineComponent({
               setItem('accessToken', response.data.token);
               setItem('user', JSON.stringify(response.data.user));
 
-              // setItem('user', JSON.stringify(response.data.user));
-              // console.log(JSON.parse(getItem('user')));
+              userState().onAuthentication(JSON.parse(getItem('user')), response.data.avatar);
 
-              // message.success('Sign in successfully!');
-              userState().onAuthentication();
               this.loginSpinning = false;
               this.$router.push({ name: 'home-page' });
               // this.loginSpinning = false;

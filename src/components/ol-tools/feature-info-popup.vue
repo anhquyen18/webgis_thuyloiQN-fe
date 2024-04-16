@@ -664,7 +664,7 @@ export default defineComponent({
   },
   setup() {
     const featurePropShow = inject('featurePropShow');
-    const userProfile = inject('userProfile');
+    const userProfile = userState().getUserProfile;
     const cancelUpdateFeatureInfo = ref('');
     const buttonSize = inject('buttonSize');
 

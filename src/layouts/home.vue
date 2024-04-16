@@ -176,15 +176,11 @@ export default defineComponent({
   },
 
   beforeRouteEnter(to, from, next) {
-    if (getItem('accessToken') === '' || from.name === 'login-page') {
+    if (userState().getLogin) {
       next((data) => {
         data.homeSpinning = false;
-        if (from.name === 'login-page') {
-          const item = getItem('user');
-          if (item) data.userProfile = JSON.parse(item);
-        }
       });
-    } else {
+    } else if (!userState().getLogin) {
       next((data) => {
         const getAuthenticatedUser = () => {
           thuyLoiApi
@@ -199,11 +195,10 @@ export default defineComponent({
             )
             .then((response) => {
               if (response) {
-                // console.log(response);
-                userState().onAuthentication();
-                data.homeSpinning = false;
-                data.userProfile = JSON.parse(getItem('user'));
                 setItem('user', JSON.stringify(response.data.user));
+                userState().onAuthentication(JSON.parse(getItem('user')), response.data.avatar);
+
+                data.homeSpinning = false;
               }
             })
             .catch((error) => {
@@ -214,15 +209,15 @@ export default defineComponent({
               userState().onLogout();
             });
         };
-        getAuthenticatedUser();
+
+        if (getItem('accessToken') === '') data.homeSpinning = false;
+        else getAuthenticatedUser();
       });
     }
   },
 
   setup() {
-    const useStateStore = userState();
-    const userProfile = ref();
-    provide('userProfile', userProfile);
+    const userStore = userState();
 
     const searchResult = ref([]);
     provide('searchResult', searchResult);
@@ -261,7 +256,6 @@ export default defineComponent({
     return {
       sliderValue,
       siderLayerManagerState,
-      userProfile,
       buttonSize,
     };
   },
@@ -293,18 +287,17 @@ export default defineComponent({
         this.siderCollapsed = false;
       }
     },
-    test() {
-      console.log(this.userProfile);
-    },
+    test() {},
   },
   mounted() {
     const mapStore = mapState();
     const { getMap, setMap } = mapStore;
     setMap(runMap());
 
-    document.getElementsByClassName('ol-closebox')[1].addEventListener('click', function () {
-      // console.log('anhquyendeptraivcl');
-    });
+    // document.getElementsByClassName('ol-closebox')[1].addEventListener('click', function () {
+    //   // console.log('anhquyendeptraivcl');
+    // });
+    // console.log(userState().getLogin);
   },
 });
 </script>
