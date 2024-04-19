@@ -196,7 +196,7 @@ export default defineComponent({
             .then((response) => {
               if (response) {
                 setItem('user', JSON.stringify(response.data.user));
-                userState().onAuthentication(JSON.parse(getItem('user')), response.data.avatar);
+                userState().onAuthentication(response.data.user, response.data.avatar);
 
                 data.homeSpinning = false;
               }
@@ -252,7 +252,11 @@ export default defineComponent({
 
     const buttonSize = ref('small');
     provide('buttonSize', buttonSize);
+    const tooltipBackground = ref('geekblue');
+    provide('tooltipBackground', tooltipBackground);
+
     if (window.innerWidth > 1600) buttonSize.value = 'medium';
+
     return {
       sliderValue,
       siderLayerManagerState,

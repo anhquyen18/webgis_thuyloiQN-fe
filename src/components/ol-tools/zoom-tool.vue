@@ -1,5 +1,5 @@
 <template>
-  <a-tooltip overlayClassName="tool-container-tooltip" :mouseEnterDelay="1">
+  <a-tooltip overlayClassName="tool-container-tooltip" :mouseEnterDelay="1" :color="tooltipBackground">
     <template #title>
       <p>Phóng to</p>
     </template>
@@ -7,7 +7,7 @@
       <i class="fa-solid fa-magnifying-glass-plus"></i>
     </a-button>
   </a-tooltip>
-  <a-tooltip overlayClassName="tool-container-tooltip" :mouseEnterDelay="1">
+  <a-tooltip overlayClassName="tool-container-tooltip" :mouseEnterDelay="1" :color="tooltipBackground">
     <template #title>
       <p>Thu nhỏ</p>
     </template>
@@ -23,8 +23,11 @@ import { mapState } from '../../stores/map-state.js';
 export default defineComponent({
   setup() {
     const buttonSize = inject('buttonSize');
+    const tooltipBackground = inject('tooltipBackground');
+
     return {
       buttonSize,
+      tooltipBackground,
     };
   },
   data() {

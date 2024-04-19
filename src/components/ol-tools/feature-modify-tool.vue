@@ -1,6 +1,6 @@
 <template>
   <div>
-    <a-tooltip overlayClassName="tool-container-tooltip" :mouseEnterDelay="1">
+    <a-tooltip overlayClassName="tool-container-tooltip" :mouseEnterDelay="1" :color="tooltipBackground">
       <template #title>
         <p>Chỉnh sửa lớp bản đồ</p>
       </template>
@@ -41,7 +41,7 @@
               },
             }">
             <a-col :span="6">
-              <a-tooltip overlayClassName="tool-container-tooltip" :mouseEnterDelay="1">
+              <a-tooltip overlayClassName="tool-container-tooltip" :mouseEnterDelay="1" :color="tooltipBackground">
                 <template #title>
                   <p>Lưu thay đổi</p>
                 </template>
@@ -51,7 +51,7 @@
               </a-tooltip>
             </a-col>
             <a-col>
-              <a-tooltip overlayClassName="tool-container-tooltip" :mouseEnterDelay="1">
+              <a-tooltip overlayClassName="tool-container-tooltip" :mouseEnterDelay="1" :color="tooltipBackground">
                 <template #title>
                   <p>Thêm đối tượng</p>
                 </template>
@@ -61,7 +61,7 @@
               </a-tooltip>
             </a-col>
             <a-col>
-              <a-tooltip overlayClassName="tool-container-tooltip" :mouseEnterDelay="1">
+              <a-tooltip overlayClassName="tool-container-tooltip" :mouseEnterDelay="1" :color="tooltipBackground">
                 <template #title>
                   <p>Điều chỉnh đối tượng</p>
                 </template>
@@ -71,7 +71,7 @@
               </a-tooltip>
             </a-col>
             <a-col>
-              <a-tooltip overlayClassName="tool-container-tooltip" :mouseEnterDelay="1">
+              <a-tooltip overlayClassName="tool-container-tooltip" :mouseEnterDelay="1" :color="tooltipBackground">
                 <template #title>
                   <p>Chọn đối tượng</p>
                 </template>
@@ -84,7 +84,7 @@
         </a-row>
         <a-row class="mt-1" align="middle" justify="space-around">
           <a-col>
-            <a-tooltip overlayClassName="tool-container-tooltip" :mouseEnterDelay="1">
+            <a-tooltip overlayClassName="tool-container-tooltip" :mouseEnterDelay="1" :color="tooltipBackground">
               <template #title>
                 <p>Ghép đối tượng</p>
               </template>
@@ -100,7 +100,7 @@
           </a-col>
 
           <a-col>
-            <a-tooltip overlayClassName="tool-container-tooltip" :mouseEnterDelay="1">
+            <a-tooltip overlayClassName="tool-container-tooltip" :mouseEnterDelay="1" :color="tooltipBackground">
               <template #title>
                 <p>Cắt đối tượng</p>
               </template>
@@ -116,7 +116,7 @@
           </a-col>
 
           <a-col>
-            <a-tooltip overlayClassName="tool-container-tooltip" :mouseEnterDelay="1">
+            <a-tooltip overlayClassName="tool-container-tooltip" :mouseEnterDelay="1" :color="tooltipBackground">
               <template #title>
                 <p>Thuộc tính đối tượng</p>
               </template>
@@ -127,7 +127,7 @@
           </a-col>
 
           <a-col>
-            <a-tooltip overlayClassName="tool-container-tooltip" :mouseEnterDelay="1">
+            <a-tooltip overlayClassName="tool-container-tooltip" :mouseEnterDelay="1" :color="tooltipBackground">
               <template #title>
                 <p>Xoá đối tượng</p>
               </template>
@@ -487,10 +487,12 @@ export default defineComponent({
   setup() {
     const buttonSize = inject('buttonSize');
     const cancelSave = ref('');
+    const tooltipBackground = inject('tooltipBackground');
 
     return {
       buttonSize,
       cancelSave,
+      tooltipBackground,
     };
   },
 
@@ -931,7 +933,7 @@ export default defineComponent({
       this.cancelUpdateFeatureInfo = axios.CancelToken.source();
       this.saveLoading = true;
       thuyLoiApi
-        .post('/update-feature-geom', this.featureCollections, {
+        .put('/update-feature-geom', this.featureCollections, {
           cancelToken: this.cancelUpdateFeatureInfo.token,
           headers: {
             Authorization: `Bearer ${getItem('accessToken')}`,

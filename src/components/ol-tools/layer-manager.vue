@@ -29,7 +29,7 @@
         </a-divider>
         <a-row class="main-layer" :gutter="[0, 8]">
           <a-col :xl="4" :xs="6" v-for="(layer, index) in mainLayerData">
-            <a-tooltip overlayClassName="tool-container-tooltip">
+            <a-tooltip overlayClassName="tool-container-tooltip" :color="tooltipBackground">
               <template #title> {{ layer.displayName }}</template>
               <div class="layer-image">
                 <a-button
@@ -54,7 +54,7 @@
         <a-divider style="border-color: black" orientation="left"> Basemaps</a-divider>
         <a-row class="basemap-layer" :gutter="[0, 8]">
           <a-col :xl="4" :xs="6" v-for="layer in basemapLayerData">
-            <a-tooltip overlayClassName="tool-container-tooltip">
+            <a-tooltip overlayClassName="tool-container-tooltip" :color="tooltipBackground">
               <template #title>{{ layer.title }}</template>
               <div class="layer-image">
                 <a-button
@@ -200,6 +200,7 @@ export default defineComponent({
       },
     ]);
     const test = ref(false);
+    const tooltipBackground = inject('tooltipBackground');
 
     return {
       basemapLayerData,
@@ -209,6 +210,7 @@ export default defineComponent({
       scaleOptions,
       scaleValue,
       test,
+      tooltipBackground,
     };
   },
 

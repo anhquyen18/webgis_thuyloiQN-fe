@@ -209,7 +209,8 @@ export default defineComponent({
           .then((response) => {
             if (response) {
               // console.log(response);
-              userState().onAuthentication();
+              userState().onAuthentication(JSON.parse(getItem('user')), response.data.avatar);
+
               // this.$router.push({ name: 'home-page' });
               next({ name: 'home-page' });
               setItem('user', JSON.stringify(response.data.user));
@@ -279,10 +280,11 @@ export default defineComponent({
           thuyLoiApi
             .post('/login', this.user)
             .then((response) => {
+              console.log(response);
               setItem('accessToken', response.data.token);
               setItem('user', JSON.stringify(response.data.user));
 
-              userState().onAuthentication(JSON.parse(getItem('user')), response.data.avatar);
+              userState().onAuthentication(response.data.user, response.data.avatar);
 
               this.loginSpinning = false;
               this.$router.push({ name: 'home-page' });

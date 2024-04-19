@@ -9,29 +9,36 @@ const home = [
     path: '/login',
     name: 'login-page',
     component: () => import('../pages/login/login.vue'),
-    meta: { title: 'Đăng Nhập' },
+    meta: { title: 'Đăng nhập' },
   },
   {
     path: '/signup',
     name: 'signup-page',
     component: () => import('../pages/login/signup.vue'),
-    meta: { title: 'Đăng Ký' },
+    meta: { title: 'Đăng ký' },
   },
 
   {
-    path: '/account/overview',
+    path: '/account',
     name: 'account-manager-page',
     component: () => import('../layouts/account-manager.vue'),
-    meta: { title: 'Quản Lý' },
+    meta: { title: 'Quản lý' },
+    redirect: '/account/overview',
+    children: [
+      {
+        path: 'overview',
+        name: 'account-manager-overview',
+        component: () => import('../pages/account-manager/overview.vue'),
+        meta: { title: 'Quản lý' },
+      },
+      {
+        path: 'profile/edit-user-info',
+        name: 'account-manager-edit-user-info',
+        component: () => import('../pages/account-manager/profile/edit-user-info.vue'),
+        meta: { title: 'Chỉnh sửa hồ sơ' },
+      },
+    ],
   },
-
-  {
-    path: '/account/overview',
-    name: 'account-manager',
-    component: () => import('../layouts/account-manager.vue'),
-    meta: { title: 'Tài Khoản' },
-  },
-
   {
     path: '/:catchAll(.*)', // Unrecognized path automatically matches 404
     redirect: '/404',

@@ -1,5 +1,5 @@
 <template>
-  <a-tooltip overlayClassName="tool-container-tooltip" :mouseEnterDelay="1">
+  <a-tooltip overlayClassName="tool-container-tooltip" :mouseEnterDelay="1" :color="tooltipBackground">
     <template #title>
       <p>Vị trí hiện tại</p>
     </template>
@@ -21,9 +21,12 @@ export default defineComponent({
   setup() {
     const buttonSize = inject('buttonSize');
     const geolocation = '';
+    const tooltipBackground = inject('tooltipBackground');
+
     return {
       buttonSize,
       geolocation,
+      tooltipBackground,
     };
   },
 

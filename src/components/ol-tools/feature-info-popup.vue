@@ -1,6 +1,6 @@
 <template>
   <div>
-    <a-tooltip overlayClassName="tool-container-tooltip" :mouseEnterDelay="1">
+    <a-tooltip overlayClassName="tool-container-tooltip" :mouseEnterDelay="1" :color="tooltipBackground">
       <template #title>
         <p>Bật/tắt click popup</p>
       </template>
@@ -667,12 +667,14 @@ export default defineComponent({
     const userProfile = userState().getUserProfile;
     const cancelUpdateFeatureInfo = ref('');
     const buttonSize = inject('buttonSize');
+    const tooltipBackground = inject('tooltipBackground');
 
     return {
       featurePropShow,
       userProfile,
       cancelUpdateFeatureInfo,
       buttonSize,
+      tooltipBackground,
     };
   },
 
