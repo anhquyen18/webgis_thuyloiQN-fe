@@ -2,6 +2,7 @@
   <a-spin :spinning="pageSpinning" size="large">
     <a-layout
       style="
+        min-height: 100vh;
         background: rgb(6, 0, 103);
         background: linear-gradient(220deg, rgba(6, 0, 103, 1) 0%, rgba(4, 96, 174, 1) 65%, rgba(0, 141, 170, 1) 100%);
       ">
@@ -110,8 +111,8 @@ export default defineComponent({
   beforeRouteEnter(to, from, next) {
     if (userState().getLogin) {
       next((data) => {
+        data.userProfile = JSON.parse(getItem('user'));
         data.pageLoading = false;
-        data.userProfile = userState().getUserProfile;
         data.avatar = data.userProfile.avatar_base64;
       });
     } else if (!userState().getLogin) {
@@ -137,7 +138,7 @@ export default defineComponent({
 
                   data.userProfile = userState().getUserProfile;
                   data.avatar = data.userProfile.avatar_base64;
-                  console.log(data.userProfile);
+
                   data.pageLoading = false;
                 }
               })
@@ -163,6 +164,7 @@ export default defineComponent({
 
     const pageLoading = ref(true);
     provide('pageLoading', pageLoading);
+
     const avatar = ref();
     provide('avatar', avatar);
 

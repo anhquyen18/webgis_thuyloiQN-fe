@@ -148,6 +148,7 @@ export default defineComponent({
     // console.log(from);
     // console.log(to);
     next((data) => {
+      window.scrollTo(0, 0);
       // console.log(userState().getLogin);
       // console.log('đã load edit info');
     });

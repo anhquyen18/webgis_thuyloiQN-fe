@@ -197,6 +197,7 @@ export default defineComponent({
               if (response) {
                 setItem('user', JSON.stringify(response.data.user));
                 userState().onAuthentication(response.data.user, response.data.avatar);
+                console.log(userState().getUserProfile);
 
                 data.homeSpinning = false;
               }

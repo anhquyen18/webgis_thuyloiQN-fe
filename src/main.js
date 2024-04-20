@@ -31,6 +31,7 @@ import {
   Skeleton,
   Image,
   Tag,
+  Upload,
 } from 'ant-design-vue';
 import App from './App.vue';
 import axios from 'axios';
@@ -79,6 +80,7 @@ app.use(Result);
 app.use(Skeleton);
 app.use(Image);
 app.use(Tag);
+app.use(Upload);
 
 app.mount('#app');
 
