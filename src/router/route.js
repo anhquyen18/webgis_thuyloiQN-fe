@@ -37,6 +37,12 @@ const home = [
         component: () => import('../pages/account-manager/profile/edit-user-info.vue'),
         meta: { title: 'Chỉnh sửa hồ sơ' },
       },
+      {
+        path: 'profile/change-user-password',
+        name: 'account-manager-change-user-password',
+        component: () => import('../pages/account-manager/profile/change-user-password.vue'),
+        meta: { title: 'Đổi mật khẩu của bạn' },
+      },
     ],
   },
   {

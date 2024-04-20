@@ -73,21 +73,24 @@
             </a-button>
           </a-upload>
 
-          <a-button
-            class="no-border-ant-button background-hover-button fs-6"
-            ghost
-            block
-            style="height: auto; padding: 15px">
-            <a-row justify="space-between" align="middle">
-              <a-col class="center-col">
-                <i class="fa-solid fa-lock me-3 fs-4" style="width: 30px"></i>
-                <p class="fw-bold">Đổi mật khẩu</p>
-              </a-col>
-              <a-col class="center-col">
-                <i class="fa-solid fa-angles-right"></i>
-              </a-col>
-            </a-row>
-          </a-button>
+          <router-link :to="{ name: 'account-manager-change-user-password' }">
+            <a-button
+              class="no-border-ant-button background-hover-button fs-6"
+              ghost
+              block
+              style="height: auto; padding: 15px">
+              <a-row justify="space-between" align="middle">
+                <a-col class="center-col">
+                  <i class="fa-solid fa-lock me-3 fs-4" style="width: 30px"></i>
+                  <p class="fw-bold">Đổi mật khẩu</p>
+                </a-col>
+                <a-col class="center-col">
+                  <i class="fa-solid fa-angles-right"></i>
+                </a-col>
+              </a-row>
+            </a-button>
+          </router-link>
+
           <a-button
             class="no-border-ant-button background-hover-button fs-6"
             ghost

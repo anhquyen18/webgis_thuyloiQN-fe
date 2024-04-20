@@ -419,10 +419,4 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
-.white-text-form {
-  & * p {
-    color: white;
-  }
-}
-</style>
+<style lang="scss"></style>

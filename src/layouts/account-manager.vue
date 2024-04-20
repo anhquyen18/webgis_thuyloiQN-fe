@@ -104,8 +104,8 @@
 <script>
 import { defineComponent, ref, provide } from 'vue';
 import { userState } from '@/stores/user-state';
-import { getItem, setItem, removeItem } from '@/js/utils/localStorage.js';
 import thuyLoiApi from '@/js/axios/thuyLoiApi';
+import { getItem, setItem, removeItem } from '@/js/utils/localStorage.js';
 
 export default defineComponent({
   beforeRouteEnter(to, from, next) {
@@ -233,6 +233,12 @@ export default defineComponent({
   transition: 0.3s;
   &:hover {
     background-color: rgb(255, 255, 255) !important;
+  }
+}
+
+.white-text-form {
+  & * p {
+    color: white;
   }
 }
 
