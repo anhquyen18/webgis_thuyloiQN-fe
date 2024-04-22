@@ -111,7 +111,8 @@ export default defineComponent({
   beforeRouteEnter(to, from, next) {
     if (userState().getLogin) {
       next((data) => {
-        data.userProfile = JSON.parse(getItem('user'));
+        // data.userProfile = JSON.parse(getItem('user'));
+        data.userProfile = userState().getUserProfile;
         data.pageLoading = false;
         data.avatar = data.userProfile.avatar_base64;
       });
@@ -242,6 +243,17 @@ export default defineComponent({
   }
 }
 
+.account-manager-table {
+  & [class^='ant-table'] {
+    color: white !important;
+    background-color: transparent !important;
+  }
+}
+
+.ant-table-content {
+  background-color: transparent !important;
+}
+
 @media (max-width: 576px) {
   .account-manager-card,
   .account-manager-transparent-card {
@@ -274,6 +286,9 @@ export default defineComponent({
   .account-manager-card,
   .account-manager-transparent-card {
     width: 55%;
+    &.account-manager-table-card {
+      width: 80%;
+    }
   }
 }
 </style>

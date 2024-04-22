@@ -31,6 +31,7 @@ const home = [
         component: () => import('../pages/account-manager/overview.vue'),
         meta: { title: 'Quản lý' },
       },
+      // Profile
       {
         path: 'profile/edit-user-info',
         name: 'account-manager-edit-user-info',
@@ -42,6 +43,13 @@ const home = [
         name: 'account-manager-change-user-password',
         component: () => import('../pages/account-manager/profile/change-user-password.vue'),
         meta: { title: 'Đổi mật khẩu của bạn' },
+      },
+      // Organization
+      {
+        path: 'profile/user-groups',
+        name: 'account-manager-user-groups',
+        component: () => import('../pages/account-manager/organization/user-groups.vue'),
+        meta: { title: 'Nhóm người dùng' },
       },
     ],
   },

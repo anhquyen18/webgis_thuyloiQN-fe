@@ -7,11 +7,11 @@
           <a-col flex="1 1 300px">
             <a-skeleton :loading="pageLoading" active>
               <span>
-                <p class="fw-bold mt-1">Đơn vị:</p>
+                <p class="fw-bold mt-1">Tổ chức:</p>
                 <p>{{ userProfile.organization_name }}</p>
               </span>
               <span>
-                <p class="fw-bold mt-1">Phòng ban:</p>
+                <p class="fw-bold mt-1">Nhóm:</p>
                 <p>{{ userProfile.department_name }}</p>
               </span>
             </a-skeleton>
@@ -106,6 +106,68 @@
               </a-col>
             </a-row>
           </a-button>
+        </a-flex>
+      </a-skeleton>
+    </a-card>
+
+    <a-card :bordered="false" class="account-manager-card">
+      <a-skeleton :loading="pageLoading" active>
+        <p class="fs-3 fw-bold mb-4">Tổ chức</p>
+
+        <a-flex vertical :gap="8">
+          <router-link :to="{ name: 'account-manager-user-groups' }">
+            <a-button
+              class="no-border-ant-button background-hover-button fs-6"
+              ghost
+              block
+              style="height: auto; padding: 15px">
+              <a-row justify="space-between" align="middle">
+                <a-col class="center-col">
+                  <i class="fa-solid fa-users-viewfinder me-3 fs-4" style="width: 30px"></i>
+                  <p class="fw-bold">Nhóm người dùng</p>
+                </a-col>
+                <a-col class="center-col">
+                  <i class="fa-solid fa-angles-right"></i>
+                </a-col>
+              </a-row>
+            </a-button>
+          </router-link>
+
+          <router-link :to="{ name: '' }">
+            <a-button
+              class="no-border-ant-button background-hover-button fs-6"
+              ghost
+              block
+              style="height: auto; padding: 15px">
+              <a-row justify="space-between" align="middle">
+                <a-col class="center-col">
+                  <i class="fa-solid fa-building-user me-3 fs-4" style="width: 30px"></i>
+                  <p class="fw-bold">Người dùng</p>
+                </a-col>
+                <a-col class="center-col">
+                  <i class="fa-solid fa-angles-right"></i>
+                </a-col>
+              </a-row>
+            </a-button>
+          </router-link>
+
+          <router-link :to="{ name: '' }">
+            <a-button
+              class="no-border-ant-button background-hover-button fs-6"
+              ghost
+              block
+              style="height: auto; padding: 15px">
+              <a-row justify="space-between" align="middle">
+                <a-col class="center-col">
+                  <i class="fa-solid fa-building-shield me-3 fs-4" style="width: 30px"></i>
+                  <p class="fw-bold">Quyền truy cập</p>
+                </a-col>
+                <a-col class="center-col">
+                  <i class="fa-solid fa-angles-right"></i>
+                </a-col>
+              </a-row>
+            </a-button>
+          </router-link>
         </a-flex>
       </a-skeleton>
     </a-card>

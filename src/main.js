@@ -32,6 +32,7 @@ import {
   Image,
   Tag,
   Upload,
+  Breadcrumb,
 } from 'ant-design-vue';
 import App from './App.vue';
 import axios from 'axios';
@@ -81,6 +82,7 @@ app.use(Skeleton);
 app.use(Image);
 app.use(Tag);
 app.use(Upload);
+app.use(Breadcrumb);
 
 app.mount('#app');
 
