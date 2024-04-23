@@ -11,7 +11,7 @@
                 <p>{{ userProfile.organization_name }}</p>
               </span>
               <span>
-                <p class="fw-bold mt-1">Nhóm:</p>
+                <p class="fw-bold mt-1">Phòng ban:</p>
                 <p>{{ userProfile.department_name }}</p>
               </span>
             </a-skeleton>
@@ -115,7 +115,7 @@
         <p class="fs-3 fw-bold mb-4">Tổ chức</p>
 
         <a-flex vertical :gap="8">
-          <router-link :to="{ name: 'account-manager-user-groups' }">
+          <router-link :to="{ name: 'account-manager-departments' }">
             <a-button
               class="no-border-ant-button background-hover-button fs-6"
               ghost
@@ -124,7 +124,7 @@
               <a-row justify="space-between" align="middle">
                 <a-col class="center-col">
                   <i class="fa-solid fa-users-viewfinder me-3 fs-4" style="width: 30px"></i>
-                  <p class="fw-bold">Nhóm người dùng</p>
+                  <p class="fw-bold">Phòng ban</p>
                 </a-col>
                 <a-col class="center-col">
                   <i class="fa-solid fa-angles-right"></i>

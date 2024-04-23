@@ -4,6 +4,7 @@ export const userState = defineStore('userStateId', {
   state: () => ({
     loginState: false,
     userProfile: null,
+    departments: null,
   }),
 
   actions: {
@@ -16,6 +17,9 @@ export const userState = defineStore('userStateId', {
       this.loginState = false;
       this.userProfile = null;
     },
+    setDepartments(departments) {
+      this.departments = departments;
+    },
   },
 
   getters: {
@@ -24,6 +28,9 @@ export const userState = defineStore('userStateId', {
     },
     getUserProfile() {
       return this.userProfile;
+    },
+    getDepartments() {
+      return this.departments;
     },
   },
 });

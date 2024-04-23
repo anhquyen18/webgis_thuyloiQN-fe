@@ -46,10 +46,16 @@ const home = [
       },
       // Organization
       {
-        path: 'profile/user-groups',
-        name: 'account-manager-user-groups',
-        component: () => import('../pages/account-manager/organization/user-groups.vue'),
-        meta: { title: 'Nhóm người dùng' },
+        path: 'departments',
+        name: 'account-manager-departments',
+        component: () => import('../pages/account-manager/organization/departments.vue'),
+        meta: { title: 'Phòng ban' },
+      },
+      {
+        path: 'departments/create',
+        name: 'account-manager-department-create',
+        component: () => import('../pages/account-manager/organization/create-department.vue'),
+        meta: { title: 'Tạo phòng ban' },
       },
     ],
   },
