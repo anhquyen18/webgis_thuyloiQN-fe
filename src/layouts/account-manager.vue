@@ -123,9 +123,9 @@ export default defineComponent({
         next((data) => {
           const getAuthenticatedUser = () => {
             thuyLoiApi
-              .post(
+              .get(
                 '/get-authenticated-user',
-                {},
+
                 {
                   headers: {
                     Authorization: `Bearer ${getItem('accessToken')}`,
@@ -171,6 +171,9 @@ export default defineComponent({
 
     const pageSpinning = ref(false);
     provide('pageSpinning', pageSpinning);
+
+    const reloadDepartmentDataSource = ref(false);
+    provide('reloadDepartmentDataSource', reloadDepartmentDataSource);
 
     return {
       userProfile,
@@ -247,6 +250,9 @@ export default defineComponent({
   & [class^='ant-table'] {
     color: white !important;
     background-color: transparent !important;
+  }
+  & .ant-pagination-total-text {
+    color: white !important;
   }
 }
 

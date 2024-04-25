@@ -191,7 +191,7 @@ export default defineComponent({
     let avatarUploadAction = '';
 
     if (userState().getLogin) {
-      avatarUploadAction = `http://127.0.0.1:8000/api/upload-user-avatar/${userProfile.id}`;
+      avatarUploadAction = `${import.meta.env.VITE_APP_API_URL}/upload-user-avatar/${userProfile.id}`;
     }
 
     return {
@@ -214,7 +214,7 @@ export default defineComponent({
     pageLoading: {
       handler() {
         if (!this.pageLoading) {
-          this.avatarUploadAction = `http://127.0.0.1:8000/api/upload-user-avatar/${this.userProfile.id}`;
+          this.avatarUploadAction = `${import.meta.env.VITE_APP_API_URL}/upload-user-avatar/${this.userProfile.id}`;
         } else {
           this.avatarUploadAction = '';
         }

@@ -14,7 +14,7 @@
 
     <a-card class="account-manager-card" :bordered="false">
       <a-skeleton :loading="pageLoading" active>
-        <p class="fs-5 fw-bold">Đặt tên phòng ban</p>
+        <p class="fs-5 fw-bold">Thông tin phòng ban</p>
         <a-divider vertical style="border-color: #fff"></a-divider>
         <a-form
           class="white-text-form"
@@ -31,6 +31,25 @@
             </template>
             <a-input :class="{ 'input-error': false }" v-model:value="departmentForm.departmentName" />
           </a-form-item>
+
+          <a-form-item v-if="accessOrganizationsUser">
+            <template #label>
+              <a-checkbox v-model:checked="departmentForm.hasOrganization"><p class="fw-bold">Tổ chức</p></a-checkbox>
+            </template>
+            <a-select
+              v-model:value="departmentForm.organizationIdd"
+              :options="organizationOptions"
+              :field-names="{ label: 'name', value: 'id' }"
+              :disabled="!departmentForm.hasOrganization">
+            </a-select>
+          </a-form-item>
+
+          <a-form-item>
+            <template #label>
+              <p class="fw-bold">Mô tả</p>
+            </template>
+            <a-textarea v-model:value="departmentForm.description" placeholder="Mô tả phòng ban" :rows="3" />
+          </a-form-item>
         </a-form>
       </a-skeleton>
     </a-card>
@@ -42,7 +61,7 @@
           :row-selection="{ selectedRowKeys: userTableState.selectedRowKeys, onChange: onUserSelectChange }"
           :columns="userColumns"
           :data-source="userDataSource"
-          :loading="userTableLoading"
+          :loading="userTableSpinning"
           :bordered="false"
           :showSorterTooltip="false"
           :expand-column-width="100"
@@ -51,7 +70,10 @@
             <a-row>
               <a-col flex="1 1 300px">
                 <p class="fs-5 fw-bold">
-                  Thêm người dùng vào phòng ban - <i>Tuỳ chọn</i> <span style="color: lightgray">(2)</span>
+                  Thêm người dùng vào phòng ban - <i>Tuỳ chọn</i>
+                  <span v-if="this.userOriginDataSource" style="color: lightgray">
+                    ({{ this.userOriginDataSource.length }})</span
+                  >
                 </p>
               </a-col>
               <a-col flex="">
@@ -65,7 +87,11 @@
             <a-row>
               <a-col class="mt-1" :xs="24"> </a-col>
               <a-col :xs="24" :md="16">
-                <a-input class="mt-2" placeholder="Tìm kiếm">
+                <a-input
+                  v-model:value="userSearchValue"
+                  class="mt-2"
+                  placeholder="Tìm kiếm người dùng"
+                  @change="userSearchChange">
                   <template #prefix>
                     <i class="fa-solid fa-magnifying-glass me-2"></i>
                   </template>
@@ -90,6 +116,7 @@
         </a-table>
       </a-skeleton>
     </a-card>
+
     <a-card class="account-manager-card" :bordered="false">
       <a-skeleton :loading="pageLoading" active>
         <a-table
@@ -98,7 +125,7 @@
           :row-selection="{ selectedRowKeys: policyTableState.selectedRowKeys, onChange: onPolicySelectChange }"
           :columns="policyColumns"
           :data-source="policyDataSource"
-          :loading="policyTableLoading"
+          :loading="policyTableSpinning"
           :bordered="false"
           :showSorterTooltip="false"
           :expand-column-width="100"
@@ -106,7 +133,12 @@
           <template #title>
             <a-row>
               <a-col flex="1 1 300px">
-                <p class="fs-5 fw-bold">Gán quyền hạn - <i>Tuỳ chọn</i> <span style="color: lightgray">(2)</span></p>
+                <p class="fs-5 fw-bold">
+                  Gán quyền hạn - <i>Tuỳ chọn</i>
+                  <span v-if="this.policyOriginDataSource" style="color: lightgray">
+                    ({{ this.policyOriginDataSource.length }})</span
+                  >
+                </p>
               </a-col>
               <a-col flex="">
                 <a-flex gap="middle">
@@ -117,9 +149,13 @@
               </a-col>
             </a-row>
             <a-row>
-              <a-col class="mt-1" :xs="24"> </a-col>
+              <a-col class="mt-1" :xs="24"></a-col>
               <a-col :xs="24" :md="16">
-                <a-input class="mt-2" placeholder="Tìm kiếm">
+                <a-input
+                  v-model:value="policySearchValue"
+                  class="mt-2"
+                  placeholder="Tìm kiếm"
+                  @change="policySearchChange">
                   <template #prefix>
                     <i class="fa-solid fa-magnifying-glass me-2"></i>
                   </template>
@@ -159,7 +195,7 @@
 
 <script>
 import { defineComponent, ref, inject, reactive } from 'vue';
-import { getLastTime } from '@/js/utils/utils.js';
+import { getLastTime, removeAccents } from '@/js/utils/utils.js';
 import thuyLoiApi from '@/js/axios/thuyLoiApi';
 import { userState } from '@/stores/user-state';
 import { getItem, setItem, removeItem } from '@/js/utils/localStorage';
@@ -168,13 +204,20 @@ export default defineComponent({
   setup() {
     const pageLoading = inject('pageLoading');
     const pageSpinning = inject('pageSpinning');
+    const userProfile = inject('userProfile');
+    const reloadDepartmentDataSource = inject('reloadDepartmentDataSource');
+    const userTableSpinning = ref(true);
+    const policyTableSpinning = ref(true);
     const departmentForm = reactive({
       departmentName: '',
+      hasOrganization: false,
+      organizationId: '',
+      description: '',
     });
     const departmentFormRef = ref();
 
     const nameValidator = async (_rule, value) => {
-      const nameRegex = /^[a-zA-Z\s]+$/;
+      const nameRegex = /^[\p{L}\d\s]+$/u;
       if (nameRegex.test(value)) {
         return Promise.resolve();
       } else {
@@ -190,6 +233,8 @@ export default defineComponent({
         },
       ],
     };
+
+    const organizationOptions = ref();
 
     const userTableState = reactive({
       selectedRowKeys: [],
@@ -207,53 +252,132 @@ export default defineComponent({
       policyTableState.selectedRowKeys = selectedRowKeys;
     };
     const myGetLastTime = getLastTime;
-    const policyDataSource = ref([
-      {
-        key: '1',
-        name: 'Mike',
-        age: 32,
-        address: '10 Downing Street',
-      },
-      {
-        key: '2',
-        name: 'John',
-        age: 42,
-        address: '10 Downing Street',
-      },
-    ]);
+
+    const userOriginDataSource = ref();
+    const userDataSource = ref();
+
+    const policyOriginDataSource = ref();
+    const policyDataSource = ref();
+
+    const accessOrganizationsUser = ref(false);
+
+    const getOrganizations = () => {
+      policyTableSpinning.value = true;
+      thuyLoiApi
+        .get(`/get-organizations`, {
+          headers: {
+            Authorization: `Bearer ${getItem('accessToken')}`,
+          },
+        })
+        .then((response) => {
+          // console.log(response);
+          userState().setOrganizations(response.data.organizations);
+          organizationOptions.value = userState().getOrganizations;
+          accessOrganizationsUser.value = response.data.accessOrganizations;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    };
+
+    getOrganizations();
+
+    const page = 1;
+    const pageSize = 10;
+    const getNoDepartmentUser = () => {
+      userTableSpinning.value = true;
+      thuyLoiApi
+        .get(
+          // `/get-no-department-user?page=${page}`,
+          `/get-no-department-user`,
+          {
+            headers: {
+              Authorization: `Bearer ${getItem('accessToken')}`,
+            },
+          },
+        )
+        .then((response) => {
+          // console.log(response);
+          userState().setNoDepartmentUsers(response.data.users);
+          userOriginDataSource.value = userState().getNoDepartmentUsers;
+          userDataSource.value = userState().getNoDepartmentUsers;
+          userTableSpinning.value = false;
+        })
+        .catch((error) => {
+          userTableSpinning.value = false;
+
+          console.log(error);
+        });
+    };
+
+    if (userState().getNoDepartmentUsers) {
+      userOriginDataSource.value = userState().getNoDepartmentUsers;
+      userDataSource.value = userState().getNoDepartmentUsers;
+      userTableSpinning.value = false;
+    } else {
+      getNoDepartmentUser();
+    }
+
+    const getPolicies = () => {
+      policyTableSpinning.value = true;
+      thuyLoiApi
+        .post(
+          `/get-policies`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${getItem('accessToken')}`,
+            },
+          },
+        )
+        .then((response) => {
+          // console.log(response);
+          userState().setAvailablePolcies(response.data);
+          policyOriginDataSource.value = userState().getAvailablePolcies;
+          policyDataSource.value = userState().getAvailablePolcies;
+          policyTableSpinning.value = false;
+        })
+        .catch((error) => {
+          policyTableSpinning.value = false;
+
+          console.log(error);
+        });
+    };
+
+    if (userState().getAvailablePolcies) {
+      policyOriginDataSource.value = userState().getAvailablePolcies;
+      policyDataSource.value = userState().getAvailablePolcies;
+      policyTableSpinning.value = false;
+    } else {
+      getPolicies();
+    }
+
     return {
       pageLoading,
       pageSpinning,
+      userProfile,
+      userTableSpinning,
+      reloadDepartmentDataSource,
+      policyTableSpinning,
       departmentForm,
       departmentFormRef,
       departmentFormRules,
+      organizationOptions,
       userTableState,
       onUserSelectChange,
       myGetLastTime,
       policyTableState,
       onPolicySelectChange,
+      userOriginDataSource,
+      userDataSource,
       policyDataSource,
+      policyOriginDataSource,
+      accessOrganizationsUser,
     };
   },
 
   data() {
     return {
-      userTableLoading: false,
-      policyTableLoading: false,
-      userDataSource: [
-        {
-          key: '1',
-          name: 'Mike',
-          age: 32,
-          address: '10 Downing Street',
-        },
-        {
-          key: '2',
-          name: 'John',
-          age: 42,
-          address: '10 Downing Street',
-        },
-      ],
       userColumns: [
         {
           title: 'Tên người dùng',
@@ -271,7 +395,7 @@ export default defineComponent({
       ],
       policyColumns: [
         {
-          title: 'Tên quyền hành',
+          title: 'Tên quyền hạn',
           dataIndex: 'name',
           key: 'name',
           sorter: (a, b) => a.name.length - b.name.length,
@@ -283,6 +407,19 @@ export default defineComponent({
           sorter: (a, b) => new Date(a.created_at) - new Date(b.created_at),
         },
       ],
+
+      userPaginationConfig: {
+        current: 1,
+        pageSize: 10,
+        showTotal: (total, range) => `${range[0]}-${range[1]} trong ${total} người dùng`,
+        showSizeChanger: true,
+        // total: this.userDataSource.total,
+        // onChange: (page, pageSize) => this.userPageChange(page, pageSize),
+        // onShowSizeChange: (current, size) => this.userPageChange(current, size),
+      },
+
+      userSearchValue: '',
+      policySearchValue: '',
     };
   },
 
@@ -295,7 +432,78 @@ export default defineComponent({
 
     reloadTable() {},
 
-    save() {},
+    save() {
+      console.log(this.departmentForm.organizationId);
+
+      this.pageSpinning = true;
+      this.departmentFormRef
+        .validate()
+        .then((response) => {
+          if (!this.departmentForm.hasOrganization) {
+            this.departmentForm.organizationId = '';
+          }
+          thuyLoiApi
+            .post(
+              `/departments/create`,
+              {
+                info: this.departmentForm,
+                users: this.userTableState.selectedRowKeys,
+                policies: this.policyTableState.selectedRowKeys,
+              },
+              {
+                headers: {
+                  Authorization: `Bearer ${getItem('accessToken')}`,
+                },
+              },
+            )
+            .then((response) => {
+              console.log(response);
+              this.$message.success(response.data.message, 3);
+              this.pageSpinning = false;
+              this.reloadDepartmentDataSource = true;
+              this.$router.push({ name: 'account-manager-departments' });
+            })
+            .catch((error) => {
+              console.log(error);
+              this.$message.error(error.response.data.message, 5);
+              this.pageSpinning = false;
+            });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+
+    userPageChange(page, pageSize) {
+      console.log(page, pageSize);
+      // currentPageSize.value = pageSize;
+      // thuyLoiApi
+      //   .post(
+      //     `/get-no-department-user?page=${page}`,
+      //     { pageSize: pageSize },
+      //     accessToken,
+      //   )
+      //   .then((response) => {
+      //     console.log(response);
+      //   })
+      //   .catch((error) => {
+      //     console.log(error);
+      //   });
+    },
+
+    filterTable(text, dataSource) {
+      return dataSource.filter(function (item) {
+        return removeAccents(item.name.toLowerCase()).includes(removeAccents(text.toLowerCase()));
+      });
+    },
+
+    userSearchChange() {
+      this.userDataSource = this.filterTable(this.userSearchValue, this.userOriginDataSource);
+    },
+
+    policySearchChange() {
+      this.policyDataSource = this.filterTable(this.policySearchValue, this.policyOriginDataSource);
+    },
   },
 
   mounted() {},

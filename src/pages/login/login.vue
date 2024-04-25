@@ -61,11 +61,7 @@
                 <template #label>
                   <p class="form-item-title">Mật khẩu</p>
                 </template>
-                <a-input-password
-                  v-model:value="user.password"
-                  size="large"
-                  placeholder="Mật khẩu"
-                  :visibility-toggle="false"></a-input-password>
+                <a-input-password v-model:value="user.password" size="large" placeholder="Mật khẩu"></a-input-password>
               </a-form-item>
 
               <a-form-item class="mt-2">
@@ -197,15 +193,11 @@ export default defineComponent({
 
       const getAuthenticatedUser = () => {
         thuyLoiApi
-          .post(
-            '/get-authenticated-user',
-            {},
-            {
-              headers: {
-                Authorization: `Bearer ${getItem('accessToken')}`,
-              },
+          .get('/get-authenticated-user', {
+            headers: {
+              Authorization: `Bearer ${getItem('accessToken')}`,
             },
-          )
+          })
           .then((response) => {
             if (response) {
               // console.log(response);

@@ -5,6 +5,10 @@ export const userState = defineStore('userStateId', {
     loginState: false,
     userProfile: null,
     departments: null,
+    noDepartmentUsers: null,
+    userPolicies: null,
+    availablePolcies: null,
+    organizations: null,
   }),
 
   actions: {
@@ -20,6 +24,15 @@ export const userState = defineStore('userStateId', {
     setDepartments(departments) {
       this.departments = departments;
     },
+    setNoDepartmentUsers(users) {
+      this.noDepartmentUsers = users;
+    },
+    setAvailablePolcies(availablePolcies) {
+      this.availablePolcies = availablePolcies;
+    },
+    setOrganizations(organizations) {
+      this.organizations = organizations;
+    },
   },
 
   getters: {
@@ -31,6 +44,15 @@ export const userState = defineStore('userStateId', {
     },
     getDepartments() {
       return this.departments;
+    },
+    getNoDepartmentUsers() {
+      return this.noDepartmentUsers;
+    },
+    getAvailablePolcies() {
+      return this.availablePolcies;
+    },
+    getOrganizations() {
+      return this.organizations;
     },
   },
 });

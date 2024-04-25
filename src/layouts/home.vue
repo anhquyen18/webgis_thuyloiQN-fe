@@ -176,7 +176,7 @@ export default defineComponent({
   },
 
   beforeRouteEnter(to, from, next) {
-    if (userState().getLogin) {
+    if (userState().getLogin || getItem('accessToken') == '') {
       next((data) => {
         data.homeSpinning = false;
       });
@@ -184,9 +184,9 @@ export default defineComponent({
       next((data) => {
         const getAuthenticatedUser = () => {
           thuyLoiApi
-            .post(
+            .get(
               '/get-authenticated-user',
-              {},
+
               {
                 headers: {
                   Authorization: `Bearer ${getItem('accessToken')}`,

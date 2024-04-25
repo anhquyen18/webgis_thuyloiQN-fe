@@ -1,6 +1,6 @@
 function getLastTime(dateString) {
   const date = new Date(dateString);
-  //   return date;
+
   const now = new Date();
 
   const diffMs = now.getTime() - date.getTime();
@@ -13,8 +13,11 @@ function getLastTime(dateString) {
   const diffYear = diffDay / 365;
 
   // Xác định đơn vị thời gian phù hợp để trả về
-  if (diffMin < 60) {
-    `${Math.floor(diffMin)} phút trước`;
+  // console.log(diffSec);
+  if (diffSec < 60) {
+    return `Bây giờ`;
+  } else if (diffMin < 60) {
+    return `${Math.floor(diffMin)} phút trước`;
   } else if (diffHour < 24) {
     return `${Math.floor(diffHour)} giờ trước`;
   } else if (diffDay < 30) {
@@ -25,5 +28,43 @@ function getLastTime(dateString) {
     return `${Math.floor(diffYear)} năm trước`;
   }
 }
+function removeAccents(str) {
+  var AccentsMap = [
+    'aàảãáạăằẳẵắặâầẩẫấậ',
+    'AÀẢÃÁẠĂẰẲẴẮẶÂẦẨẪẤẬ',
+    'dđ',
+    'DĐ',
+    'eèẻẽéẹêềểễếệ',
+    'EÈẺẼÉẸÊỀỂỄẾỆ',
+    'iìỉĩíị',
+    'IÌỈĨÍỊ',
+    'oòỏõóọôồổỗốộơờởỡớợ',
+    'OÒỎÕÓỌÔỒỔỖỐỘƠỜỞỠỚỢ',
+    'uùủũúụưừửữứự',
+    'UÙỦŨÚỤƯỪỬỮỨỰ',
+    'yỳỷỹýỵ',
+    'YỲỶỸÝỴ',
+  ];
+  for (var i = 0; i < AccentsMap.length; i++) {
+    var re = new RegExp('[' + AccentsMap[i].substring(1) + ']', 'g');
+    var char = AccentsMap[i][0];
+    str = str.replace(re, char);
+  }
+  return str;
+}
 
-export { getLastTime };
+function debounce(callback, delay) {
+  let timerId;
+
+  return function (...args) {
+    if (timerId) {
+      clearTimeout(timerId);
+    }
+
+    timerId = setTimeout(() => {
+      callback(...args);
+    }, delay);
+  };
+}
+
+export { getLastTime, removeAccents, debounce };

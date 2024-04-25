@@ -30,7 +30,7 @@
                   <a-button class="ps-3 pe-3 fw-bold" type="default" ghost @click="reloadTable">
                     <i class="fa-solid fa-rotate-right"></i>
                   </a-button>
-                  <a-button class="ps-3 pe-3 fw-bold" type="default">Xoá</a-button>
+                  <a-button class="ps-3 pe-3 fw-bold" type="default" @click="deleteDepartments">Xoá</a-button>
 
                   <router-link :to="{ name: 'account-manager-department-create' }">
                     <a-button class="ps-3 pe-3 fw-bold" type="primary">Tạo phòng ban</a-button>
@@ -76,11 +76,11 @@
             </template>
 
             <template v-else-if="column.key === 'users_count'">
-              <span v-if="record.policies_count > 0">
+              <span v-if="record.users_count > 0">
                 {{ record.users_count }}
               </span>
 
-              <span class="text-warning" v-else>
+              <span v-else class="text-warning">
                 {{ record.users_count }}
                 <ExclamationCircleOutlined />
               </span>
@@ -103,7 +103,7 @@
             </template>
 
             <template v-else-if="column.key === 'created'">
-              <span>{{ myGetLastTime(record.created_at) }}</span>
+              <span>{{ myGetLastTime(record.created_at) }} </span> <br />
             </template>
           </template>
         </a-table>
@@ -114,7 +114,7 @@
 </template>
 
 <script>
-import { defineComponent, inject, ref } from 'vue';
+import { defineComponent, inject, ref, provide } from 'vue';
 import thuyLoiApi from '@/js/axios/thuyLoiApi';
 import { userState } from '@/stores/user-state';
 import { getItem, setItem, removeItem } from '@/js/utils/localStorage.js';
@@ -130,6 +130,7 @@ export default defineComponent({
   setup() {
     const pageLoading = inject('pageLoading');
     const userProfile = inject('userProfile');
+    const reloadDepartmentDataSource = inject('reloadDepartmentDataSource');
 
     const tableState = ref({
       selectedRowKeys: [],
@@ -148,15 +149,11 @@ export default defineComponent({
     const getDepartments = (organizationId) => {
       pageLoading.value = true;
       thuyLoiApi
-        .post(
-          `/organization/${organizationId}/departments`,
-          {},
-          {
-            headers: {
-              Authorization: `Bearer ${getItem('accessToken')}`,
-            },
+        .get(`/organization/${organizationId}/departments`, {
+          headers: {
+            Authorization: `Bearer ${getItem('accessToken')}`,
           },
-        )
+        })
         .then((response) => {
           // console.log(response);
           userState().setDepartments(response.data.departments);
@@ -172,8 +169,9 @@ export default defineComponent({
     };
 
     if (userState().getLogin) {
-      if (!userState().getDepartments) {
+      if (!userState().getDepartments || reloadDepartmentDataSource.value) {
         getDepartments(userProfile.value.organization_id);
+        reloadDepartmentDataSource.value = false;
       } else {
         dataSource.value = userState().getDepartments;
       }
@@ -268,7 +266,7 @@ export default defineComponent({
     reloadTable() {
       this.tableLoading = true;
       thuyLoiApi
-        .post(
+        .get(
           `/organization/${this.userProfile.organization_id}/departments`,
           {},
           {
@@ -282,6 +280,29 @@ export default defineComponent({
           userState().setDepartments(response.data.departments);
           this.dataSource = userState().getDepartments;
           this.allOrganizationAccess = response.data.allAccess;
+          this.tableLoading = false;
+        })
+        .catch((error) => {
+          console.log(error);
+          this.tableLoading = false;
+        });
+    },
+
+    deleteDepartments() {
+      console.log(import.meta.env.APP_API_URL);
+      console.log(import.meta.env.GEOSERVER_DOMAIN);
+      return;
+      this.tableLoading = true;
+      const departmentIds = this.tableState.selectedRowKeys.join(',');
+      thuyLoiApi
+        .delete(`/departments/delete?id=${departmentIds}`, {
+          headers: {
+            Authorization: `Bearer ${getItem('accessToken')}`,
+          },
+        })
+        .then((response) => {
+          console.log(response);
+          this.reloadTable();
           this.tableLoading = false;
         })
         .catch((error) => {
