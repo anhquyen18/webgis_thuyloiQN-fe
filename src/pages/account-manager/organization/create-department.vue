@@ -32,14 +32,15 @@
             <a-input :class="{ 'input-error': false }" v-model:value="departmentForm.departmentName" />
           </a-form-item>
 
-          <a-form-item v-if="accessOrganizationsUser">
+          <a-form-item v-if="hasOrganizationsPolicy">
             <template #label>
               <a-checkbox v-model:checked="departmentForm.hasOrganization"><p class="fw-bold">Tổ chức</p></a-checkbox>
             </template>
             <a-select
-              v-model:value="departmentForm.organizationIdd"
+              v-model:value="departmentForm.organizationId"
               :options="organizationOptions"
               :field-names="{ label: 'name', value: 'id' }"
+              :loading="organizationSelectLoading"
               :disabled="!departmentForm.hasOrganization">
             </a-select>
           </a-form-item>
@@ -78,7 +79,7 @@
               </a-col>
               <a-col flex="">
                 <a-flex gap="middle">
-                  <a-button class="ps-3 pe-3 fw-bold" type="default" ghost @click="reloadTable">
+                  <a-button class="ps-3 pe-3 fw-bold" type="default" ghost @click="reloadUserTable">
                     <i class="fa-solid fa-rotate-right"></i>
                   </a-button>
                 </a-flex>
@@ -142,7 +143,7 @@
               </a-col>
               <a-col flex="">
                 <a-flex gap="middle">
-                  <a-button class="ps-3 pe-3 fw-bold" type="default" ghost @click="reloadTable">
+                  <a-button class="ps-3 pe-3 fw-bold" type="default" ghost @click="reloadPolicyTable">
                     <i class="fa-solid fa-rotate-right"></i>
                   </a-button>
                 </a-flex>
@@ -259,10 +260,9 @@ export default defineComponent({
     const policyOriginDataSource = ref();
     const policyDataSource = ref();
 
-    const accessOrganizationsUser = ref(false);
+    const organizationSelectLoading = ref(true);
 
     const getOrganizations = () => {
-      policyTableSpinning.value = true;
       thuyLoiApi
         .get(`/get-organizations`, {
           headers: {
@@ -273,15 +273,21 @@ export default defineComponent({
           // console.log(response);
           userState().setOrganizations(response.data.organizations);
           organizationOptions.value = userState().getOrganizations;
-          accessOrganizationsUser.value = response.data.accessOrganizations;
+          organizationSelectLoading.value = false;
         })
         .catch((error) => {
           console.log(error);
         });
     };
 
-    // Cần sửa lúc user có quyền hay không
-    getOrganizations();
+    const hasOrganizationsPolicy = ref();
+    if (userState().getLogin) {
+      // Kiểm tra toàn quyền quản lí tổ chức
+      hasOrganizationsPolicy.value = userProfile.value.allPolicies.find((policy) => policy.id === 2);
+      if (hasOrganizationsPolicy.value) {
+        getOrganizations();
+      }
+    }
 
     const page = 1;
     const pageSize = 10;
@@ -369,7 +375,11 @@ export default defineComponent({
       userDataSource,
       policyDataSource,
       policyOriginDataSource,
-      accessOrganizationsUser,
+      hasOrganizationsPolicy,
+      getOrganizations,
+      getNoDepartmentUser,
+      getPolicies,
+      organizationSelectLoading,
     };
   },
 
@@ -420,6 +430,24 @@ export default defineComponent({
     };
   },
 
+  watch: {
+    pageLoading: {
+      handler() {
+        if (!this.pageLoading) {
+          // Kiểm tra toàn quyền quản lí tổ chức
+          this.hasOrganizationsPolicy = this.userProfile.allPolicies.find((policy) => policy.id === 2);
+          if (this.hasOrganizationsPolicy) {
+            this.getOrganizations();
+          }
+        } else {
+          // this.dataSource = [];
+        }
+      },
+      deep: false,
+      once: true,
+    },
+  },
+
   computed: {},
 
   methods: {
@@ -427,7 +455,12 @@ export default defineComponent({
       this.$router.push({ name: 'account-manager-departments' });
     },
 
-    reloadTable() {},
+    reloadUserTable() {
+      this.getNoDepartmentUser();
+    },
+    reloadPolicyTable() {
+      this.getPolicies();
+    },
 
     save() {
       console.log(this.departmentForm.organizationId);

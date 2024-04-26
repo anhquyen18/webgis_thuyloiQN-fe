@@ -3,12 +3,11 @@ import { defineStore } from 'pinia';
 export const userState = defineStore('userStateId', {
   state: () => ({
     loginState: false,
-    userProfile: null,
-    departments: null,
-    noDepartmentUsers: null,
-    userPolicies: null,
-    availablePolcies: null,
-    organizations: null,
+    userProfile: null, // Hứng data người đăng nhập được gửi về từ server
+    departments: null, // Các department có thể gán cho người khác
+    noDepartmentUsers: null, // Những người dùng chưa được gán department
+    availablePolcies: null, // Các quyền có thể gán cho người khác
+    organizations: null, // Các tổ chức có thể gán cho người khác
   }),
 
   actions: {

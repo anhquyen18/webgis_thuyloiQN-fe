@@ -194,7 +194,7 @@ export default defineComponent({
     return {
       columns: [
         {
-          title: 'Tên nhóm',
+          title: 'Tên',
           dataIndex: 'name',
           key: 'name',
           sorter: (a, b) => a.name.length - b.name.length,
