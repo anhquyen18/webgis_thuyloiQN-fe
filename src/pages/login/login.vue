@@ -202,7 +202,7 @@ export default defineComponent({
             if (response) {
               // console.log(response);
 
-              userState().onAuthentication(response.data.user, response.data.avatar);
+              userState().onAuthentication(response.data.user);
 
               // this.$router.push({ name: 'home-page' });
               next({ name: 'home-page' });
@@ -277,7 +277,7 @@ export default defineComponent({
               setItem('accessToken', response.data.token);
               setItem('user', JSON.stringify(response.data.user));
 
-              userState().onAuthentication(response.data.user, response.data.avatar);
+              userState().onAuthentication(response.data.user);
               console.log(userState().getUserProfile);
               this.loginSpinning = false;
               this.$router.push({ name: 'home-page' });

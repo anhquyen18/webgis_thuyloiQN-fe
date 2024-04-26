@@ -266,15 +266,11 @@ export default defineComponent({
     reloadTable() {
       this.tableLoading = true;
       thuyLoiApi
-        .get(
-          `/organization/${this.userProfile.organization_id}/departments`,
-          {},
-          {
-            headers: {
-              Authorization: `Bearer ${getItem('accessToken')}`,
-            },
+        .get(`/organization/${this.userProfile.organization_id}/departments`, {
+          headers: {
+            Authorization: `Bearer ${getItem('accessToken')}`,
           },
-        )
+        })
         .then((response) => {
           // console.log(response);
           userState().setDepartments(response.data.departments);
@@ -289,9 +285,6 @@ export default defineComponent({
     },
 
     deleteDepartments() {
-      console.log(import.meta.env.APP_API_URL);
-      console.log(import.meta.env.GEOSERVER_DOMAIN);
-      return;
       this.tableLoading = true;
       const departmentIds = this.tableState.selectedRowKeys.join(',');
       thuyLoiApi

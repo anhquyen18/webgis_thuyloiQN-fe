@@ -280,6 +280,7 @@ export default defineComponent({
         });
     };
 
+    // Cần sửa lúc user có quyền hay không
     getOrganizations();
 
     const page = 1;
@@ -321,15 +322,11 @@ export default defineComponent({
     const getPolicies = () => {
       policyTableSpinning.value = true;
       thuyLoiApi
-        .post(
-          `/get-policies`,
-          {},
-          {
-            headers: {
-              Authorization: `Bearer ${getItem('accessToken')}`,
-            },
+        .get(`/get-policies`, {
+          headers: {
+            Authorization: `Bearer ${getItem('accessToken')}`,
           },
-        )
+        })
         .then((response) => {
           // console.log(response);
           userState().setAvailablePolcies(response.data);

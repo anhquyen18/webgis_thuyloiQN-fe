@@ -12,10 +12,9 @@ export const userState = defineStore('userStateId', {
   }),
 
   actions: {
-    onAuthentication(userProfile, avatar) {
+    onAuthentication(userProfile) {
       this.loginState = true;
       this.userProfile = userProfile;
-      this.userProfile.avatar_base64 = avatar;
     },
     onLogout() {
       this.loginState = false;
