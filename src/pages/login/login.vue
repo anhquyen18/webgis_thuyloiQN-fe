@@ -288,7 +288,7 @@ export default defineComponent({
               // if (error.response.status == 400) this.loginErrors = error.response.data.message;
               // else if (error.response.status == 422) this.loginValidateErrors = error.response.data.errors;
               this.loginErrors = error.response.data.message;
-              // this.$message.error('Đăng nhập không thành công, vui lòng thử lại!');
+              this.$message.error('Đăng nhập không thành công, vui lòng thử lại!');
               this.loginSpinning = false;
             });
         })
