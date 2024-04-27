@@ -29,7 +29,7 @@
             <template #label>
               <p class="fw-bold">Tên phòng ban</p>
             </template>
-            <a-input :class="{ 'input-error': false }" v-model:value="departmentForm.departmentName" />
+            <a-input v-model:value="departmentForm.departmentName" />
           </a-form-item>
 
           <a-form-item v-if="hasOrganizationsPolicy">

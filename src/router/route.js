@@ -46,16 +46,23 @@ const home = [
       },
       // Organization
       {
-        path: 'departments',
+        path: 'organization/departments',
         name: 'account-manager-departments',
         component: () => import('../pages/account-manager/organization/departments.vue'),
         meta: { title: 'Phòng ban' },
       },
       {
-        path: 'departments/create',
+        path: 'organization/departments/create',
         name: 'account-manager-department-create',
         component: () => import('../pages/account-manager/organization/create-department.vue'),
         meta: { title: 'Tạo phòng ban' },
+      },
+
+      {
+        path: 'organization/departments/:departmentId',
+        name: 'account-manager-department-detail',
+        component: () => import('../pages/account-manager/organization/department-detail.vue'),
+        meta: { title: 'Phòng ban' },
       },
     ],
   },

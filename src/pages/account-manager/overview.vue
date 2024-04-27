@@ -38,7 +38,7 @@
               <a-row justify="space-between" align="middle">
                 <a-col class="center-col">
                   <i class="fa-solid fa-pen me-3 fs-4" style="width: 30px"></i>
-                  <p class="fw-bold">Chỉnh sửa hồ sơ</p>
+                  <p class="fw-bold text-wrap">Chỉnh sửa hồ sơ</p>
                 </a-col>
                 <a-col class="center-col">
                   <i class="fa-solid fa-angles-right"></i>
@@ -64,7 +64,7 @@
               <a-row justify="space-between" align="middle">
                 <a-col class="center-col">
                   <i class="fa-solid fa-image-portrait me-3 fs-4" style="width: 30px"></i>
-                  <p class="fw-bold">Đổi ảnh đại diện</p>
+                  <p class="fw-bold text-wrap">Đổi ảnh đại diện</p>
                 </a-col>
                 <a-col class="center-col">
                   <i class="fa-solid fa-angles-right"></i>
@@ -82,7 +82,7 @@
               <a-row justify="space-between" align="middle">
                 <a-col class="center-col">
                   <i class="fa-solid fa-lock me-3 fs-4" style="width: 30px"></i>
-                  <p class="fw-bold">Đổi mật khẩu</p>
+                  <p class="fw-bold text-wrap">Đổi mật khẩu</p>
                 </a-col>
                 <a-col class="center-col">
                   <i class="fa-solid fa-angles-right"></i>
@@ -98,8 +98,8 @@
             style="height: auto; padding: 15px">
             <a-row justify="space-between" align="middle">
               <a-col class="center-col">
-                <i class="fa-solid fa-comment-dots me-3 fs-4" style="width: 30px"></i>
-                <p class="fw-bold">Yêu cầu quyền truy cập</p>
+                <i class="fa-solid fa-comment-dots account-manager-button-icon"></i>
+                <p class="fw-bold text-wrap">Yêu cầu quyền truy cập</p>
               </a-col>
               <a-col class="center-col">
                 <i class="fa-solid fa-angles-right"></i>
@@ -117,14 +117,33 @@
         <a-flex vertical :gap="8">
           <router-link :to="{ name: 'account-manager-departments' }">
             <a-button
+              v-if="userProfile.allPolicies.find((policy) => policy.id === 2 || policy.id === 1)"
               class="no-border-ant-button background-hover-button fs-6"
               ghost
               block
               style="height: auto; padding: 15px">
               <a-row justify="space-between" align="middle">
                 <a-col class="center-col">
-                  <i class="fa-solid fa-users-viewfinder me-3 fs-4" style="width: 30px"></i>
-                  <p class="fw-bold">Phòng ban</p>
+                  <i class="fa-solid fa-users-viewfinder account-manager-button-icon"></i>
+                  <p class="fw-bold text-wrap">Phòng ban</p>
+                </a-col>
+                <a-col class="center-col">
+                  <i class="fa-solid fa-angles-right"></i>
+                </a-col>
+              </a-row>
+            </a-button>
+          </router-link>
+
+          <router-link :to="{ name: 'account-manager-department-detail', params: { departmentId: routeDepartmentId } }">
+            <a-button
+              class="no-border-ant-button background-hover-button fs-6"
+              ghost
+              block
+              style="height: auto; padding: 15px">
+              <a-row justify="space-between" align="middle">
+                <a-col class="center-col">
+                  <i class="fa-solid fa-user-group account-manager-button-icon"></i>
+                  <p class="fw-bold text-wrap">Phòng ban của bạn</p>
                 </a-col>
                 <a-col class="center-col">
                   <i class="fa-solid fa-angles-right"></i>
@@ -141,8 +160,8 @@
               style="height: auto; padding: 15px">
               <a-row justify="space-between" align="middle">
                 <a-col class="center-col">
-                  <i class="fa-solid fa-building-user me-3 fs-4" style="width: 30px"></i>
-                  <p class="fw-bold">Người dùng</p>
+                  <i class="fa-solid fa-building-user account-manager-button-icon"></i>
+                  <p class="fw-bold text-wrap">Người dùng</p>
                 </a-col>
                 <a-col class="center-col">
                   <i class="fa-solid fa-angles-right"></i>
@@ -159,8 +178,8 @@
               style="height: auto; padding: 15px">
               <a-row justify="space-between" align="middle">
                 <a-col class="center-col">
-                  <i class="fa-solid fa-building-shield me-3 fs-4" style="width: 30px"></i>
-                  <p class="fw-bold">Quyền truy cập</p>
+                  <i class="fa-solid fa-building-shield account-manager-button-icon"></i>
+                  <p class="fw-bold text-wrap">Quyền hạn của bạn</p>
                 </a-col>
                 <a-col class="center-col">
                   <i class="fa-solid fa-angles-right"></i>
@@ -183,8 +202,9 @@ import { userState } from '@/stores/user-state';
 export default defineComponent({
   setup() {
     const pageLoading = inject('pageLoading');
-    // const userProfile = inject('userProfile');
-    const userProfile = JSON.parse(getItem('user'));
+    const userProfile = inject('userProfile');
+    // const userProfile = JSON.parse(getItem('user'));
+
     const avatar = inject('avatar');
     const pageSpinning = inject('pageSpinning');
     const accessToken = getItem('accessToken');
@@ -224,7 +244,15 @@ export default defineComponent({
     },
   },
 
-  computed: {},
+  computed: {
+    routeDepartmentId() {
+      if (this.userProfile.department_id) {
+        return this.userProfile.department_id;
+      } else {
+        return 'no-department';
+      }
+    },
+  },
 
   methods: {
     beforeAvatarUpload(file) {

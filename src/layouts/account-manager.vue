@@ -218,6 +218,10 @@ export default defineComponent({
   background: rgb(27, 79, 175);
   background: linear-gradient(90deg, rgba(27, 79, 175, 1) 0%, rgba(58, 108, 200, 1) 100%); //#1b4faf, #3a6cc8
   color: white;
+  & .ant-tabs-tab-btn {
+    color: white;
+    font-weight: bold;
+  }
 }
 
 .account-manager-transparent-card {
@@ -258,6 +262,17 @@ export default defineComponent({
 
 .ant-table-content {
   background-color: transparent !important;
+}
+
+.account-manager-button-icon {
+  font-size: 1.5rem;
+  margin-right: 1rem;
+  width: 1.8rem;
+}
+
+.account-manager-text-ant-button {
+  font-weight: bold;
+  padding-inline: 1rem;
 }
 
 @media (max-width: 576px) {

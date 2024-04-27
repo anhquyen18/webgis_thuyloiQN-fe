@@ -8,6 +8,7 @@ export const userState = defineStore('userStateId', {
     noDepartmentUsers: null, // Những người dùng chưa được gán department
     availablePolcies: null, // Các quyền có thể gán cho người khác
     organizations: null, // Các tổ chức có thể gán cho người khác
+    myDepartment: null, // Thông tin về department của user
   }),
 
   actions: {
@@ -31,6 +32,9 @@ export const userState = defineStore('userStateId', {
     setOrganizations(organizations) {
       this.organizations = organizations;
     },
+    setMyDepartment(myDepartment) {
+      this.myDepartment = myDepartment;
+    },
   },
 
   getters: {
@@ -51,6 +55,9 @@ export const userState = defineStore('userStateId', {
     },
     getOrganizations() {
       return this.organizations;
+    },
+    getMyDepartment() {
+      return this.myDepartment;
     },
   },
 });

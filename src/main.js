@@ -33,6 +33,7 @@ import {
   Tag,
   Upload,
   Breadcrumb,
+  Tabs,
 } from 'ant-design-vue';
 import App from './App.vue';
 import axios from 'axios';
@@ -83,6 +84,7 @@ app.use(Image);
 app.use(Tag);
 app.use(Upload);
 app.use(Breadcrumb);
+app.use(Tabs);
 
 app.mount('#app');
 
