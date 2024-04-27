@@ -294,6 +294,7 @@ export default defineComponent({
         })
         .catch((error) => {
           console.log('error', error);
+          this.loginSpinning = false;
         });
 
       // .catch((error) => {
