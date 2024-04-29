@@ -279,7 +279,7 @@ export default defineComponent({
 
               userState().onAuthentication(response.data.user);
               console.log(userState().getUserProfile);
-              this.loginSpinning = false;
+              // this.loginSpinning = false;
               this.$router.push({ name: 'home-page' });
               // this.loginSpinning = false;
             })
