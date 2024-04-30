@@ -50,7 +50,11 @@
                 </p>
               </a-col>
               <a-col :xs="24" :md="16">
-                <a-input class="mt-2" placeholder="Tìm kiếm">
+                <a-input
+                  v-model:value="departmentSearchValue"
+                  class="mt-2"
+                  placeholder="Tìm kiếm phòng ban"
+                  @change="departmentSearchChange">
                   <template #prefix>
                     <i class="fa-solid fa-magnifying-glass me-2"></i>
                   </template>
@@ -124,8 +128,8 @@
 import { defineComponent, inject, ref, provide } from 'vue';
 import thuyLoiApi from '@/js/axios/thuyLoiApi';
 import { userState } from '@/stores/user-state';
-import { getItem, setItem, removeItem } from '@/js/utils/localStorage.js';
-import { getLastTime } from '@/js/utils/utils.js';
+import { getItem } from '@/js/utils/localStorage.js';
+import { getLastTime, removeAccents } from '@/js/utils/utils.js';
 import { CheckCircleOutlined, ExclamationCircleOutlined } from '@ant-design/icons-vue';
 
 export default defineComponent({
@@ -148,6 +152,7 @@ export default defineComponent({
       tableState.value.selectedRowKeys = selectedRowKeys;
     };
 
+    const originDataSource = ref();
     const dataSource = ref();
     const allOrganizationAccess = ref();
 
@@ -162,6 +167,7 @@ export default defineComponent({
         .then((response) => {
           // console.log(response.data);
           userState().setDepartments(response.data.departments);
+          originDataSource.value = userState().getDepartments;
           dataSource.value = userState().getDepartments;
 
           allOrganizationAccess.value = response.data.allAccess;
@@ -190,6 +196,7 @@ export default defineComponent({
       userProfile,
       getDepartments,
       dataSource,
+      originDataSource,
       allOrganizationAccess,
       myGetLastTime,
     };
@@ -244,6 +251,7 @@ export default defineComponent({
         },
       ],
       tableLoading: false,
+      departmentSearchValue: '',
     };
   },
 
@@ -280,6 +288,7 @@ export default defineComponent({
         .then((response) => {
           // console.log(response);
           userState().setDepartments(response.data.departments);
+          this.originDataSource = userState().getDepartments;
           this.dataSource = userState().getDepartments;
           this.allOrganizationAccess = response.data.allAccess;
           this.tableLoading = false;
@@ -308,6 +317,16 @@ export default defineComponent({
           console.log(error);
           this.tableLoading = false;
         });
+    },
+
+    filterTable(text, dataSource) {
+      return dataSource.filter(function (item) {
+        return removeAccents(item.name.toLowerCase()).includes(removeAccents(text.toLowerCase()));
+      });
+    },
+
+    departmentSearchChange() {
+      this.dataSource = this.filterTable(this.departmentSearchValue, this.originDataSource);
     },
   },
 
