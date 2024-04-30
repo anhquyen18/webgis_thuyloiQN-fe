@@ -8,11 +8,13 @@
             <a-skeleton :loading="pageLoading" active>
               <span>
                 <p class="fw-bold mt-1">Tổ chức:</p>
-                <p>{{ userProfile.organization_name }}</p>
+                <p v-if="userProfile.organization_name">{{ userProfile.organization_name }}</p>
+                <p v-else>Không</p>
               </span>
               <span>
                 <p class="fw-bold mt-1">Phòng ban:</p>
-                <p>{{ userProfile.department_name }}</p>
+                <p v-if="userProfile.department_name">{{ userProfile.department_name }}</p>
+                <p v-else>Không</p>
               </span>
             </a-skeleton>
           </a-col>

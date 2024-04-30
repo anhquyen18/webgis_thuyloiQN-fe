@@ -23,7 +23,12 @@
           <template #title>
             <a-row>
               <a-col flex="1 1 300px">
-                <p class="fs-4 fw-bold">Phòng ban ({{ this.dataSource.length }})</p>
+                <p class="fs-4 fw-bold">
+                  Phòng ban
+                  <span class="fs-4 fw-bold" v-if="this.dataSource" style="color: lightgray">
+                    ({{ this.dataSource.length }})
+                  </span>
+                </p>
               </a-col>
               <a-col flex="">
                 <a-flex gap="middle">
@@ -56,11 +61,13 @@
 
           <template #bodyCell="{ column, record, index }">
             <template v-if="column.key === 'name'">
-              <a-button class="no-border-ant-button" ghost>
-                <u style="text-underline-offset: 3px">
-                  {{ record.name }}
-                </u>
-              </a-button>
+              <router-link :to="{ name: 'account-manager-department-detail', params: { departmentId: record.id } }">
+                <a-button class="no-border-ant-button" ghost>
+                  <u style="text-underline-offset: 3px">
+                    {{ record.name }}
+                  </u>
+                </a-button>
+              </router-link>
             </template>
 
             <template v-else-if="column.key === 'organization_name'">
@@ -134,12 +141,10 @@ export default defineComponent({
 
     const tableState = ref({
       selectedRowKeys: [],
-      // Check here to configure the default column
       loading: false,
     });
 
     const onSelectChange = (selectedRowKeys) => {
-      // console.log('selectedRowKeys changed: ', selectedRowKeys);
       tableState.value.selectedRowKeys = selectedRowKeys;
     };
 
@@ -155,7 +160,7 @@ export default defineComponent({
           },
         })
         .then((response) => {
-          // console.log(response);
+          // console.log(response.data);
           userState().setDepartments(response.data.departments);
           dataSource.value = userState().getDepartments;
 
@@ -204,10 +209,11 @@ export default defineComponent({
           dataIndex: 'organization_name',
           key: 'organization_name',
           sorter: (a, b) => {
+            // console.log(a.organization_name, b.organization_name);
             const none = 'Chưa xác định';
-            if (!a.organization_name) {
+            if (!a.organization_name && b.organization_name) {
               return none.length - b.organization_name.length;
-            } else if (!b.organization_name) {
+            } else if (!b.organization_name && a.organization_name) {
               return a.organization_name - none.length;
             } else if (!a.organization_name && !b.organization_name) {
               return none.length - none.length;
@@ -294,7 +300,7 @@ export default defineComponent({
           },
         })
         .then((response) => {
-          console.log(response);
+          // console.log(response);
           this.reloadTable();
           this.tableLoading = false;
         })

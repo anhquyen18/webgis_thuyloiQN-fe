@@ -9,7 +9,7 @@
     <div class="account-manager-transparent-card">
       <a-skeleton :loading="pageLoading" active>
         <a-flex justify="space-between">
-          <h3 class="text-white fs-5">Bạn chưa tham gia phòng ban nào.</h3>
+          <h3 class="text-white fs-5">Không tìm thấy phòng ban.</h3>
         </a-flex>
       </a-skeleton>
     </div>
@@ -90,12 +90,18 @@
                         v-if="hasOrganizationPolicy"
                         class="account-manager-text-ant-button"
                         type="default"
-                        @click="deleteUser"
-                        :disabled="!this.userSelectedRowKeys.length > 0">
+                        @click="removeUsers"
+                        :disabled="this.userSelectedRowKeys.length <= 0"
+                        :loading="removeUsersLoading">
                         Xoá
                       </a-button>
 
-                      <router-link :to="{ name: '' }">
+                      <router-link
+                        :to="{
+                          name: 'account-manager-department-detail-add-users',
+                          parmas: { departmentId: this.departmentId },
+                          query: { removeUsersStatus: removeUsersStatus },
+                        }">
                         <a-button v-if="hasOrganizationPolicy" class="account-manager-text-ant-button" type="primary">
                           Thêm thành viên
                         </a-button>
@@ -167,12 +173,18 @@
                         v-if="hasOrganizationPolicy"
                         class="account-manager-text-ant-button"
                         type="default"
-                        @click="deleteUser"
-                        :disabled="!this.userSelectedRowKeys.length > 0">
+                        @click="removePolicies"
+                        :disabled="!this.policySelectedRowKeys.length > 0"
+                        :loading="removePoliciesLoading">
                         Xoá
                       </a-button>
 
-                      <router-link :to="{ name: '' }">
+                      <router-link
+                        :to="{
+                          name: 'account-manager-department-detail-add-policies',
+                          parmas: { departmentId: this.departmentId },
+                          query: { removePoliciesStatus: removePoliciesStatus },
+                        }">
                         <a-button v-if="hasOrganizationPolicy" class="account-manager-text-ant-button" type="primary">
                           Thêm quyền hạn
                         </a-button>
@@ -261,70 +273,97 @@
 </template>
 
 <script>
-import { defineComponent, inject, ref, reactive } from 'vue';
+import { defineComponent, inject, ref, reactive, provide } from 'vue';
 import thuyLoiApi from '@/js/axios/thuyLoiApi';
 import { userState } from '@/stores/user-state';
-import { getItem, setItem, removeItem } from '@/js/utils/localStorage.js';
+import { getItem } from '@/js/utils/localStorage.js';
 import { getLastTime, removeAccents } from '@/js/utils/utils.js';
 import { useRouter } from 'vue-router';
 
 export default defineComponent({
+  beforeRouteEnter(to, from, next) {
+    // console.log(from);
+    if (from.name === 'account-manager-department-detail-add-users' && to.query.addUsersComplete == 'true') {
+      next((data) => {
+        data.reloadUserTable();
+        // data.preRoute =
+      });
+    } else if (
+      from.name === 'account-manager-department-detail-add-policies' &&
+      to.query.addPoliciesComplete == 'true'
+    ) {
+      next((data) => {
+        data.reloadPolicyTable();
+      });
+    } else {
+      next((data) => {
+        data.preRoute = from;
+      });
+    }
+  },
+
   setup() {
     const pageLoading = inject('pageLoading');
     const userProfile = inject('userProfile');
     const router = useRouter();
-    const departmentId = router.currentRoute.value.params.departmentId;
+    const departmentId = ref(router.currentRoute.value.params.departmentId);
     const tabActiveKey = ref('users');
     const currentQuery = { ...router.currentRoute.query };
     currentQuery.section = tabActiveKey.value;
     router.replace({ query: currentQuery });
 
     const department = ref();
+    provide('department', department);
+
     const departmentDate = ref();
     const userOriginDataSource = ref();
     const userDataSource = ref();
     const policyOriginDataSource = ref();
     const policyDataSource = ref();
-
     const editInfoState = reactive({
       name: '',
       description: '',
     });
 
     const getDataFromDepartment = (department) => {
-      departmentDate.value = new Date(department.created_at);
+      if (department) {
+        departmentDate.value = new Date(department.created_at);
 
-      userOriginDataSource.value = department.users;
-      userDataSource.value = userOriginDataSource.value;
-      policyOriginDataSource.value = department.policies;
-      policyDataSource.value = policyOriginDataSource.value;
+        userOriginDataSource.value = department.users;
+        userDataSource.value = userOriginDataSource.value;
+        policyOriginDataSource.value = department.policies;
+        policyDataSource.value = policyOriginDataSource.value;
 
-      editInfoState.name = department.name;
-      editInfoState.description = department.description;
+        editInfoState.name = department.name;
+        editInfoState.description = department.description;
+      }
     };
 
+    // Cần lấy thông tin để hiện thị là đang add vào Department nào
     const getDepartment = () => {
       pageLoading.value = true;
       thuyLoiApi
-        .get('/departments/' + departmentId, {
+        .get('/departments/' + departmentId.value, {
           headers: {
             Authorization: `Bearer ${getItem('accessToken')}`,
           },
         })
         .then((response) => {
-          console.log(response.data);
+          // console.log(response.data);
           userState().setMyDepartment(response.data.department);
           department.value = userState().getMyDepartment;
           getDataFromDepartment(department.value);
+
           pageLoading.value = false;
         })
         .catch((error) => {
+          departmentId.value = 'no-department';
           console.log(error);
           pageLoading.value = false;
         });
     };
 
-    if (userState().getLogin && departmentId != 'no-department') {
+    if (userState().getLogin && departmentId.value != 'no-department') {
       // Kiểm tra đăng nhập và người đùng đang có trong nhóm nào không
       // Không trong nhóm thì không request gì cả
       if (!userState().getMyDepartment) {
@@ -429,6 +468,12 @@ export default defineComponent({
       policySearchValue: '',
 
       editInfoModalOpen: false,
+      removeUsersLoading: false,
+      removeUsersStatus: false,
+      removePoliciesLoading: false,
+      removePoliciesStatus: false,
+
+      preRoute: '',
     };
   },
 
@@ -461,8 +506,13 @@ export default defineComponent({
 
   methods: {
     backward() {
-      console.log(this.$router);
-      // this.$router.push({ name: 'account-manager-page' });
+      const overviewName = 'account-manager-overview';
+      const departmentsName = 'account-manager-departments';
+      if (this.preRoute.name == departmentsName) {
+        this.$router.push(this.preRoute);
+      } else {
+        this.$router.push({ name: overviewName });
+      }
     },
 
     onUserSelectChange(selectedRowKeys) {
@@ -470,7 +520,7 @@ export default defineComponent({
     },
 
     onPolicySelectChange(selectedRowKeys) {
-      this.PolicySelectedRowKeys = selectedRowKeys;
+      this.policySelectedRowKeys = selectedRowKeys;
     },
 
     reloadUserTable() {
@@ -500,7 +550,55 @@ export default defineComponent({
       this.$router.replace({ query: this.currentQuery });
     },
 
-    deleteUser() {},
+    removeUsers() {
+      this.removeUserLoading = true;
+
+      thuyLoiApi
+        .put(
+          `/departments/${this.departmentId}/remove-users`,
+          { users: this.userSelectedRowKeys },
+          {
+            headers: {
+              Authorization: `Bearer ${getItem('accessToken')}`,
+            },
+          },
+        )
+        .then((response) => {
+          // console.log(response);
+          this.$message.success(response.data.message);
+          this.selectedRowKeys = [];
+          this.removeUserLoading = false;
+          this.removeUsersStatus = true;
+          this.reloadUserTable();
+        })
+        .catch((error) => {
+          console.log(error);
+          this.removeUserLoading = false;
+          this.$message.error(error.response.data.message);
+        });
+    },
+
+    removePolicies() {
+      this.removePoliciesLoading = true;
+      thuyLoiApi
+        .delete(`/departments/${this.departmentId}/remove-policies?id=${this.policySelectedRowKeys.join(',')}`, {
+          headers: {
+            Authorization: `Bearer ${getItem('accessToken')}`,
+          },
+        })
+        .then((response) => {
+          this.policySelectedRowKeys = [];
+          this.removePoliciesLoading = false;
+          this.removePoliciesStatus = true;
+          this.$message.success(response.data.message);
+          this.reloadPolicyTable();
+        })
+        .catch((error) => {
+          this.removePoliciesLoading = false;
+          console.log(error);
+          this.$message.error(error.response.data.message);
+        });
+    },
 
     showEditInfoModal() {
       this.editInfoModalOpen = true;
@@ -543,11 +641,17 @@ export default defineComponent({
 
   mounted() {
     const section = this.$route.query.section;
-    const sections = ['policies'];
+    const sections = ['policies', 'users'];
     if (section === sections[0]) {
       this.tabActiveKey = sections[0];
       this.currentQuery.section = sections[0];
       this.$router.replace({ query: this.currentQuery });
+    }
+
+    if (userState().getMyDepartment) {
+      const idRequested = this.$router.currentRoute.value.params.departmentId;
+      const idStored = userState().getMyDepartment.id;
+      if (idRequested != idStored) this.getDepartment();
     }
   },
 });

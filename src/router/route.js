@@ -57,12 +57,24 @@ const home = [
         component: () => import('../pages/account-manager/organization/create-department.vue'),
         meta: { title: 'Tạo phòng ban' },
       },
-
       {
         path: 'organization/departments/:departmentId',
         name: 'account-manager-department-detail',
         component: () => import('../pages/account-manager/organization/department-detail.vue'),
         meta: { title: 'Phòng ban' },
+        children: [],
+      },
+      {
+        path: 'organization/departments/:departmentId/add-users',
+        name: 'account-manager-department-detail-add-users',
+        component: () => import('../pages/account-manager/organization/add-users-to-department.vue'),
+        meta: { title: 'Thêm thành viên' },
+      },
+      {
+        path: 'organization/departments/:departmentId/add-policies',
+        name: 'account-manager-department-detail-add-policies',
+        component: () => import('../pages/account-manager/organization/add-policies-to-department.vue'),
+        meta: { title: 'Thêm quyền hạn' },
       },
     ],
   },

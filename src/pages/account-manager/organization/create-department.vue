@@ -273,6 +273,7 @@ export default defineComponent({
           // console.log(response);
           userState().setOrganizations(response.data.organizations);
           organizationOptions.value = userState().getOrganizations;
+
           organizationSelectLoading.value = false;
         })
         .catch((error) => {
@@ -334,10 +335,10 @@ export default defineComponent({
           },
         })
         .then((response) => {
-          // console.log(response);
-          userState().setAvailablePolcies(response.data);
-          policyOriginDataSource.value = userState().getAvailablePolcies;
-          policyDataSource.value = userState().getAvailablePolcies;
+          console.log(response.data);
+          userState().setAvailablePolicies(response.data.policies);
+          policyOriginDataSource.value = userState().getAvailablePolicies;
+          policyDataSource.value = userState().getAvailablePolicies;
           policyTableSpinning.value = false;
         })
         .catch((error) => {
@@ -347,9 +348,9 @@ export default defineComponent({
         });
     };
 
-    if (userState().getAvailablePolcies) {
-      policyOriginDataSource.value = userState().getAvailablePolcies;
-      policyDataSource.value = userState().getAvailablePolcies;
+    if (userState().getAvailablePolicies) {
+      policyOriginDataSource.value = userState().getAvailablePolicies;
+      policyDataSource.value = userState().getAvailablePolicies;
       policyTableSpinning.value = false;
     } else {
       getPolicies();
