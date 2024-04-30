@@ -123,15 +123,11 @@ export default defineComponent({
         next((data) => {
           const getAuthenticatedUser = () => {
             thuyLoiApi
-              .get(
-                '/get-authenticated-user',
-
-                {
-                  headers: {
-                    Authorization: `Bearer ${getItem('accessToken')}`,
-                  },
+              .get('/get-authenticated-user', {
+                headers: {
+                  Authorization: `Bearer ${getItem('accessToken')}`,
                 },
-              )
+              })
               .then((response) => {
                 if (response) {
                   // console.log(response.data);

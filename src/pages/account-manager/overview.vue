@@ -145,7 +145,7 @@
               <a-row justify="space-between" align="middle">
                 <a-col class="center-col">
                   <i class="fa-solid fa-user-group account-manager-button-icon"></i>
-                  <p class="fw-bold text-wrap">Phòng ban của bạn</p>
+                  <p class="fw-bold text-wrap">Phòng ban của tôi</p>
                 </a-col>
                 <a-col class="center-col">
                   <i class="fa-solid fa-angles-right"></i>
@@ -172,7 +172,7 @@
             </a-button>
           </router-link>
 
-          <router-link :to="{ name: '' }">
+          <router-link :to="{ name: 'account-manager-my-policies' }">
             <a-button
               class="no-border-ant-button background-hover-button fs-6"
               ghost
@@ -181,7 +181,7 @@
               <a-row justify="space-between" align="middle">
                 <a-col class="center-col">
                   <i class="fa-solid fa-building-shield account-manager-button-icon"></i>
-                  <p class="fw-bold text-wrap">Quyền hạn của bạn</p>
+                  <p class="fw-bold text-wrap">Quyền hạn của tôi</p>
                 </a-col>
                 <a-col class="center-col">
                   <i class="fa-solid fa-angles-right"></i>
