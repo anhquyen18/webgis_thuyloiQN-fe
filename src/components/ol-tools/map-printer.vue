@@ -1,5 +1,5 @@
 <template>
-  <a-tooltip overlayClassName="tool-container-tooltip" :mouseEnterDelay="1">
+  <a-tooltip overlayClassName="tool-container-tooltip" :mouseEnterDelay="1" :color="tooltipBackground">
     <template #title>
       <p>In bản đồ</p>
     </template>
@@ -29,9 +29,12 @@ import * as VueLayer from '@/js/openlayers/VueLayer.js';
 export default defineComponent({
   setup() {
     const buttonSize = inject('buttonSize');
+    const tooltipBackground = inject('tooltipBackground');
+
     // buttonSize.value = 'large';
     return {
       buttonSize,
+      tooltipBackground,
     };
   },
 

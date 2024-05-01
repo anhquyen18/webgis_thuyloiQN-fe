@@ -61,11 +61,7 @@
                 <template #label>
                   <p class="form-item-title">Mật khẩu</p>
                 </template>
-                <a-input-password
-                  v-model:value="user.password"
-                  size="large"
-                  placeholder="Mật khẩu"
-                  :visibility-toggle="false"></a-input-password>
+                <a-input-password v-model:value="user.password" size="large" placeholder="Mật khẩu"></a-input-password>
               </a-form-item>
 
               <a-form-item class="mt-2">
@@ -197,19 +193,17 @@ export default defineComponent({
 
       const getAuthenticatedUser = () => {
         thuyLoiApi
-          .post(
-            '/get-authenticated-user',
-            {},
-            {
-              headers: {
-                Authorization: `Bearer ${getItem('accessToken')}`,
-              },
+          .get('/get-authenticated-user', {
+            headers: {
+              Authorization: `Bearer ${getItem('accessToken')}`,
             },
-          )
+          })
           .then((response) => {
             if (response) {
               // console.log(response);
-              userState().onAuthentication();
+
+              userState().onAuthentication(response.data.user);
+
               // this.$router.push({ name: 'home-page' });
               next({ name: 'home-page' });
               setItem('user', JSON.stringify(response.data.user));
@@ -279,15 +273,13 @@ export default defineComponent({
           thuyLoiApi
             .post('/login', this.user)
             .then((response) => {
+              console.log(response);
               setItem('accessToken', response.data.token);
               setItem('user', JSON.stringify(response.data.user));
 
-              // setItem('user', JSON.stringify(response.data.user));
-              // console.log(JSON.parse(getItem('user')));
-
-              // message.success('Sign in successfully!');
-              userState().onAuthentication();
-              this.loginSpinning = false;
+              userState().onAuthentication(response.data.user);
+              console.log(userState().getUserProfile);
+              // this.loginSpinning = false;
               this.$router.push({ name: 'home-page' });
               // this.loginSpinning = false;
             })
@@ -296,12 +288,13 @@ export default defineComponent({
               // if (error.response.status == 400) this.loginErrors = error.response.data.message;
               // else if (error.response.status == 422) this.loginValidateErrors = error.response.data.errors;
               this.loginErrors = error.response.data.message;
-              // this.$message.error('Đăng nhập không thành công, vui lòng thử lại!');
+              this.$message.error('Đăng nhập không thành công, vui lòng thử lại!');
               this.loginSpinning = false;
             });
         })
         .catch((error) => {
           console.log('error', error);
+          this.loginSpinning = false;
         });
 
       // .catch((error) => {

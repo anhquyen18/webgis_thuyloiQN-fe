@@ -1,6 +1,6 @@
 <template>
   <div>
-    <a-tooltip overlayClassName="tool-container-tooltip" :mouseEnterDelay="1">
+    <a-tooltip overlayClassName="tool-container-tooltip" :mouseEnterDelay="1" :color="tooltipBackground">
       <template #title>
         <p>Đo đạc</p>
       </template>
@@ -73,10 +73,12 @@ export default defineComponent({
   setup() {
     const modalOpen = ref(false);
     const buttonSize = inject('buttonSize');
+    const tooltipBackground = inject('tooltipBackground');
 
     return {
       modalOpen,
       buttonSize,
+      tooltipBackground,
     };
   },
   data() {

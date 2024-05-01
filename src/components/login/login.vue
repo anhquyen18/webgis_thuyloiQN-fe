@@ -5,7 +5,9 @@
         <a-popover trigger="click" :arrowPointAtCenter="true" placement="bottomRight">
           <template #content>
             <a-flex vertical>
-              <a-button class="no-border-ant-button fw-bold"> Tài khoản </a-button>
+              <router-link :to="{ name: 'account-manager-page' }">
+                <a-button class="no-border-ant-button fw-bold"> Tài khoản </a-button>
+              </router-link>
 
               <a-config-provider
                 :theme="{

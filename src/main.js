@@ -10,6 +10,7 @@ import {
   Flex,
   ConfigProvider,
   Input,
+  InputNumber,
   Card,
   Menu,
   Collapse,
@@ -26,6 +27,13 @@ import {
   Form,
   Checkbox,
   Popconfirm,
+  Result,
+  Skeleton,
+  Image,
+  Tag,
+  Upload,
+  Breadcrumb,
+  Tabs,
 } from 'ant-design-vue';
 import App from './App.vue';
 import axios from 'axios';
@@ -41,6 +49,10 @@ const app = createApp(App);
 app.config.productionTip = false;
 app.use(createPinia());
 app.use(router);
+router.beforeEach((to, from, next) => {
+  if (to.meta.title) document.title = to.meta.title;
+  next();
+});
 
 app.use(Button);
 app.use(Row);
@@ -49,6 +61,7 @@ app.use(Layout);
 app.use(Flex);
 app.use(ConfigProvider);
 app.use(Input);
+app.use(InputNumber);
 app.use(Card);
 app.use(Menu);
 app.use(Collapse);
@@ -65,6 +78,13 @@ app.use(Carousel);
 app.use(Form);
 app.use(Checkbox);
 app.use(Popconfirm);
+app.use(Result);
+app.use(Skeleton);
+app.use(Image);
+app.use(Tag);
+app.use(Upload);
+app.use(Breadcrumb);
+app.use(Tabs);
 
 app.mount('#app');
 

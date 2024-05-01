@@ -34,8 +34,8 @@ const runMap = () => {
   // var map;
   // const GEOSERVER_DOMAIN = 'http://aqtran.name.vn:8080';
   // const GEOSERVER_DOMAIN = 'https://geo.tamky.click';
-  const GEOSERVER_DOMAIN = 'http://localhost:8080';
-  const GEOSERVER_WORKSPACE = 'webgis_dev';
+  const GEOSERVER_DOMAIN = import.meta.env.VITE_GEOSERVER_DOMAIN;
+  const GEOSERVER_WORKSPACE = import.meta.env.VITE_GEOSERVER_WORKSPACE;
   const map = new Map({
     target: 'map',
     view: new View({

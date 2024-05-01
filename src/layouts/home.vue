@@ -90,6 +90,7 @@
                 <div ref="mapContainer" id="map-container" class="content-container h-100" style="position: relative">
                   <div id="map" class="map h-100"></div>
                   <div class="bottom-right-nav align-items-center">
+                    <IrrigationToolContainer></IrrigationToolContainer>
                     <LayerManager class="mt-5"></LayerManager>
                   </div>
                   <LegendControl></LegendControl>
@@ -161,6 +162,8 @@ import LayerManager from '../components/ol-tools/layer-manager.vue';
 import SearchByNameTool from '../components/sider/search-by-name-tool.vue';
 import LegendControl from '@/components/ol-tools/legend-control.vue';
 import Login from '@/components/login/login.vue';
+import IrrigationToolContainer from '@/components/irrigation-tools/tool-container.vue';
+
 export default defineComponent({
   components: {
     ToolContainer,
@@ -169,23 +172,21 @@ export default defineComponent({
     SearchByNameTool,
     LegendControl,
     Login,
+    IrrigationToolContainer,
   },
 
   beforeRouteEnter(to, from, next) {
-    if (getItem('accessToken') === '' || from.name === 'login-page') {
+    if (userState().getLogin || getItem('accessToken') == '') {
       next((data) => {
         data.homeSpinning = false;
-        if (from.name === 'login-page') {
-          data.userProfile = JSON.parse(getItem('user'));
-        }
       });
-    } else {
+    } else if (!userState().getLogin) {
       next((data) => {
         const getAuthenticatedUser = () => {
           thuyLoiApi
-            .post(
+            .get(
               '/get-authenticated-user',
-              {},
+
               {
                 headers: {
                   Authorization: `Bearer ${getItem('accessToken')}`,
@@ -194,11 +195,11 @@ export default defineComponent({
             )
             .then((response) => {
               if (response) {
-                // console.log(response);
-                userState().onAuthentication();
-                data.homeSpinning = false;
-                data.userProfile = JSON.parse(getItem('user'));
                 setItem('user', JSON.stringify(response.data.user));
+                userState().onAuthentication(response.data.user);
+                console.log(userState().getUserProfile);
+
+                data.homeSpinning = false;
               }
             })
             .catch((error) => {
@@ -209,15 +210,15 @@ export default defineComponent({
               userState().onLogout();
             });
         };
-        getAuthenticatedUser();
+
+        if (getItem('accessToken') === '') data.homeSpinning = false;
+        else getAuthenticatedUser();
       });
     }
   },
 
   setup() {
-    const useStateStore = userState();
-    const userProfile = ref();
-    provide('userProfile', userProfile);
+    const userStore = userState();
 
     const searchResult = ref([]);
     provide('searchResult', searchResult);
@@ -252,11 +253,14 @@ export default defineComponent({
 
     const buttonSize = ref('small');
     provide('buttonSize', buttonSize);
+    const tooltipBackground = ref('geekblue');
+    provide('tooltipBackground', tooltipBackground);
+
     if (window.innerWidth > 1600) buttonSize.value = 'medium';
+
     return {
       sliderValue,
       siderLayerManagerState,
-      userProfile,
       buttonSize,
     };
   },
@@ -288,18 +292,17 @@ export default defineComponent({
         this.siderCollapsed = false;
       }
     },
-    test() {
-      console.log(this.userProfile);
-    },
+    test() {},
   },
   mounted() {
     const mapStore = mapState();
     const { getMap, setMap } = mapStore;
     setMap(runMap());
 
-    document.getElementsByClassName('ol-closebox')[1].addEventListener('click', function () {
-      // console.log('anhquyendeptraivcl');
-    });
+    // document.getElementsByClassName('ol-closebox')[1].addEventListener('click', function () {
+    //   // console.log('anhquyendeptraivcl');
+    // });
+    // console.log(userState().getLogin);
   },
 });
 </script>
