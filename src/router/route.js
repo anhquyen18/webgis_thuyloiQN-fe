@@ -76,7 +76,18 @@ const home = [
         component: () => import('../pages/account-manager/organization/add-policies-to-department.vue'),
         meta: { title: 'Thêm quyền hạn' },
       },
-
+      {
+        path: 'organization/users',
+        name: 'account-manager-users',
+        component: () => import('../pages/account-manager/organization/users.vue'),
+        meta: { title: 'Người dùng' },
+      },
+      {
+        path: 'organization/users/:id',
+        name: 'account-manager-user-profile',
+        component: () => import('../pages/account-manager/organization/user-profile.vue'),
+        meta: { title: 'Chỉnh sửa hồ sơ' },
+      },
       {
         path: 'organization/my-policies',
         name: 'account-manager-my-policies',

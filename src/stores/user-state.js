@@ -9,6 +9,7 @@ export const userState = defineStore('userStateId', {
     availablePolicies: null, // Các quyền có thể gán cho người khác
     organizations: null, // Các tổ chức có thể gán cho người khác
     myDepartment: null, // Thông tin về department của page account-manager-department-detail
+    users: null, // Tất cả user mà user hiện tại có quyền quản lí
   }),
 
   actions: {
@@ -35,6 +36,9 @@ export const userState = defineStore('userStateId', {
     setMyDepartment(myDepartment) {
       this.myDepartment = myDepartment;
     },
+    setUsers(users) {
+      this.users = users;
+    },
   },
 
   getters: {
@@ -58,6 +62,9 @@ export const userState = defineStore('userStateId', {
     },
     getMyDepartment() {
       return this.myDepartment;
+    },
+    getUsers() {
+      return this.users;
     },
   },
 });

@@ -34,6 +34,7 @@ import {
   Upload,
   Breadcrumb,
   Tabs,
+  Typography,
 } from 'ant-design-vue';
 import App from './App.vue';
 import axios from 'axios';
@@ -85,6 +86,7 @@ app.use(Tag);
 app.use(Upload);
 app.use(Breadcrumb);
 app.use(Tabs);
+app.use(Typography);
 
 app.mount('#app');
 

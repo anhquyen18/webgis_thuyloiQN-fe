@@ -130,7 +130,7 @@ export default defineComponent({
               })
               .then((response) => {
                 if (response) {
-                  // console.log(response.data);
+                  console.log(response.data);
                   setItem('user', JSON.stringify(response.data.user));
                   userState().onAuthentication(response.data.user);
 
