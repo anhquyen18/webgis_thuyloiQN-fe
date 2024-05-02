@@ -108,7 +108,7 @@
 
           <a-form-item class="mt-3">
             <template #label>
-              <p class="fw-bold">Cơ quan</p>
+              <p class="fw-bold">Tổ chức</p>
             </template>
             <!-- <a-input size="large" :value="this.userProfile.organization_name" style="width: 100%" disabled> </a-input> -->
             <p>{{ this.userProfile.organization_name }}</p>
@@ -394,7 +394,13 @@ export default defineComponent({
               },
             })
             .then((response) => {
-              console.log(response);
+              const { name, email, phone_number, gender, dayOfBirth, monthOfBirth, yearOfBirth } =
+                this.editUserInfoForm;
+              this.userProfile.name = name;
+              this.userProfile.email = email;
+              this.userProfile.phone_number = phone_number;
+              this.userProfile.gender = gender;
+              this.userProfile.birthday = `${yearOfBirth}-${monthOfBirth}-${dayOfBirth}`;
 
               this.$message.success(response.data.message, 3);
               this.pageSpinning = false;

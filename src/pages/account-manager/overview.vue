@@ -154,7 +154,7 @@
             </a-button>
           </router-link>
 
-          <router-link :to="{ name: '' }">
+          <router-link :to="{ name: 'account-manager-users' }">
             <a-button
               class="no-border-ant-button background-hover-button fs-6"
               ghost

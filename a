@@ -1,0 +1,113 @@
+[33mcommit 6f11804859c419601dfed014020c20698ac91a8f[m[33m ([m[1;36mHEAD -> [m[1;32manhquyen-dev[m[33m)[m
+Author: Pai18 <anhquyen18092000@gmail.com>
+Date:   Tue Apr 30 16:50:44 2024 +0700
+
+    feat: add my policies page
+
+[33mcommit b63b267a6d38da2a7b38c40d6e22fd77175be0ef[m
+Author: Pai18 <anhquyen18092000@gmail.com>
+Date:   Tue Apr 30 16:09:20 2024 +0700
+
+    feat: add remove and add user, policy in department detail
+
+[33mcommit c22f06807c87132886f310aa1b19d88431e4e9fa[m
+Author: Pai18 <anhquyen18092000@gmail.com>
+Date:   Mon Apr 29 09:16:50 2024 +0700
+
+    refactor: login spin
+
+[33mcommit 33609ab369c6224f6c036441a67792204b803038[m
+Author: Pai18 <anhquyen18092000@gmail.com>
+Date:   Sat Apr 27 22:38:25 2024 +0700
+
+    feat: add department-detail
+
+[33mcommit 3c7d8fd31fd92a03928a852f248f20be9616784d[m
+Author: Pai18 <anhquyen18092000@gmail.com>
+Date:   Sat Apr 27 15:17:28 2024 +0700
+
+    refactor: add message when login error
+
+[33mcommit d759d83b84d87f3fc2ef4083f01da7c6f241dfa1[m
+Author: Pai18 <anhquyen18092000@gmail.com>
+Date:   Sat Apr 27 15:17:01 2024 +0700
+
+    refactor: add message when login error
+
+[33mcommit 36b6a800a4c873f1691ffbb91544edba016f74d6[m
+Author: Pai18 <anhquyen18092000@gmail.com>
+Date:   Fri Apr 26 15:49:05 2024 +0700
+
+    feat: update create department
+
+[33mcommit 40136a06611fb009c4add4bb625bc94b29f8e2ce[m
+Author: Pai18 <anhquyen18092000@gmail.com>
+Date:   Fri Apr 26 14:50:12 2024 +0700
+
+    refactor: change return var when auth-ed
+
+[33mcommit ac9d0e6f7e0a30a4216a0d3cdd59f150516b4c95[m
+Author: Pai18 <anhquyen18092000@gmail.com>
+Date:   Thu Apr 25 22:34:59 2024 +0700
+
+    feat, refactor: update department manager and create department, change http methods to suit RESTfulAPI, add .env
+
+[33mcommit d1cf7fdc1688c54b2d00cf5bba7708f36b4c4383[m
+Author: Pai18 <anhquyen18092000@gmail.com>
+Date:   Tue Apr 23 23:07:11 2024 +0700
+
+    feat: add create department
+
+[33mcommit a4c6039b6c64c83ad466bd56da5b3efd8200e70a[m
+Author: Pai18 <anhquyen18092000@gmail.com>
+Date:   Mon Apr 22 23:42:06 2024 +0700
+
+    feat: add department manager
+
+[33mcommit 78fafb073f4249396beb4cce61f9f915fb1692a1[m
+Author: Pai18 <anhquyen18092000@gmail.com>
+Date:   Sat Apr 20 20:59:22 2024 +0700
+
+    add change user password
+
+[33mcommit 9c333de420f6f91aed2d7d69694b3088719bb247[m
+Author: Pai18 <anhquyen18092000@gmail.com>
+Date:   Sat Apr 20 17:32:10 2024 +0700
+
+    add update user avatar
+
+[33mcommit fb0003bb749c2a2e75782e27184d8807b9dac46e[m
+Author: Pai18 <anhquyen18092000@gmail.com>
+Date:   Fri Apr 19 21:40:06 2024 +0700
+
+    add update user info
+
+[33mcommit 331715b039cdf5b1375f7b0ba9673462f5583db4[m
+Author: Pai18 <anhquyen18092000@gmail.com>
+Date:   Tue Apr 16 21:03:14 2024 +0700
+
+    update account manager page
+
+[33mcommit a8b9e581c00f20d4ef7c08ca4e7d6d0adaf37048[m
+Author: Pai18 <anhquyen18092000@gmail.com>
+Date:   Wed Apr 10 18:07:46 2024 +0700
+
+    update account page
+
+[33mcommit b7cc940eff554f9563833b02ca271cdf06ec3d62[m
+Author: Pai18 <anhquyen18092000@gmail.com>
+Date:   Wed Apr 10 10:23:36 2024 +0700
+
+    add account page
+
+[33mcommit 4fca2c3fcd5ce68a436798e08357ee3b959c48d3[m
+Author: Pai18 <anhquyen18092000@gmail.com>
+Date:   Sun Mar 31 22:51:46 2024 +0700
+
+    update modify feature: update to db
+
+[33mcommit 1cbfca4a14105884ec97cb0bc5171091f7a2dd48[m
+Author: Pai18 <anhquyen18092000@gmail.com>
+Date:   Sat Mar 30 19:32:29 2024 +0700
+
+    update modify feature: merge, split, snap
