@@ -35,6 +35,7 @@ import {
   Breadcrumb,
   Tabs,
   Typography,
+  Radio,
 } from 'ant-design-vue';
 import App from './App.vue';
 import axios from 'axios';
@@ -45,6 +46,8 @@ import '../node_modules/bootstrap/dist/css/bootstrap-utilities.min.css';
 import '../node_modules/ol/ol.css';
 import '../node_modules/ol-ext/dist/ol-ext.css';
 import '../node_modules/jsts/dist/jsts.min.js';
+import '@/css/custom-template/ant-custom-style.scss';
+import '@/css/custom-template/vuejs-transition.scss';
 
 const app = createApp(App);
 app.config.productionTip = false;
@@ -87,6 +90,7 @@ app.use(Upload);
 app.use(Breadcrumb);
 app.use(Tabs);
 app.use(Typography);
+app.use(Radio);
 
 app.mount('#app');
 

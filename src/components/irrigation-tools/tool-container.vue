@@ -1,5 +1,5 @@
 <template>
-  <a-popover trigger="click" placement="topRight">
+  <a-popover trigger="focus" placement="topRight">
     <a-button tpye="primary" shape="circle" ghost>
       <i class="fa-solid fa-file-signature"></i>
     </a-button>
@@ -7,9 +7,7 @@
     <template #content>
       <a-row justify="between" style="width: 8vw">
         <a-col :span="8">
-          <a-button type="primary">
-            <i class="fa-solid fa-shield-halved"></i>
-          </a-button>
+          <ReservoirSafety :tooltipBackground="tooltipBackground"></ReservoirSafety>
         </a-col>
         <a-col :span="8">
           <a-button type="primary">
@@ -27,15 +25,23 @@
 </template>
 
 <script>
-import { defineComponent } from 'vue';
+import { defineComponent, provide } from 'vue';
+import ReservoirSafety from '@/components/irrigation-tools/reservoir-safety.vue';
 
 export default defineComponent({
+  components: {
+    ReservoirSafety,
+  },
+
   setup() {
+    // const buttonSize = ref('medium');
     return {};
   },
 
   data() {
-    return {};
+    return {
+      tooltipBackground: 'geekblue',
+    };
   },
 
   computed: {},

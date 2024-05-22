@@ -1,0 +1,19 @@
+/* ------------------------------------------------------------------ */
+/* Custom componet ant design vue */
+/* ------------------------------------------------------------------ */
+
+.no-border-ant-button {
+  border: none !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+
+  & .ant-wave {
+    display: none;
+  }
+}
+
+.no-padding-ant-modal {
+  & .ant-modal-content {
+    padding: 0 !important;
+  }
+}

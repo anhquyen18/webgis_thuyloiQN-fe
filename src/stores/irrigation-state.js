@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 
-export const mapState = defineStore('irrigation', {
+export const mapState = defineStore('map', {
   state: () => ({
     map: null,
   }),
