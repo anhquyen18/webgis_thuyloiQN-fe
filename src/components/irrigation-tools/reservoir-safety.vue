@@ -21,11 +21,15 @@
       </template>
       <template #footer>
         <a-button key="back" shape="round" @click="modalCancel">Huỷ</a-button>
-        <a-button :loading="formSpinning" key="submit" type="primary" shape="round" @click="save(false)">
+        <a-button
+          :loading="formSpinning"
+          key="submit"
+          type="primary"
+          shape="round"
+          @click="save(false)"
+          style="padding: 0 30px">
+          <i class="fa-regular fa-floppy-disk me-1"></i>
           Lưu
-        </a-button>
-        <a-button :loading="formSpinning" key="submit" type="primary" shape="round" @click="save(true)">
-          <i class="fa-solid fa-download me-1"></i> Lưu và tải xuống
         </a-button>
       </template>
       <a-spin :spinning="formSpinning">
@@ -49,6 +53,10 @@
               :disabled="reservoirSelectLoading"
               @change="reservoirSelectChange">
             </a-select>
+          </a-form-item>
+
+          <a-form-item name="download">
+            <a-checkbox v-model:checked="formModel.download">Tải xuống báo cáo sau khi lưu</a-checkbox>
           </a-form-item>
 
           <a-divider
@@ -180,6 +188,33 @@
                 :rows="3" />
             </a-form-item>
           </a-flex>
+
+          <a-divider
+            v-if="formModel.drainages.length > 0"
+            style="border-color: var(--primary-color)"
+            orientation="left"
+            orientation-margin="0px">
+            Tải lên hình ảnh báo cáo
+          </a-divider>
+
+          <div v-if="formModel.id" class="clearfix">
+            <a-upload
+              v-model:file-list="formModel.fileList"
+              list-type="picture-card"
+              :action="uploadTemporaryAction"
+              :headers="accessHeader"
+              crossOrigin="anonymous"
+              :before-upload="beforeAvatarUpload"
+              @preview="handlePreview">
+              <div v-if="formModel.fileList.length < 10">
+                <PlusOutlined />
+                <div style="margin-top: 8px">Upload</div>
+              </div>
+            </a-upload>
+            <a-modal :open="previewVisible" :title="previewTitle" :footer="null" @cancel="handleCancel">
+              <img alt="An toàn đập" style="width: 100%" :src="previewImage" />
+            </a-modal>
+          </div>
         </a-form>
       </a-spin>
     </a-modal>
@@ -191,8 +226,13 @@ import { defineComponent, ref, reactive } from 'vue';
 import thuyLoiApi from '@/js/axios/thuyLoiApi';
 import { getItem } from '@/js/utils/localStorage';
 import { downloadFile } from '@/js/utils/utils';
+import { PlusOutlined } from '@ant-design/icons-vue';
 
 export default defineComponent({
+  components: {
+    PlusOutlined,
+  },
+
   props: {
     buttonSize: { type: String },
     tooltipBackground: { type: String },
@@ -202,14 +242,17 @@ export default defineComponent({
 
   setup() {
     const formRef = ref();
-    const formModel = reactive({
+    const initialForm = {
       id: '',
       mainDams: [],
       subDams: [],
       sewers: [],
       spillways: [],
       drainages: [],
-    });
+      download: false,
+      fileList: [],
+    };
+    const formModel = reactive({ ...initialForm });
     const formRules = {
       id: [
         {
@@ -242,12 +285,44 @@ export default defineComponent({
       },
     ]);
     const reservoirSelectLoading = ref(false);
+
+    function getBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = (error) => reject(error);
+      });
+    }
+
+    const previewVisible = ref(false);
+    const previewImage = ref('');
+    const previewTitle = ref('');
+    const handleCancel = () => {
+      previewVisible.value = false;
+      previewTitle.value = '';
+    };
+    const handlePreview = async (file) => {
+      if (!file.url && !file.preview) {
+        file.preview = await getBase64(file.originFileObj);
+      }
+      previewImage.value = file.url || file.preview;
+      previewVisible.value = true;
+      previewTitle.value = file.name || file.url.substring(file.url.lastIndexOf('/') + 1);
+    };
+
     return {
       formRef,
+      initialForm,
       formModel,
       formRules,
       reservoirOptions,
       reservoirSelectLoading,
+      previewVisible,
+      previewImage,
+      previewTitle,
+      handleCancel,
+      handlePreview,
     };
   },
 
@@ -271,14 +346,12 @@ export default defineComponent({
   },
 
   computed: {
-    accessToken() {
-      const accessToken = {
-        headers: {
-          Authorization: `Bearer ${getItem('accessToken')}`,
-        },
-      };
+    accessHeader() {
+      return { Authorization: `Bearer ${getItem('accessToken')}` };
+    },
 
-      return accessToken;
+    uploadTemporaryAction() {
+      return `${import.meta.env.VITE_APP_API_URL}/upload-temporary-image`;
     },
   },
 
@@ -292,31 +365,50 @@ export default defineComponent({
     },
     modalCancel() {
       this.modalOpen = false;
+
+      if (this.formModel.fileList.length > 0) {
+        thuyLoiApi
+          .delete(`/delete-temporary-image`, {
+            headers: {
+              Authorization: `Bearer ${getItem('accessToken')}`,
+            },
+            data: {
+              fileList: this.formModel.fileList,
+            },
+          })
+          .then((response) => {})
+          .catch((error) => {
+            console.log(error);
+          });
+      }
     },
-    save(download) {
+    save() {
       this.formRef
         .validate()
         .then((response) => {
           this.formSpinning = true;
-
           thuyLoiApi
             .post(`/reservoirs/${this.formModel.id}/safety-report`, this.formModel, {
               headers: {
                 Authorization: `Bearer ${getItem('accessToken')}`,
               },
-              responseType: 'arraybuffer',
+              // responseType: 'arraybuffer',
             })
             .then((response) => {
               console.log(response);
-              downloadFile(response, 'bao-cao-an-toan-dap');
-              if (download == false) this.$message.success('Tạo báo cáo thành công', 3);
+              this.$message.success('Tạo báo cáo thành công.', 3);
+              if (this.formModel.download == true) {
+                downloadFile(response, 'bao-cao-an-toan-dap');
+              }
 
-              // this.$message.success(response.data.message, 3);
+              Object.assign(this.formModel, this.initialForm);
+              this.modalOpen = false;
               this.formSpinning = false;
             })
             .catch((error) => {
               console.log(error);
               this.formSpinning = false;
+              this.$message.error('Tạo báo cáo thất bại.', 3);
             });
         })
         .catch((error) => {
@@ -327,13 +419,14 @@ export default defineComponent({
     formModelPushItem(array, prop) {
       this.formModel[prop] = [];
       array.forEach((item) => {
-        if (item['Tên']) this.formModel[prop].push({ id: item.id, status: null, description: '', name: item['Tên'] });
-        else this.formModel[prop].push({ id: item.id, status: null, description: '', name: item.id });
+        if (item['Tên']) this.formModel[prop].push({ id: item.id, status: true, description: '', name: item['Tên'] });
+        else this.formModel[prop].push({ id: item.id, status: true, description: '', name: item.id });
       });
     },
 
     reservoirSelectChange(value) {
       this.formSpinning = true;
+      this.formModel.fileList = [];
       thuyLoiApi
         .get(`/reservoirs/${this.formModel.id}/constructions`, this.accessToken)
         .then((response) => {
@@ -361,6 +454,16 @@ export default defineComponent({
           this.formModel.spillways = [];
           this.formModel.drainages = [];
         });
+    },
+
+    beforeAvatarUpload(file) {
+      const acceptList = ['image/png', 'image/jpg', 'image/jpeg', 'image/gif'];
+      if (acceptList.indexOf(file.type) !== -1) {
+        return true;
+      } else {
+        this.$message.error('Ảnh không phù hợp. Vui lòng chọn ảnh khác.');
+        return false;
+      }
     },
   },
 
