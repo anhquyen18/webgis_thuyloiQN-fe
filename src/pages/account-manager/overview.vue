@@ -192,6 +192,73 @@
         </a-flex>
       </a-skeleton>
     </a-card>
+
+    <a-card :bordered="false" class="account-manager-card">
+      <a-skeleton :loading="pageLoading" active>
+        <p class="fs-3 fw-bold mb-4">Hoạt động công trình</p>
+
+        <a-flex vertical :gap="8">
+          <router-link :to="{ name: 'account-manager-safety-reports' }">
+            <a-button
+              v-if="userProfile.allPolicies.find((policy) => policy.id === 9 || policy.id === 10)"
+              class="no-border-ant-button background-hover-button fs-6"
+              ghost
+              block
+              style="height: auto; padding: 15px">
+              <a-row justify="space-between" align="middle">
+                <a-col class="center-col">
+                  <i class="fa-solid fa-shield-halved account-manager-button-icon"></i>
+                  <p class="fw-bold text-wrap">An toàn công trình</p>
+                </a-col>
+                <a-col class="center-col">
+                  <i class="fa-solid fa-angles-right"></i>
+                </a-col>
+              </a-row>
+            </a-button>
+          </router-link>
+        </a-flex>
+
+        <a-flex vertical :gap="8">
+          <router-link :to="{ name: '' }">
+            <a-button
+              class="no-border-ant-button background-hover-button fs-6"
+              ghost
+              block
+              style="height: auto; padding: 15px">
+              <a-row justify="space-between" align="middle">
+                <a-col class="center-col">
+                  <i class="fa-solid fa-hammer account-manager-button-icon"></i>
+                  <p class="fw-bold text-wrap">Duy tu bảo dưỡng</p>
+                </a-col>
+                <a-col class="center-col">
+                  <i class="fa-solid fa-angles-right"></i>
+                </a-col>
+              </a-row>
+            </a-button>
+          </router-link>
+        </a-flex>
+
+        <a-flex vertical :gap="8">
+          <router-link :to="{ name: '' }">
+            <a-button
+              class="no-border-ant-button background-hover-button fs-6"
+              ghost
+              block
+              style="height: auto; padding: 15px">
+              <a-row justify="space-between" align="middle">
+                <a-col class="center-col">
+                  <i class="fa-solid fa-tags account-manager-button-icon"></i>
+                  <p class="fw-bold text-wrap">Vận hành công trình</p>
+                </a-col>
+                <a-col class="center-col">
+                  <i class="fa-solid fa-angles-right"></i>
+                </a-col>
+              </a-row>
+            </a-button>
+          </router-link>
+        </a-flex>
+      </a-skeleton>
+    </a-card>
   </a-flex>
 </template>
 

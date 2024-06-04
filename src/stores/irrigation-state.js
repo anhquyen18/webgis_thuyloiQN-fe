@@ -1,19 +1,26 @@
 import { defineStore } from 'pinia';
 
-export const mapState = defineStore('map', {
+export const irrigationState = defineStore('irrigation', {
   state: () => ({
-    map: null,
+    reservoirs: null, // all reservoirs
+    safetyReports: null,
   }),
 
   actions: {
-    setMap(map) {
-      this.map = map;
+    setSafetyReports(safetyReports) {
+      this.safetyReports = safetyReports;
+    },
+    setReservoirs(reservoirs) {
+      this.reservoirs = reservoirs;
     },
   },
 
   getters: {
-    getMap() {
-      return this.map;
+    getSafetyReports() {
+      return this.safetyReports;
+    },
+    getReservoirs() {
+      return this.reservoirs;
     },
   },
 });

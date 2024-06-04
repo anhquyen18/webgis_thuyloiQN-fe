@@ -4,7 +4,10 @@
       <p>Tạo báo cáo an toàn đập</p>
     </template>
     <a-button class="white-border-ant-button" :type="type" :ghost="ghost" :size="buttonSize" @click="showModal">
-      <i class="fa-solid fa-shield-halved"></i>
+      <i v-if="buttonIcon" :class="buttonIcon"></i>
+      <p v-if="buttonText" class="ms-2 me-2 fw-bold">
+        {{ buttonText }}
+      </p>
     </a-button>
 
     <a-modal v-model:open="modalOpen" :maskClosable="false" :closable="false">
@@ -14,20 +17,18 @@
             <span class="fs-4">
               <i class="fa-solid fa-shield-halved"></i>
             </span>
-            Báo cáo an toàn hồ chứa
+            {{ this.title }}
           </p>
           <a class="close-button me-2" @click="modalCancel"><i class="fa-solid fa-xmark"></i></a>
         </a-row>
       </template>
       <template #footer>
-        <a-button key="back" shape="round" @click="modalCancel">Huỷ</a-button>
-        <a-button
-          :loading="formSpinning"
-          key="submit"
-          type="primary"
-          shape="round"
-          @click="save(false)"
-          style="padding: 0 30px">
+        <a-button key="back" @click="modalCancel">
+          <span>
+            <p class="me-2 ms-2">Huỷ</p>
+          </span>
+        </a-button>
+        <a-button :loading="formSpinning" key="submit" type="primary" @click="save(false)" style="padding: 0 30px">
           <i class="fa-regular fa-floppy-disk me-1"></i>
           Lưu
         </a-button>
@@ -57,6 +58,17 @@
 
           <a-form-item name="download">
             <a-checkbox v-model:checked="formModel.download">Tải xuống báo cáo sau khi lưu</a-checkbox>
+          </a-form-item>
+
+          <a-form-item name="finished">
+            <a-checkbox v-model:checked="formModel.finished">Đã hoành thành báo cáo</a-checkbox>
+          </a-form-item>
+
+          <a-form-item name="name">
+            <template #label>
+              <p class="fw-bold">Tên báo cáo</p>
+            </template>
+            <a-input v-model:value="formModel.name" placeholder="Nhập tên báo cáo" />
           </a-form-item>
 
           <a-divider
@@ -190,6 +202,31 @@
           </a-flex>
 
           <a-divider
+            v-if="formModel.monitors.length > 0"
+            style="border-color: var(--primary-color)"
+            orientation="left"
+            orientation-margin="0px">
+            Hệ thống giám sát
+          </a-divider>
+          <a-flex v-for="(monitor, index) in formModel.monitors" :key="monitor.id" vertical>
+            <p class="fw-bold">Hệ thống {{ monitor.id }}</p>
+            <a-form-item :name="['monitors', index, 'status']" :rules="formRules.status">
+              <a-radio-group
+                v-model:value="monitor.status"
+                :options="statusOptions"
+                button-style="solid"
+                option-type="button">
+              </a-radio-group>
+            </a-form-item>
+            <a-form-item :name="['monitors', index, 'description']">
+              <a-textarea
+                v-model:value="monitor.description"
+                :placeholder="`Mô tả tình trạng hệ thống ${monitor.id}`"
+                :rows="3" />
+            </a-form-item>
+          </a-flex>
+
+          <a-divider
             v-if="formModel.drainages.length > 0"
             style="border-color: var(--primary-color)"
             orientation="left"
@@ -227,6 +264,7 @@ import thuyLoiApi from '@/js/axios/thuyLoiApi';
 import { getItem } from '@/js/utils/localStorage';
 import { downloadFile } from '@/js/utils/utils';
 import { PlusOutlined } from '@ant-design/icons-vue';
+import { irrigationState } from '@/stores/irrigation-state';
 
 export default defineComponent({
   components: {
@@ -234,6 +272,9 @@ export default defineComponent({
   },
 
   props: {
+    title: { type: String, default: 'Báo cáo an toàn hồ chứa' },
+    buttonIcon: { type: String, default: 'fa-solid fa-shield-halved' },
+    buttonText: { type: String },
     buttonSize: { type: String },
     tooltipBackground: { type: String },
     type: { type: String, default: 'primary' },
@@ -244,15 +285,28 @@ export default defineComponent({
     const formRef = ref();
     const initialForm = {
       id: '',
+      name: '',
       mainDams: [],
+      spillways: [],
+      monitors: [],
       subDams: [],
       sewers: [],
-      spillways: [],
       drainages: [],
       download: false,
+      finished: false,
       fileList: [],
     };
     const formModel = reactive({ ...initialForm });
+    const nameValidator = async (_rule, value) => {
+      const nameRegex =
+        /^[a-zA-Z0-9._-àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđÀÁẠẢÃÂẦẤẬẨẪĂẰẮẶẲẴÈÉẸẺẼÊỀẾỆỂỄÌÍỊỈĨÒÓỌỎÕÔỒỐỘỔỖƠỜỚỢỞỠÙÚỤỦŨƯỪỨỰỬỮỲÝỴỶỸĐ ]+$/;
+      if (nameRegex.test(value)) {
+        return Promise.resolve();
+      } else {
+        return Promise.reject('Tên báo cáo không hợp lệ!');
+        // }
+      }
+    };
     const formRules = {
       id: [
         {
@@ -261,7 +315,6 @@ export default defineComponent({
           trigger: ['blur', 'change'],
         },
       ],
-
       status: [
         {
           required: true,
@@ -269,22 +322,37 @@ export default defineComponent({
           trigger: ['blur', 'change'],
         },
       ],
+      name: [
+        {
+          validator: nameValidator,
+          trigger: ['blur', 'change'],
+        },
+      ],
     };
-    const reservoirOptions = ref([
-      {
-        id: 1,
-        name: 'Hồ A1',
-      },
-      {
-        id: 2,
-        name: 'Hồ B',
-      },
-      {
-        id: 3,
-        name: 'Hồ C5',
-      },
-    ]);
+    const reservoirOptions = ref([]);
+
     const reservoirSelectLoading = ref(false);
+
+    const getReservoirs = () => {
+      reservoirSelectLoading.value = true;
+      thuyLoiApi
+        .get(`/reservoirs/index`, {
+          headers: {
+            Authorization: `Bearer ${getItem('accessToken')}`,
+          },
+        })
+        .then((response) => {
+          // console.log(response);
+          irrigationState().setReservoirs(response.data.reservoirs);
+          reservoirOptions.value = irrigationState().getReservoirs;
+          reservoirSelectLoading.value = false;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    };
+
+    getReservoirs();
 
     function getBase64(file) {
       return new Promise((resolve, reject) => {
@@ -358,10 +426,6 @@ export default defineComponent({
   methods: {
     showModal() {
       this.modalOpen = true;
-      this.reservoirSelectLoading = true;
-      setTimeout(() => {
-        this.reservoirSelectLoading = false;
-      }, 1000);
     },
     modalCancel() {
       this.modalOpen = false;
@@ -369,9 +433,7 @@ export default defineComponent({
       if (this.formModel.fileList.length > 0) {
         thuyLoiApi
           .delete(`/delete-temporary-image`, {
-            headers: {
-              Authorization: `Bearer ${getItem('accessToken')}`,
-            },
+            headers: this.accessHeader,
             data: {
               fileList: this.formModel.fileList,
             },
@@ -389,13 +451,11 @@ export default defineComponent({
           this.formSpinning = true;
           thuyLoiApi
             .post(`/reservoirs/${this.formModel.id}/safety-report`, this.formModel, {
-              headers: {
-                Authorization: `Bearer ${getItem('accessToken')}`,
-              },
-              // responseType: 'arraybuffer',
+              headers: this.accessHeader,
+              responseType: 'arraybuffer',
             })
             .then((response) => {
-              console.log(response);
+              // console.log(response);
               this.$message.success('Tạo báo cáo thành công.', 3);
               if (this.formModel.download == true) {
                 downloadFile(response, 'bao-cao-an-toan-dap');
@@ -412,7 +472,7 @@ export default defineComponent({
             });
         })
         .catch((error) => {
-          console.log(error);
+          // console.log(error);
         });
     },
 
@@ -424,35 +484,42 @@ export default defineComponent({
       });
     },
 
-    reservoirSelectChange(value) {
+    reservoirSelectChange() {
       this.formSpinning = true;
       this.formModel.fileList = [];
       thuyLoiApi
-        .get(`/reservoirs/${this.formModel.id}/constructions`, this.accessToken)
+        .get(`/reservoirs/${this.formModel.id}/info`, {
+          headers: this.accessHeader,
+        })
         .then((response) => {
-          console.log(response);
+          // console.log(response);
           this.formSpinning = false;
-          const { mainDams, subDams, sewers, spillways, drainages } = response.data;
+          const { mainDams, subDams, sewers, spillways, drainages, monitors } = response.data;
 
           this.mainDams = mainDams;
           this.formModelPushItem(this.mainDams, 'mainDams');
-          this.subDams = subDams;
-          this.formModelPushItem(this.subDams, 'subDams');
-          this.sewers = sewers;
-          this.formModelPushItem(this.sewers, 'sewers');
           this.spillways = spillways;
           this.formModelPushItem(this.spillways, 'spillways');
-          this.drainages = drainages;
-          this.formModelPushItem(this.drainages, 'drainages');
+          this.monitors = monitors;
+          this.formModelPushItem(this.monitors, 'monitors');
+
+          // this.subDams = subDams;
+          // this.formModelPushItem(this.subDams, 'subDams');
+          // this.sewers = sewers;
+          // this.formModelPushItem(this.sewers, 'sewers');
+
+          // this.drainages = drainages;
+          // this.formModelPushItem(this.drainages, 'drainages');
         })
         .catch((error) => {
           console.log(error);
           this.formSpinning = false;
           this.formModel.mainDams = [];
-          this.formModel.subDams = [];
-          this.formModel.sewers = [];
           this.formModel.spillways = [];
-          this.formModel.drainages = [];
+          this.formModel.monitors = [];
+          // this.formModel.subDams = [];
+          // this.formModel.sewers = [];
+          // this.formModel.drainages = [];
         });
     },
 
