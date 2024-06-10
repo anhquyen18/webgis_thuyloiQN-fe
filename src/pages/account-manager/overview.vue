@@ -193,11 +193,11 @@
       </a-skeleton>
     </a-card>
 
-    <a-card :bordered="false" class="account-manager-card">
+    <a-card v-if="hasPermissions([5, 6, 7, 8, 9, 10])" :bordered="false" class="account-manager-card">
       <a-skeleton :loading="pageLoading" active>
         <p class="fs-3 fw-bold mb-4">Hoạt động công trình</p>
 
-        <a-flex vertical :gap="8">
+        <a-flex v-if="hasPermissions([9, 10])" vertical :gap="8">
           <router-link :to="{ name: 'account-manager-safety-reports' }">
             <a-button
               v-if="userProfile.allPolicies.find((policy) => policy.id === 9 || policy.id === 10)"
@@ -218,7 +218,7 @@
           </router-link>
         </a-flex>
 
-        <a-flex vertical :gap="8">
+        <a-flex v-if="hasPermissions([7, 8])" vertical :gap="8">
           <router-link :to="{ name: '' }">
             <a-button
               class="no-border-ant-button background-hover-button fs-6"
@@ -238,7 +238,7 @@
           </router-link>
         </a-flex>
 
-        <a-flex vertical :gap="8">
+        <a-flex v-if="hasPermissions([5, 6])" vertical :gap="8">
           <router-link :to="{ name: '' }">
             <a-button
               class="no-border-ant-button background-hover-button fs-6"
@@ -280,7 +280,7 @@ export default defineComponent({
     let avatarUploadAction = '';
 
     if (userState().getLogin) {
-      avatarUploadAction = `${import.meta.env.VITE_APP_API_URL}/upload-user-avatar/${userProfile.id}`;
+      avatarUploadAction = `${import.meta.env.VITE_APP_API_URL}/upload-user-avatar/${userState().getUserProfile.id}`;
     }
 
     return {
@@ -314,6 +314,9 @@ export default defineComponent({
   },
 
   computed: {
+    loginState() {
+      return userState().getLogin;
+    },
     routeDepartmentId() {
       if (this.userProfile.department_id) {
         return this.userProfile.department_id;
@@ -346,11 +349,21 @@ export default defineComponent({
         this.pageSpinning = false;
       }
       if (info.file.status === 'error') {
-        // message.error('upload error');
+        console.log(info);
         this.pageSpinning = false;
         this.$message.error('Ảnh không phù hợp. Vui lòng chọn ảnh khác.');
 
         // this.$message.error(this.avatarFile[0].response.message, 3);
+      }
+    },
+
+    hasPermissions(policies) {
+      if (this.loginState) {
+        return policies.some((policy) => {
+          return userState().getUserProfile.allPolicies.some((userPolicy) => userPolicy.id == policy);
+        });
+      } else {
+        return false;
       }
     },
   },

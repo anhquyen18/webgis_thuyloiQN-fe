@@ -1,9 +1,7 @@
 <template>
   <a-button :class="buttonClass" :type="type" :ghost="ghost" :size="buttonSize" @click="showModal">
-    <!-- <i v-if="buttonIcon" :class="buttonIcon"></i> -->
     <slot name="text"> </slot>
   </a-button>
-  <!-- <slot name="button"></slot> -->
 
   <a-modal v-model:open="modalOpen" :maskClosable="false" :closable="false">
     <template #title>
@@ -22,13 +20,15 @@
       </a-row>
     </template>
     <template #footer>
-      <a-button key="back" shape="round" @click="modalCancel">Huỷ</a-button>
-      <a-button :loading="formSpinning" key="submit" type="primary" shape="round" @click="save">
-        Lưu thay đổi
+      <a-button key="back" @click="modalCancel">
+        <span>
+          <p class="me-2 ms-2">Huỷ</p>
+        </span>
       </a-button>
-
-      <a-button :loading="formSpinning" key="submit" type="primary" shape="round" @click="save">
-        Lưu và tải báo cáo
+      <a-button :loading="formSpinning" key="submit" type="primary" @click="save">
+        <span>
+          <p class="me-2 ms-2">Lưu thay đổi</p>
+        </span>
       </a-button>
     </template>
     <a-spin :spinning="formSpinning">
@@ -42,18 +42,10 @@
         :rules="formRules">
         <a-form-item class="mb-4" name="id">
           <template #label>
-            <p class="fw-bold">Hồ chứa:</p>
+            <p class="fw-bold">Tên báo cáo:</p>
           </template>
-          <a-select
-            v-model:value="formModel.id"
-            :options="reservoirOptions"
-            :field-names="{ label: 'name', value: 'id' }"
-            :loading="reservoirSelectLoading"
-            :disabled="reservoirSelectLoading"
-            @change="reservoirSelectChange">
-          </a-select>
+          <p>{{ reportName }}</p>
         </a-form-item>
-
         <a-form-item name="finished">
           <a-checkbox v-model:checked="formModel.finished">Đã hoành thành báo cáo</a-checkbox>
         </a-form-item>
@@ -127,10 +119,7 @@
             </a-radio-group>
           </a-form-item>
           <a-form-item :name="['sewers', index, 'description']">
-            <!-- <a-textarea
-                  v-model:value="sewer.description"
-                  :placeholder="`Mô tả tình trạng cống lấy nước ${sewer.id}`"
-                  :rows="3" /> -->
+            >
             <a-textarea
               v-model:value="sewer.description"
               :placeholder="`Mô tả tình trạng ${sewer['name']}`"
@@ -189,6 +178,31 @@
         </a-flex>
 
         <a-divider
+          v-if="formModel.monitors.length > 0"
+          style="border-color: var(--primary-color)"
+          orientation="left"
+          orientation-margin="0px">
+          Hệ thống giám sát
+        </a-divider>
+        <a-flex v-for="(monitor, index) in formModel.monitors" :key="monitor.id" vertical>
+          <p class="fw-bold">Hệ thống {{ monitor.id }}</p>
+          <a-form-item :name="['monitors', index, 'status']" :rules="formRules.status">
+            <a-radio-group
+              v-model:value="monitor.status"
+              :options="statusOptions"
+              button-style="solid"
+              option-type="button">
+            </a-radio-group>
+          </a-form-item>
+          <a-form-item :name="['monitors', index, 'description']">
+            <a-textarea
+              v-model:value="monitor.description"
+              :placeholder="`Mô tả tình trạng hệ thống ${monitor.id}`"
+              :rows="3" />
+          </a-form-item>
+        </a-flex>
+
+        <a-divider
           v-if="formModel.drainages.length > 0"
           style="border-color: var(--primary-color)"
           orientation="left"
@@ -203,7 +217,7 @@
             :action="uploadTemporaryAction"
             :headers="accessHeader"
             crossOrigin="anonymous"
-            :before-upload="beforeAvatarUpload"
+            :before-upload="beforeImageUpload"
             @preview="handlePreview">
             <div v-if="formModel.fileList.length < 10">
               <PlusOutlined />
@@ -220,11 +234,12 @@
 </template>
 
 <script>
-import { defineComponent, ref, reactive } from 'vue';
+import { defineComponent, ref, reactive, toRefs } from 'vue';
 import thuyLoiApi from '@/js/axios/thuyLoiApi';
 import { getItem } from '@/js/utils/localStorage';
 import { downloadFile } from '@/js/utils/utils';
 import { PlusOutlined } from '@ant-design/icons-vue';
+import { message } from 'ant-design-vue';
 
 export default defineComponent({
   components: {
@@ -233,6 +248,7 @@ export default defineComponent({
 
   props: {
     title: { type: String, default: 'Chỉnh sửa ' },
+    report: { type: Object, required: true },
     buttonIcon: { type: String, default: 'fa-solid fa-shield-halved' },
     buttonText: { type: String },
     buttonClass: { type: String },
@@ -240,30 +256,27 @@ export default defineComponent({
     tooltipBackground: { type: String },
     type: { type: String, default: 'primary' },
     ghost: { type: Boolean },
+    reportName: { type: String, required: true },
   },
 
-  setup() {
+  setup(props) {
+    const modalOpen = ref(false);
     const formRef = ref();
     const initialForm = {
       id: '',
+      name: '',
       mainDams: [],
+      spillways: [],
+      monitors: [],
       subDams: [],
       sewers: [],
-      spillways: [],
       drainages: [],
-      download: false,
       finished: false,
       fileList: [],
     };
-    const formModel = reactive({ ...initialForm });
+
+    const formModel = reactive(JSON.parse(JSON.stringify(initialForm)));
     const formRules = {
-      id: [
-        {
-          required: true,
-          message: 'Chọn hồ chứa.',
-          trigger: ['blur', 'change'],
-        },
-      ],
       status: [
         {
           required: true,
@@ -272,21 +285,6 @@ export default defineComponent({
         },
       ],
     };
-    const reservoirOptions = ref([
-      {
-        id: 1,
-        name: 'Hồ A1',
-      },
-      {
-        id: 2,
-        name: 'Hồ B',
-      },
-      {
-        id: 3,
-        name: 'Hồ C5',
-      },
-    ]);
-    const reservoirSelectLoading = ref(false);
 
     function getBase64(file) {
       return new Promise((resolve, reject) => {
@@ -313,24 +311,50 @@ export default defineComponent({
       previewTitle.value = file.name || file.url.substring(file.url.lastIndexOf('/') + 1);
     };
 
+    const fillForm = () => {
+      const {
+        id,
+        name,
+        finished_status,
+        main_dam_status,
+        main_dam_description,
+        spillway_status,
+        spillway_description,
+        monitor_system_status,
+        monitor_system_description,
+      } = props.report;
+      formModel.id = id;
+      formModel.name = name;
+      formModel.finished = finished_status;
+      formModel.mainDams.push({ name: 1, id: 1, status: main_dam_status, description: main_dam_description });
+      formModel.spillways.push({ name: 1, id: 1, status: spillway_status, description: spillway_description });
+      formModel.monitors.push({
+        name: 1,
+        id: 1,
+        status: monitor_system_status,
+        description: monitor_system_description,
+      });
+    };
+    fillForm();
+
     return {
       formRef,
+      modalOpen,
       initialForm,
+      // ...toRefs(formModel),
       formModel,
       formRules,
-      reservoirOptions,
-      reservoirSelectLoading,
       previewVisible,
       previewImage,
       previewTitle,
       handleCancel,
       handlePreview,
+      fillForm,
     };
   },
 
   data() {
     return {
-      modalOpen: false,
       formSpinning: false,
       mainDams: [],
       sewers: [],
@@ -360,62 +384,74 @@ export default defineComponent({
   methods: {
     showModal() {
       this.modalOpen = true;
-      this.reservoirSelectLoading = true;
-      setTimeout(() => {
-        this.reservoirSelectLoading = false;
-      }, 1000);
+
+      // Tạm thời chưa tham chiếu thêm các công trình phụ
+      // Chỉ lấy thông tin report
+      // Nên id của các công trình phụ sẽ được giả lập là 1
+      // console.log(this.report);
+
+      // console.log(this.formModel);
     },
+
     modalCancel() {
       this.modalOpen = false;
+      Object.assign(this.formModel, this.initialForm);
+      // console.log(this.initialForm);
+      // this.formModel.mainDams = [];
+      // this.formModel.spillways = [];
+      // this.formModel.monitors = [];
+      this.fillForm();
 
-      if (this.formModel.fileList.length > 0) {
-        thuyLoiApi
-          .delete(`/delete-temporary-image`, {
-            headers: {
-              Authorization: `Bearer ${getItem('accessToken')}`,
-            },
-            data: {
-              fileList: this.formModel.fileList,
-            },
-          })
-          .then((response) => {})
-          .catch((error) => {
-            console.log(error);
-          });
-      }
+      // if (this.formModel.fileList.length > 0) {
+      //   thuyLoiApi
+      //     .delete(`/delete-temporary-image`, {
+      //       headers: {
+      //         Authorization: `Bearer ${getItem('accessToken')}`,
+      //       },
+      //       data: {
+      //         fileList: this.formModel.fileList,
+      //       },
+      //     })
+      //     .then((response) => {})
+      //     .catch((error) => {
+      //       console.log(error);
+      //     });
+      // }
     },
     save() {
-      this.formRef
-        .validate()
-        .then((response) => {
-          this.formSpinning = true;
-          thuyLoiApi
-            .post(`/reservoirs/${this.formModel.id}/safety-report`, this.formModel, {
-              headers: {
-                Authorization: `Bearer ${getItem('accessToken')}`,
-              },
-              // responseType: 'arraybuffer',
-            })
-            .then((response) => {
-              console.log(response);
-              this.$message.success('Tạo báo cáo thành công.', 3);
-              if (this.formModel.download == true) {
-                downloadFile(response, 'bao-cao-an-toan-dap');
-              }
+      console.log(this.formModel);
 
-              Object.assign(this.formModel, this.initialForm);
-              this.modalOpen = false;
-              this.formSpinning = false;
-            })
-            .catch((error) => {
-              console.log(error);
-              this.formSpinning = false;
-              this.$message.error('Tạo báo cáo thất bại.', 3);
-            });
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+      // this.title = 'anhquyen111';
+      // this.formRef
+      //   .validate()
+      //   .then((response) => {
+      //     this.formSpinning = true;
+      //     thuyLoiApi
+      //       .post(`/reservoirs/${this.formModel.id}/safety-report`, this.formModel, {
+      //         headers: {
+      //           Authorization: `Bearer ${getItem('accessToken')}`,
+      //         },
+      //         // responseType: 'arraybuffer',
+      //       })
+      //       .then((response) => {
+      //         console.log(response);
+      //         this.$message.success('Tạo báo cáo thành công.', 3);
+      //         if (this.formModel.download == true) {
+      //           downloadFile(response, 'bao-cao-an-toan-dap');
+      //         }
+      //         Object.assign(this.formModel, this.initialForm);
+      //         this.modalOpen = false;
+      //         this.formSpinning = false;
+      //       })
+      //       .catch((error) => {
+      //         console.log(error);
+      //         this.formSpinning = false;
+      //         this.$message.error('Tạo báo cáo thất bại.', 3);
+      //       });
+      //   })
+      //   .catch((error) => {
+      //     console.log(error);
+      //   });
     },
 
     formModelPushItem(array, prop) {
@@ -426,39 +462,7 @@ export default defineComponent({
       });
     },
 
-    reservoirSelectChange(value) {
-      this.formSpinning = true;
-      this.formModel.fileList = [];
-      thuyLoiApi
-        .get(`/reservoirs/${this.formModel.id}/constructions`, this.accessToken)
-        .then((response) => {
-          console.log(response);
-          this.formSpinning = false;
-          const { mainDams, subDams, sewers, spillways, drainages } = response.data;
-
-          this.mainDams = mainDams;
-          this.formModelPushItem(this.mainDams, 'mainDams');
-          this.subDams = subDams;
-          this.formModelPushItem(this.subDams, 'subDams');
-          this.sewers = sewers;
-          this.formModelPushItem(this.sewers, 'sewers');
-          this.spillways = spillways;
-          this.formModelPushItem(this.spillways, 'spillways');
-          this.drainages = drainages;
-          this.formModelPushItem(this.drainages, 'drainages');
-        })
-        .catch((error) => {
-          console.log(error);
-          this.formSpinning = false;
-          this.formModel.mainDams = [];
-          this.formModel.subDams = [];
-          this.formModel.sewers = [];
-          this.formModel.spillways = [];
-          this.formModel.drainages = [];
-        });
-    },
-
-    beforeAvatarUpload(file) {
+    beforeImageUpload(file) {
       const acceptList = ['image/png', 'image/jpg', 'image/jpeg', 'image/gif'];
       if (acceptList.indexOf(file.type) !== -1) {
         return true;

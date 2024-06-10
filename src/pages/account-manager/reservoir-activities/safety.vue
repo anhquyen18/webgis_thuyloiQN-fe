@@ -35,6 +35,7 @@
                   </a-button>
 
                   <ConfirmModal
+                    v-if="hasPermissions([10])"
                     title="Bạn có chắc muốn xoá báo cáo?"
                     description="Dữ liệu được xoá sẽ không thể phục hồi."
                     :confirm="deleteReports">
@@ -45,7 +46,7 @@
                     </template>
                   </ConfirmModal>
 
-                  <CreateReservoirSafety buttonIcon="" buttonText="Tạo báo cáo" />
+                  <CreateReservoirSafety v-if="hasPermissions([10])" buttonIcon="" buttonText="Tạo báo cáo" />
                 </a-flex>
 
                 <!-- <a-flex class="mt-2" gap="middle">
@@ -87,7 +88,10 @@
             <template v-if="column.key === 'name'">
               <a-row justify="space-between" align="middle">
                 <UpdateReservoirSafety
+                  v-if="hasPermissions([10])"
                   buttonClass="no-border-ant-button"
+                  :reportName="record.name"
+                  :report="record"
                   :title="'Chỉnh sửa ' + record.name"
                   type="default"
                   :ghost="true">
@@ -97,6 +101,10 @@
                     </u>
                   </template>
                 </UpdateReservoirSafety>
+
+                <u v-else style="text-underline-offset: 3px">
+                  {{ record.name }}
+                </u>
                 <a-button type="primary" size="small" :loading="false">
                   <template #icon>
                     <DownloadOutlined />
@@ -154,6 +162,7 @@
 import { defineComponent, inject, ref, provide } from 'vue';
 import thuyLoiApi from '@/js/axios/thuyLoiApi';
 import { userState } from '@/stores/user-state';
+import { useRouter } from 'vue-router';
 import { irrigationState } from '@/stores/irrigation-state';
 import { getItem } from '@/js/utils/localStorage.js';
 import { getLastTime, removeAccents } from '@/js/utils/utils.js';
@@ -181,6 +190,7 @@ export default defineComponent({
   },
 
   setup() {
+    const router = useRouter();
     const pageLoading = inject('pageLoading');
     const userProfile = inject('userProfile');
     const tableState = ref({
@@ -204,7 +214,7 @@ export default defineComponent({
           },
         })
         .then((response) => {
-          // console.log(response.data);
+          console.log(response.data);
           irrigationState().setSafetyReports(response.data.reports);
           originDataSource.value = irrigationState().getSafetyReports;
           dataSource.value = irrigationState().getSafetyReports;
@@ -213,6 +223,7 @@ export default defineComponent({
         })
         .catch((error) => {
           console.log(error);
+          router.push({ name: 'account-manager-page' });
           pageLoading.value = false;
         });
     };
@@ -319,7 +330,11 @@ export default defineComponent({
     },
   },
 
-  computed: {},
+  computed: {
+    loginState() {
+      return userState().getLogin;
+    },
+  },
 
   methods: {
     backward() {
@@ -360,11 +375,13 @@ export default defineComponent({
         .then((response) => {
           // console.log(response.data);
           this.reloadTable();
+          this.$message.success('Xoá báo cáo thành công.');
           // this.tableLoading = false;
         })
         .catch((error) => {
           console.log(error);
           this.tableLoading = false;
+          this.$message.error('Xoá báo cáo thất bại.');
         });
     },
 
@@ -376,6 +393,16 @@ export default defineComponent({
 
     departmentSearchChange() {
       this.dataSource = this.filterTable(this.departmentSearchValue, this.originDataSource);
+    },
+
+    hasPermissions(policies) {
+      if (this.loginState) {
+        return policies.some((policy) => {
+          return userState().getUserProfile.allPolicies.some((userPolicy) => userPolicy.id == policy);
+        });
+      } else {
+        return false;
+      }
     },
   },
 

@@ -241,7 +241,7 @@
               :action="uploadTemporaryAction"
               :headers="accessHeader"
               crossOrigin="anonymous"
-              :before-upload="beforeAvatarUpload"
+              :before-upload="beforeImageUpload"
               @preview="handlePreview">
               <div v-if="formModel.fileList.length < 10">
                 <PlusOutlined />
@@ -282,6 +282,7 @@ export default defineComponent({
   },
 
   setup() {
+    const modalOpen = ref(false);
     const formRef = ref();
     const initialForm = {
       id: '',
@@ -349,6 +350,7 @@ export default defineComponent({
         })
         .catch((error) => {
           console.log(error);
+          modalOpen.value = false;
         });
     };
 
@@ -381,6 +383,7 @@ export default defineComponent({
 
     return {
       formRef,
+      modalOpen,
       initialForm,
       formModel,
       formRules,
@@ -396,7 +399,6 @@ export default defineComponent({
 
   data() {
     return {
-      modalOpen: false,
       formSpinning: false,
       mainDams: [],
       sewers: [],
@@ -523,7 +525,7 @@ export default defineComponent({
         });
     },
 
-    beforeAvatarUpload(file) {
+    beforeImageUpload(file) {
       const acceptList = ['image/png', 'image/jpg', 'image/jpeg', 'image/gif'];
       if (acceptList.indexOf(file.type) !== -1) {
         return true;
