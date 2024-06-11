@@ -112,24 +112,19 @@
             </a-col>
           </a-row>
 
-          <a-form-item v-if="!!allAccessOrgnizations()" class="mt-3">
+          <!-- <a-form-item v-if="userProfile.organization" class="mt-3">
             <template #label>
               <p class="fw-bold">Tổ chức</p>
             </template>
-            <a-select
-              v-model:value="editUserInfoForm.organization_id"
+            <a-input
+              v-model:value="editUserInfoForm.organization_name"
               size="large"
               :field-names="{ label: 'name', value: 'id' }"
-              :options="organizationOptions"
-              @change="onOrganizationSelectChange"
-              :loading="organizationSelectLoading"
-              :disabled="organizationSelectLoading"
-              allowClear
-              style="width: 100%">
-            </a-select>
-          </a-form-item>
+              :disabled="true">
+            </a-input>
+          </a-form-item> -->
 
-          <a-form-item class="mt-3">
+          <!-- <a-form-item class="mt-3">
             <template #label>
               <p class="fw-bold">Phòng ban</p>
             </template>
@@ -143,7 +138,7 @@
               allowClear
               style="width: 100%">
             </a-select>
-          </a-form-item>
+          </a-form-item> -->
         </a-form>
       </a-skeleton>
     </div>
@@ -152,7 +147,9 @@
       <a-skeleton :loading="profileLoading" active>
         <a-tabs :activeKey="tabActiveKey" @change="tabChange">
           <a-tab-pane key="assigned">
-            <template #tab> Quyền hạn hiện tại ({{ this.assignedOriginDataSource.length }}) </template>
+            <template v-if="this.assignedOriginDataSource" #tab>
+              Quyền hạn hiện tại ({{ this.assignedOriginDataSource.length }})
+            </template>
             <a-table
               class="account-manager-table"
               rowKey="id"
@@ -216,7 +213,9 @@
           </a-tab-pane>
 
           <a-tab-pane key="not-assigned" force-render>
-            <template #tab> Thêm quyền hạn ({{ notAssignedOriginDataSource.length }}) </template>
+            <template v-if="notAssignedOriginDataSource" #tab>
+              Thêm quyền hạn ({{ notAssignedOriginDataSource.length }})
+            </template>
             <a-table
               class="account-manager-table"
               rowKey="id"
@@ -318,66 +317,14 @@ export default defineComponent({
     const userId = ref(router.currentRoute.value.params.id);
     const userProfile = ref();
 
-    const organizationOptions = ref([]);
     const departmentOptions = ref([]);
-    const organizationSelectLoading = ref(false);
 
     const assignedOriginDataSource = ref([]);
     const assignedDataSource = ref([]);
     const notAssignedOriginDataSource = ref([]);
     const notAssignedDataSource = ref([]);
 
-    const getOrganizations = () => {
-      organizationSelectLoading.value = true;
-      thuyLoiApi
-        .get(`/get-organizations`, {
-          headers: {
-            Authorization: `Bearer ${getItem('accessToken')}`,
-          },
-        })
-        .then((response) => {
-          userState().setOrganizations(response.data.organizations);
-          organizationOptions.value = userState().getOrganizations;
-
-          if (userProfile.value.organization_id) {
-            organizationOptions.value.filter(function (obj) {
-              if (obj.id == userProfile.value.organization_id) {
-                departmentOptions.value = obj.departments;
-                return;
-              }
-            });
-          }
-
-          organizationSelectLoading.value = false;
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    };
-
-    const noOrganizationDepartments = ref();
-    const getNoOrganizationDeparmtents = () => {
-      organizationSelectLoading.value = true;
-      thuyLoiApi
-        .get(`/get-no-organization-departments`, {
-          headers: {
-            Authorization: `Bearer ${getItem('accessToken')}`,
-          },
-        })
-        .then((response) => {
-          noOrganizationDepartments.value = response.data.departments;
-          if (!userProfile.value.organization_id) {
-            departmentOptions.value = noOrganizationDepartments.value;
-          }
-          //   userState().setOrganizations(response.data.organizations);
-
-          organizationSelectLoading.value = false;
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    };
-
+    const organizationSelectLoading = ref(false);
     const getDepartmentsInOrganization = (organizationId) => {
       organizationSelectLoading.value = true;
       thuyLoiApi
@@ -411,13 +358,14 @@ export default defineComponent({
           console.log(response.data);
 
           userProfile.value = response.data.user;
+
           const {
             name,
             status_id,
             email,
             phone_number,
+            organization,
             gender,
-            organization_id,
             department_id,
             birthday,
             policies,
@@ -430,8 +378,9 @@ export default defineComponent({
             email,
             phone_number,
             gender,
-            organization_id,
             department_id,
+            organization_id: organization.id,
+            organization_name: organization.name,
             dayOfBirth: '',
             monthOfBirth: '',
             yearOfBirth: '',
@@ -441,7 +390,6 @@ export default defineComponent({
             editUserInfoForm.value.monthOfBirth = birthday.split('-')[1];
             editUserInfoForm.value.yearOfBirth = birthday.split('-')[0];
           }
-
           assignedOriginDataSource.value = policies;
           assignedDataSource.value = assignedOriginDataSource.value;
           notAssignedOriginDataSource.value = noPolicies;
@@ -469,8 +417,8 @@ export default defineComponent({
         getOrganizations();
         getNoOrganizationDeparmtents();
       } else {
-        if (loggedUserProfile.value.organization_id != null) {
-          getDepartmentsInOrganization(loggedUserProfile.value.organization_id);
+        if (loggedUserProfile.value.organization.id != null) {
+          getDepartmentsInOrganization(loggedUserProfile.value.organization.id);
         }
       }
     }
@@ -629,20 +577,16 @@ export default defineComponent({
       editUserInfoForm,
       saveLoading,
       statusOptions,
-      organizationOptions,
       departmentOptions,
-      getOrganizations,
-      organizationSelectLoading,
       getUser,
       profileLoading,
-      getNoOrganizationDeparmtents,
-      noOrganizationDepartments,
       assignedDataSource,
       assignedOriginDataSource,
       notAssignedDataSource,
       notAssignedOriginDataSource,
       allAccessOrgnizations,
       getDepartmentsInOrganization,
+      organizationSelectLoading,
     };
   },
 
@@ -678,11 +622,9 @@ export default defineComponent({
           this.getUser(this.userId);
 
           if (this.allAccessOrgnizations()) {
-            this.getOrganizations();
-            this.getNoOrganizationDeparmtents();
           } else {
-            if (this.loggedUserProfile.organization_id != null) {
-              this.getDepartmentsInOrganization(this.loggedUserProfile.organization_id);
+            if (this.loggedUserProfile.organization.id != null) {
+              this.getDepartmentsInOrganization(this.loggedUserProfile.organization.id);
             }
           }
         } else {
@@ -747,16 +689,6 @@ export default defineComponent({
         .catch((error) => {
           console.log(error);
         });
-    },
-
-    onOrganizationSelectChange(value, option) {
-      if (option) {
-        this.departmentOptions = option.departments;
-        this.editUserInfoForm.department_id = '';
-      } else {
-        this.departmentOptions = this.noOrganizationDepartments;
-        this.editUserInfoForm.department_id = '';
-      }
     },
 
     filterTable(text, dataSource) {

@@ -181,7 +181,7 @@ export default defineComponent({
 
     if (userState().getLogin) {
       if (!userState().getDepartments || reloadDepartmentDataSource.value) {
-        getDepartments(userProfile.value.organization_id);
+        getDepartments(userProfile.value.organization.id);
         reloadDepartmentDataSource.value = false;
       } else {
         dataSource.value = userState().getDepartments;
@@ -259,7 +259,7 @@ export default defineComponent({
     pageLoading: {
       handler() {
         if (!this.pageLoading && !userState().getDepartments) {
-          this.getDepartments(this.userProfile.organization_id);
+          this.getDepartments(this.userProfile.organization.id);
           // this.dataSource.users[0];
         } else {
           // this.dataSource = [];
@@ -280,7 +280,7 @@ export default defineComponent({
     reloadTable() {
       this.tableLoading = true;
       thuyLoiApi
-        .get(`/organization/${this.userProfile.organization_id}/departments`, {
+        .get(`/organization/${this.userProfile.organization.id}/departments`, {
           headers: {
             Authorization: `Bearer ${getItem('accessToken')}`,
           },

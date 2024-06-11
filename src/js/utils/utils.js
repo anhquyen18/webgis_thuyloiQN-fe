@@ -67,4 +67,22 @@ function debounce(callback, delay) {
   };
 }
 
-export { getLastTime, removeAccents, debounce };
+function downloadFile(response, fileName) {
+  var newBlob = new Blob([response.data], {
+    type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  });
+  if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+    window.navigator.msSaveOrOpenBlob(newBlob);
+    return;
+  }
+  const data = window.URL.createObjectURL(newBlob);
+  var link = document.createElement('a');
+  link.href = data;
+  link.download = fileName + '.docx';
+  link.click();
+  setTimeout(function () {
+    window.URL.revokeObjectURL(data);
+  }, 100);
+}
+
+export { getLastTime, removeAccents, debounce, downloadFile };

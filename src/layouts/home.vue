@@ -90,7 +90,13 @@
                 <div ref="mapContainer" id="map-container" class="content-container h-100" style="position: relative">
                   <div id="map" class="map h-100"></div>
                   <div class="bottom-right-nav align-items-center">
-                    <IrrigationToolContainer></IrrigationToolContainer>
+                    <IrrigationToolContainer
+                      v-if="createReportsPermission"
+                      :safety="hasPermission(10)"
+                      :maintain="hasPermission(8)"
+                      :operation="hasPermission(6)">
+                    </IrrigationToolContainer>
+
                     <LayerManager class="mt-5"></LayerManager>
                   </div>
                   <LegendControl></LegendControl>
@@ -271,8 +277,19 @@ export default defineComponent({
     };
   },
 
-  loginState: function () {
-    return userState().getLogin;
+  computed: {
+    loginState() {
+      return userState().getLogin;
+    },
+
+    createReportsPermission() {
+      const policies = [6, 8, 10];
+      if (this.loginState) {
+        return userState().getUserProfile.allPolicies.find((policy) => policies.includes(policy.id));
+      } else {
+        return false;
+      }
+    },
   },
 
   methods: {
@@ -292,8 +309,17 @@ export default defineComponent({
         this.siderCollapsed = false;
       }
     },
+    hasPermission(policyId) {
+      if (this.loginState) {
+        return userState().getUserProfile.allPolicies.find((policy) => policy.id == policyId) ? true : false;
+      } else {
+        return false;
+      }
+    },
+
     test() {},
   },
+
   mounted() {
     const mapStore = mapState();
     const { getMap, setMap } = mapStore;

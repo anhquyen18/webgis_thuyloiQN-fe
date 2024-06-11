@@ -94,6 +94,12 @@ const home = [
         component: () => import('../pages/account-manager/organization/my-policies.vue'),
         meta: { title: 'Quyền hạn của tôi' },
       },
+      {
+        path: 'reservoir/safety-reports',
+        name: 'account-manager-safety-reports',
+        component: () => import('../pages/account-manager/reservoir-activities/safety.vue'),
+        meta: { title: 'An toàn công trình' },
+      },
     ],
   },
   {

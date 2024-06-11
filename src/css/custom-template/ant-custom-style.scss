@@ -1,0 +1,29 @@
+/* ------------------------------------------------------------------ */
+/* Custom componet ant design vue */
+/* ------------------------------------------------------------------ */
+
+.no-border-ant-button {
+  border: none !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+
+  & .ant-wave {
+    display: none;
+  }
+}
+
+.no-padding-ant-modal {
+  & .ant-modal-content {
+    padding: 0 !important;
+  }
+}
+
+.ant-upload-select-picture-card i {
+  font-size: 32px;
+  color: #999;
+}
+
+.ant-upload-select-picture-card .ant-upload-text {
+  margin-top: 8px;
+  color: #666;
+}

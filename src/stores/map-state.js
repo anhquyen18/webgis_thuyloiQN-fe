@@ -1,19 +1,19 @@
-import { defineStore } from 'pinia'
+import { defineStore } from 'pinia';
 
 export const mapState = defineStore('map', {
   state: () => ({
-    map: null
+    map: null,
   }),
 
   actions: {
     setMap(map) {
-      this.map = map
-    }
+      this.map = map;
+    },
   },
 
   getters: {
     getMap() {
-      return this.map
-    }
-  }
-})
+      return this.map;
+    },
+  },
+});

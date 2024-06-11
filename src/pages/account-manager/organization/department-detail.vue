@@ -349,7 +349,7 @@ export default defineComponent({
           },
         })
         .then((response) => {
-          // console.log(response.data);
+          console.log(response.data);
           userState().setMyDepartment(response.data.department);
           department.value = userState().getMyDepartment;
           getDataFromDepartment(department.value);
