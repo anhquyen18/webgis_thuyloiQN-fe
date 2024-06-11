@@ -90,6 +90,7 @@
                 <UpdateReservoirSafety
                   v-if="hasPermissions([10])"
                   buttonClass="no-border-ant-button"
+                  @completed="reloadTable"
                   :reportName="record.name"
                   :report="record"
                   :title="'Chỉnh sửa ' + record.name"
@@ -105,7 +106,12 @@
                 <u v-else style="text-underline-offset: 3px">
                   {{ record.name }}
                 </u>
-                <a-button type="primary" size="small" :loading="false">
+                <a-button
+                  v-if="record.finished_status"
+                  type="primary"
+                  size="small"
+                  :loading="downloadLoading"
+                  @click="downloadSafetyReport(record.id, record.name)">
                   <template #icon>
                     <DownloadOutlined />
                   </template>
@@ -165,7 +171,7 @@ import { userState } from '@/stores/user-state';
 import { useRouter } from 'vue-router';
 import { irrigationState } from '@/stores/irrigation-state';
 import { getItem } from '@/js/utils/localStorage.js';
-import { getLastTime, removeAccents } from '@/js/utils/utils.js';
+import { getLastTime, removeAccents, downloadFile } from '@/js/utils/utils.js';
 import ConfirmModal from '@/components/interface/confirm-modal.vue';
 import CreateReservoirSafety from '@/components/irrigation-tools/create-reservoir-safety.vue';
 import UpdateReservoirSafety from '@/components/irrigation-tools/update-reservoir-safety.vue';
@@ -312,6 +318,7 @@ export default defineComponent({
       ],
       tableLoading: false,
       departmentSearchValue: '',
+      downloadLoading: false,
     };
   },
 
@@ -348,6 +355,7 @@ export default defineComponent({
           headers: {
             Authorization: `Bearer ${getItem('accessToken')}`,
           },
+          responseType: 'arraybuffer',
         })
         .then((response) => {
           // console.log(response.data);
@@ -373,7 +381,7 @@ export default defineComponent({
           data: this.tableState.selectedRowKeys,
         })
         .then((response) => {
-          // console.log(response.data);
+          console.log(response.data);
           this.reloadTable();
           this.$message.success('Xoá báo cáo thành công.');
           // this.tableLoading = false;
@@ -403,6 +411,26 @@ export default defineComponent({
       } else {
         return false;
       }
+    },
+
+    downloadSafetyReport(id, name) {
+      this.downloadLoading = true;
+      thuyLoiApi
+        .get(`/reservoirs/safety-reports/${id}/download`, {
+          headers: {
+            Authorization: `Bearer ${getItem('accessToken')}`,
+          },
+          responseType: 'arraybuffer',
+        })
+        .then((response) => {
+          console.log(response);
+          downloadFile(response, name);
+          this.downloadLoading = false;
+        })
+        .catch((error) => {
+          this.downloadLoading = false;
+          console.log(error);
+        });
     },
   },
 

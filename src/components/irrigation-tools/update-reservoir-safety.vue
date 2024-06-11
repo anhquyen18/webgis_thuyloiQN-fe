@@ -3,7 +3,7 @@
     <slot name="text"> </slot>
   </a-button>
 
-  <a-modal v-model:open="modalOpen" :maskClosable="false" :closable="false">
+  <a-modal v-model:open="modalOpen" :maskClosable="false" :closable="false" :keyboard="false">
     <template #title>
       <a-row justify="space-between" align="top">
         <a-col :span="23">
@@ -40,12 +40,13 @@
         name="basic"
         :model="formModel"
         :rules="formRules">
-        <a-form-item class="mb-4" name="id">
+        <a-form-item name="name">
           <template #label>
-            <p class="fw-bold">Tên báo cáo:</p>
+            <p class="fw-bold">Tên báo cáo</p>
           </template>
-          <p>{{ reportName }}</p>
+          <a-input v-model:value="formModel.name" placeholder="Nhập tên báo cáo" />
         </a-form-item>
+
         <a-form-item name="finished">
           <a-checkbox v-model:checked="formModel.finished">Đã hoành thành báo cáo</a-checkbox>
         </a-form-item>
@@ -202,11 +203,7 @@
           </a-form-item>
         </a-flex>
 
-        <a-divider
-          v-if="formModel.drainages.length > 0"
-          style="border-color: var(--primary-color)"
-          orientation="left"
-          orientation-margin="0px">
+        <a-divider style="border-color: var(--primary-color)" orientation="left" orientation-margin="0px">
           Tải lên hình ảnh báo cáo
         </a-divider>
 
@@ -218,6 +215,7 @@
             :headers="accessHeader"
             crossOrigin="anonymous"
             :before-upload="beforeImageUpload"
+            @remove="removeTemporaryImage"
             @preview="handlePreview">
             <div v-if="formModel.fileList.length < 10">
               <PlusOutlined />
@@ -245,7 +243,7 @@ export default defineComponent({
   components: {
     PlusOutlined,
   },
-
+  emits: ['completed'],
   props: {
     title: { type: String, default: 'Chỉnh sửa ' },
     report: { type: Object, required: true },
@@ -262,6 +260,7 @@ export default defineComponent({
   setup(props) {
     const modalOpen = ref(false);
     const formRef = ref();
+    // Id của báo cáo
     const initialForm = {
       id: '',
       name: '',
@@ -273,14 +272,31 @@ export default defineComponent({
       drainages: [],
       finished: false,
       fileList: [],
+      deletedFileList: [],
     };
 
     const formModel = reactive(JSON.parse(JSON.stringify(initialForm)));
+    const nameValidator = async (_rule, value) => {
+      const nameRegex =
+        /^[a-zA-Z0-9._-àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđÀÁẠẢÃÂẦẤẬẨẪĂẰẮẶẲẴÈÉẸẺẼÊỀẾỆỂỄÌÍỊỈĨÒÓỌỎÕÔỒỐỘỔỖƠỜỚỢỞỠÙÚỤỦŨƯỪỨỰỬỮỲÝỴỶỸĐ ]+$/;
+      if (nameRegex.test(value)) {
+        return Promise.resolve();
+      } else {
+        return Promise.reject('Tên báo cáo không hợp lệ!');
+        // }
+      }
+    };
     const formRules = {
       status: [
         {
           required: true,
           message: 'Chọn tình trạng công trình.',
+          trigger: ['blur', 'change'],
+        },
+      ],
+      name: [
+        {
+          validator: nameValidator,
           trigger: ['blur', 'change'],
         },
       ],
@@ -322,10 +338,12 @@ export default defineComponent({
         spillway_description,
         monitor_system_status,
         monitor_system_description,
+        docs,
       } = props.report;
       formModel.id = id;
       formModel.name = name;
       formModel.finished = finished_status;
+      formModel.fileList = [...docs];
       formModel.mainDams.push({ name: 1, id: 1, status: main_dam_status, description: main_dam_description });
       formModel.spillways.push({ name: 1, id: 1, status: spillway_status, description: spillway_description });
       formModel.monitors.push({
@@ -341,7 +359,6 @@ export default defineComponent({
       formRef,
       modalOpen,
       initialForm,
-      // ...toRefs(formModel),
       formModel,
       formRules,
       previewVisible,
@@ -384,7 +401,9 @@ export default defineComponent({
   methods: {
     showModal() {
       this.modalOpen = true;
-
+      this.formModel.fileList.forEach((file) => {
+        file.url = file.rooturl + '?token=' + getItem('accessToken');
+      });
       // Tạm thời chưa tham chiếu thêm các công trình phụ
       // Chỉ lấy thông tin report
       // Nên id của các công trình phụ sẽ được giả lập là 1
@@ -395,63 +414,56 @@ export default defineComponent({
 
     modalCancel() {
       this.modalOpen = false;
-      Object.assign(this.formModel, this.initialForm);
       // console.log(this.initialForm);
       // this.formModel.mainDams = [];
       // this.formModel.spillways = [];
       // this.formModel.monitors = [];
-      this.fillForm();
 
-      // if (this.formModel.fileList.length > 0) {
-      //   thuyLoiApi
-      //     .delete(`/delete-temporary-image`, {
-      //       headers: {
-      //         Authorization: `Bearer ${getItem('accessToken')}`,
-      //       },
-      //       data: {
-      //         fileList: this.formModel.fileList,
-      //       },
-      //     })
-      //     .then((response) => {})
-      //     .catch((error) => {
-      //       console.log(error);
-      //     });
-      // }
+      if (this.formModel.fileList.length > 0) {
+        thuyLoiApi
+          .delete(`/delete-temporary-image`, {
+            headers: {
+              Authorization: `Bearer ${getItem('accessToken')}`,
+            },
+            data: {
+              fileList: this.formModel.fileList,
+            },
+          })
+          .then((response) => {})
+          .catch((error) => {
+            console.log(error);
+          });
+      }
+      Object.assign(this.formModel, this.initialForm);
+      this.fillForm();
     },
     save() {
-      console.log(this.formModel);
-
-      // this.title = 'anhquyen111';
-      // this.formRef
-      //   .validate()
-      //   .then((response) => {
-      //     this.formSpinning = true;
-      //     thuyLoiApi
-      //       .post(`/reservoirs/${this.formModel.id}/safety-report`, this.formModel, {
-      //         headers: {
-      //           Authorization: `Bearer ${getItem('accessToken')}`,
-      //         },
-      //         // responseType: 'arraybuffer',
-      //       })
-      //       .then((response) => {
-      //         console.log(response);
-      //         this.$message.success('Tạo báo cáo thành công.', 3);
-      //         if (this.formModel.download == true) {
-      //           downloadFile(response, 'bao-cao-an-toan-dap');
-      //         }
-      //         Object.assign(this.formModel, this.initialForm);
-      //         this.modalOpen = false;
-      //         this.formSpinning = false;
-      //       })
-      //       .catch((error) => {
-      //         console.log(error);
-      //         this.formSpinning = false;
-      //         this.$message.error('Tạo báo cáo thất bại.', 3);
-      //       });
-      //   })
-      //   .catch((error) => {
-      //     console.log(error);
-      //   });
+      this.formRef
+        .validate()
+        .then((response) => {
+          this.formSpinning = true;
+          thuyLoiApi
+            .put(`/reservoirs/safety-reports/${this.formModel.id}/update`, this.formModel, {
+              headers: {
+                Authorization: `Bearer ${getItem('accessToken')}`,
+              },
+            })
+            .then((response) => {
+              console.log(response);
+              this.$emit('completed');
+              this.$message.success('Cập nhật báo cáo thành công.', 3);
+              this.modalOpen = false;
+              this.formSpinning = false;
+            })
+            .catch((error) => {
+              console.log(error);
+              this.formSpinning = false;
+              this.$message.error('Cập nhật thất bại. Vui lòng thử lại sau.', 3);
+            });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     },
 
     formModelPushItem(array, prop) {
@@ -469,6 +481,27 @@ export default defineComponent({
       } else {
         this.$message.error('Ảnh không phù hợp. Vui lòng chọn ảnh khác.');
         return false;
+      }
+    },
+
+    removeTemporaryImage(file) {
+      if (file.id) {
+        this.formModel.deletedFileList.push(file);
+        console.log(this.formModel.deletedFileList);
+      } else {
+        thuyLoiApi
+          .delete(`/delete-temporary-image`, {
+            headers: {
+              Authorization: `Bearer ${getItem('accessToken')}`,
+            },
+            data: {
+              fileList: [file],
+            },
+          })
+          .then((response) => {})
+          .catch((error) => {
+            console.log(error);
+          });
       }
     },
   },

@@ -10,7 +10,7 @@
       </p>
     </a-button>
 
-    <a-modal v-model:open="modalOpen" :maskClosable="false" :closable="false">
+    <a-modal v-model:open="modalOpen" :maskClosable="false" :closable="false" :keyboard="false">
       <template #title>
         <a-row justify="space-between" align="middle">
           <p class="fs-5">
@@ -242,6 +242,7 @@
               :headers="accessHeader"
               crossOrigin="anonymous"
               :before-upload="beforeImageUpload"
+              @remove="removeTemporaryImage"
               @preview="handlePreview">
               <div v-if="formModel.fileList.length < 10">
                 <PlusOutlined />
@@ -284,6 +285,7 @@ export default defineComponent({
   setup() {
     const modalOpen = ref(false);
     const formRef = ref();
+    // Id của reservoir
     const initialForm = {
       id: '',
       name: '',
@@ -533,6 +535,23 @@ export default defineComponent({
         this.$message.error('Ảnh không phù hợp. Vui lòng chọn ảnh khác.');
         return false;
       }
+    },
+
+    removeTemporaryImage(file) {
+      console.log(file);
+      thuyLoiApi
+        .delete(`/delete-temporary-image`, {
+          headers: {
+            Authorization: `Bearer ${getItem('accessToken')}`,
+          },
+          data: {
+            fileList: [file],
+          },
+        })
+        .then((response) => {})
+        .catch((error) => {
+          console.log(error);
+        });
     },
   },
 
