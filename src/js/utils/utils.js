@@ -28,6 +28,25 @@ function getLastTime(dateString) {
     return `${Math.floor(diffYear)} năm trước`;
   }
 }
+
+function addLeadingZero(number) {
+  return number < 10 ? '0' + number : number;
+}
+
+function getVnTime(dateString) {
+  const date = new Date(dateString);
+  // Lấy thông tin ngày, tháng và năm
+  var day = addLeadingZero(date.getDate());
+  var month = addLeadingZero(date.getMonth() + 1); // Tháng trong JavaScript được đếm từ 0
+  var year = addLeadingZero(date.getFullYear());
+
+  // Lấy thông tin giờ, phút và giây
+  var hours = addLeadingZero(date.getHours());
+  var minutes = addLeadingZero(date.getMinutes());
+  var seconds = addLeadingZero(date.getSeconds());
+
+  return hours + ':' + minutes + ' ' + day + ':' + month + ':' + year;
+}
 function removeAccents(str) {
   var AccentsMap = [
     'aàảãáạăằẳẵắặâầẩẫấậ',
@@ -85,4 +104,4 @@ function downloadFile(response, fileName) {
   }, 100);
 }
 
-export { getLastTime, removeAccents, debounce, downloadFile };
+export { getLastTime, getVnTime, removeAccents, debounce, downloadFile };

@@ -36,6 +36,7 @@
 
                   <ConfirmModal
                     v-if="hasPermissions([10])"
+                    :buttonDisabled="this.tableState.selectedRowKeys.length < 1"
                     title="Bạn có chắc muốn xoá báo cáo?"
                     description="Dữ liệu được xoá sẽ không thể phục hồi."
                     :confirm="deleteReports">
@@ -238,6 +239,7 @@ export default defineComponent({
       if (!irrigationState().getSafetyReports) {
         getReports();
       } else {
+        originDataSource.value = irrigationState().getSafetyReports;
         dataSource.value = irrigationState().getSafetyReports;
       }
     }
@@ -315,6 +317,12 @@ export default defineComponent({
           },
           width: 200,
         },
+        {
+          title: 'Id',
+          dataIndex: 'id',
+          key: 'id',
+          sorter: (a, b) => a.id.length - b.id.length,
+        },
       ],
       tableLoading: false,
       departmentSearchValue: '',
@@ -355,7 +363,6 @@ export default defineComponent({
           headers: {
             Authorization: `Bearer ${getItem('accessToken')}`,
           },
-          responseType: 'arraybuffer',
         })
         .then((response) => {
           // console.log(response.data);

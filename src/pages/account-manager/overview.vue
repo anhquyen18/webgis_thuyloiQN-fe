@@ -200,7 +200,6 @@
         <a-flex v-if="hasPermissions([9, 10])" vertical :gap="8">
           <router-link :to="{ name: 'account-manager-safety-reports' }">
             <a-button
-              v-if="userProfile.allPolicies.find((policy) => policy.id === 9 || policy.id === 10)"
               class="no-border-ant-button background-hover-button fs-6"
               ghost
               block
@@ -249,6 +248,32 @@
                 <a-col class="center-col">
                   <i class="fa-solid fa-tags account-manager-button-icon"></i>
                   <p class="fw-bold text-wrap">Vận hành công trình</p>
+                </a-col>
+                <a-col class="center-col">
+                  <i class="fa-solid fa-angles-right"></i>
+                </a-col>
+              </a-row>
+            </a-button>
+          </router-link>
+        </a-flex>
+      </a-skeleton>
+    </a-card>
+
+    <a-card v-if="hasPermissions([3])" :bordered="false" class="account-manager-card">
+      <a-skeleton :loading="pageLoading" active>
+        <p class="fs-3 fw-bold mb-4">Hệ thống</p>
+
+        <a-flex vertical :gap="8">
+          <router-link :to="{ name: 'account-manager-user-logs' }">
+            <a-button
+              class="no-border-ant-button background-hover-button fs-6"
+              ghost
+              block
+              style="height: auto; padding: 15px">
+              <a-row justify="space-between" align="middle">
+                <a-col class="center-col">
+                  <i class="fa-solid fa-clock-rotate-left account-manager-button-icon"></i>
+                  <p class="fw-bold text-wrap">Hoạt động người dùng</p>
                 </a-col>
                 <a-col class="center-col">
                   <i class="fa-solid fa-angles-right"></i>

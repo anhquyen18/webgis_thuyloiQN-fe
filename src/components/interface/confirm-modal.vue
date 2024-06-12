@@ -1,6 +1,12 @@
 <template>
   <div>
-    <a-button :type="buttonType" :ghost="buttonGhost" :size="buttonSize" :buttonShape="buttonShape" @click="showModal">
+    <a-button
+      :disabled="buttonDisabled"
+      :type="buttonType"
+      :ghost="buttonGhost"
+      :size="buttonSize"
+      :buttonShape="buttonShape"
+      @click="showModal">
       <slot name="buttonContent"></slot>
     </a-button>
 
@@ -56,6 +62,7 @@ export default defineComponent({
     buttonSize: { type: String },
     buttonShape: { type: String },
     buttonGhost: { type: Boolean, default: false },
+    buttonDisabled: { type: Boolean, default: false },
     confirm: Function,
     width: { type: Number, default: 420 },
     title: { type: String },
