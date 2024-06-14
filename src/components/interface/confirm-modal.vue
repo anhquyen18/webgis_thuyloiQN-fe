@@ -5,7 +5,8 @@
       :type="buttonType"
       :ghost="buttonGhost"
       :size="buttonSize"
-      :buttonShape="buttonShape"
+      :shape="buttonShape"
+      :danger="buttonDanger"
       @click="showModal">
       <slot name="buttonContent"></slot>
     </a-button>
@@ -16,7 +17,7 @@
           <a-col :span="2">
             <a-typography-text class="fs-4" type="warning"> <ExclamationCircleOutlined /> </a-typography-text>
           </a-col>
-          <a-col>
+          <a-col :span="22">
             <p class="fs-6">
               {{ title }}
             </p>
@@ -63,6 +64,7 @@ export default defineComponent({
     buttonShape: { type: String },
     buttonGhost: { type: Boolean, default: false },
     buttonDisabled: { type: Boolean, default: false },
+    buttonDanger: { type: Boolean, deafault: false },
     confirm: Function,
     width: { type: Number, default: 420 },
     title: { type: String },

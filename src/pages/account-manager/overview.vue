@@ -259,7 +259,7 @@
       </a-skeleton>
     </a-card>
 
-    <a-card v-if="hasPermissions([3])" :bordered="false" class="account-manager-card">
+    <a-card v-if="hasPermissions([2])" :bordered="false" class="account-manager-card">
       <a-skeleton :loading="pageLoading" active>
         <p class="fs-3 fw-bold mb-4">Hệ thống</p>
 
@@ -274,6 +274,26 @@
                 <a-col class="center-col">
                   <i class="fa-solid fa-clock-rotate-left account-manager-button-icon"></i>
                   <p class="fw-bold text-wrap">Hoạt động người dùng</p>
+                </a-col>
+                <a-col class="center-col">
+                  <i class="fa-solid fa-angles-right"></i>
+                </a-col>
+              </a-row>
+            </a-button>
+          </router-link>
+        </a-flex>
+
+        <a-flex vertical :gap="8">
+          <router-link :to="{ name: 'account-manager-locked-app' }">
+            <a-button
+              class="no-border-ant-button background-hover-button fs-6"
+              ghost
+              block
+              style="height: auto; padding: 15px">
+              <a-row justify="space-between" align="middle">
+                <a-col class="center-col">
+                  <i class="fa-solid fa-shop-lock account-manager-button-icon"></i>
+                  <p class="fw-bold text-wrap">Tạm khoá ứng dụng</p>
                 </a-col>
                 <a-col class="center-col">
                   <i class="fa-solid fa-angles-right"></i>

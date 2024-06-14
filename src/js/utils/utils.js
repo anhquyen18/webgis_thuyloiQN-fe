@@ -104,4 +104,4 @@ function downloadFile(response, fileName) {
   }, 100);
 }
 
-export { getLastTime, getVnTime, removeAccents, debounce, downloadFile };
+export { getLastTime, getVnTime, removeAccents, debounce, downloadFile, addLeadingZero };

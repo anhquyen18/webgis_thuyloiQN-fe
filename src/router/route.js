@@ -110,6 +110,12 @@ const home = [
         component: () => import('../pages/account-manager/system/user-logs.vue'),
         meta: { title: 'Hoạt động người dùng' },
       },
+      {
+        path: 'system/locked-app',
+        name: 'account-manager-locked-app',
+        component: () => import('../pages/account-manager/system/locked-app.vue'),
+        meta: { title: 'Tạm khoá ứng dụng' },
+      },
     ],
   },
   {

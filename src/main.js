@@ -36,6 +36,7 @@ import {
   Tabs,
   Typography,
   Radio,
+  DatePicker,
 } from 'ant-design-vue';
 import App from './App.vue';
 import axios from 'axios';
@@ -91,6 +92,7 @@ app.use(Breadcrumb);
 app.use(Tabs);
 app.use(Typography);
 app.use(Radio);
+app.use(DatePicker);
 
 app.mount('#app');
 
