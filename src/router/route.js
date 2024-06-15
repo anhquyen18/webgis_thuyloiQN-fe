@@ -94,11 +94,27 @@ const home = [
         component: () => import('../pages/account-manager/organization/my-policies.vue'),
         meta: { title: 'Quyền hạn của tôi' },
       },
+
+      // Object activities -----
+
       {
         path: 'reservoir/safety-reports',
         name: 'account-manager-safety-reports',
         component: () => import('../pages/account-manager/reservoir-activities/safety.vue'),
         meta: { title: 'An toàn công trình' },
+      },
+      // System -----
+      {
+        path: 'system/user-logs',
+        name: 'account-manager-user-logs',
+        component: () => import('../pages/account-manager/system/user-logs.vue'),
+        meta: { title: 'Hoạt động người dùng' },
+      },
+      {
+        path: 'system/locked-app',
+        name: 'account-manager-locked-app',
+        component: () => import('../pages/account-manager/system/locked-app.vue'),
+        meta: { title: 'Tạm khoá ứng dụng' },
       },
     ],
   },
