@@ -262,32 +262,10 @@ export default defineComponent({
 
     const organizationSelectLoading = ref(true);
 
-    const getOrganizations = () => {
-      thuyLoiApi
-        .get(`/get-organizations`, {
-          headers: {
-            Authorization: `Bearer ${getItem('accessToken')}`,
-          },
-        })
-        .then((response) => {
-          // console.log(response);
-          userState().setOrganizations(response.data.organizations);
-          organizationOptions.value = userState().getOrganizations;
-
-          organizationSelectLoading.value = false;
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    };
-
     const hasOrganizationsPolicy = ref();
     if (userState().getLogin) {
       // Kiểm tra toàn quyền quản lí tổ chức
       hasOrganizationsPolicy.value = userProfile.value.allPolicies.find((policy) => policy.id === 2);
-      if (hasOrganizationsPolicy.value) {
-        getOrganizations();
-      }
     }
 
     const page = 1;
@@ -377,7 +355,6 @@ export default defineComponent({
       policyDataSource,
       policyOriginDataSource,
       hasOrganizationsPolicy,
-      getOrganizations,
       getNoDepartmentUser,
       getPolicies,
       organizationSelectLoading,
@@ -438,7 +415,6 @@ export default defineComponent({
           // Kiểm tra toàn quyền quản lí tổ chức
           this.hasOrganizationsPolicy = this.userProfile.allPolicies.find((policy) => policy.id === 2);
           if (this.hasOrganizationsPolicy) {
-            this.getOrganizations();
           }
         } else {
           // this.dataSource = [];

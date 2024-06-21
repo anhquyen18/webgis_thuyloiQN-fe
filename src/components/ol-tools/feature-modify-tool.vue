@@ -1576,6 +1576,7 @@ export default defineComponent({
   mounted() {
     const container = document.getElementById('map-container');
     container.appendChild(this.$refs.controlPanel);
+
     // this.removePoint();
   },
 });

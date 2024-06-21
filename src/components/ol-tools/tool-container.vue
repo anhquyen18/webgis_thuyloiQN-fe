@@ -1,20 +1,45 @@
 <template>
-  <a-row class="h-100" justify="space-around" align="middle">
-    <p class="text-white">Công cụ:</p>
-    <PanToHome></PanToHome>
-    <ZoomTool></ZoomTool>
-    <!-- <a-button class="white-border-ant-button" type="primary" size="small" @click="test">
+  <a-row class="h-100">
+    <a-col :xs="{ span: 0, offset: 0 }" :sm="{ span: 24, offset: 0 }" :xl="{ span: 24, offset: 0 }">
+      <a-row class="h-100" justify="space-around" align="middle">
+        <p class="text-white">Công cụ:</p>
+        <PanToHome></PanToHome>
+        <ZoomTool></ZoomTool>
+        <!-- <a-button class="white-border-ant-button" type="primary" size="small" @click="test">
       <i class="fa-solid fa-hand"></i>
     </a-button> -->
-    <MeasureTool></MeasureTool>
-    <FeatureInfoPopup></FeatureInfoPopup>
-    <MapPrinter></MapPrinter>
-    <GeolocationTool></GeolocationTool>
-    <!-- <FeatureModifyTool></FeatureModifyTool> -->
-    <FeatureModifyTool v-show="loginState"></FeatureModifyTool>
-    <!-- <a-button class="white-border-ant-button" type="primary" size="small">
+        <MeasureTool></MeasureTool>
+        <FeatureInfoPopup></FeatureInfoPopup>
+        <MapPrinter></MapPrinter>
+        <GeolocationTool></GeolocationTool>
+        <!-- <FeatureModifyTool></FeatureModifyTool> -->
+        <FeatureModifyTool v-show="loginState"></FeatureModifyTool>
+        <!-- <a-button class="white-border-ant-button" type="primary" size="small">
       <i class="fa-solid fa-pencil"></i>
     </a-button> -->
+      </a-row>
+    </a-col>
+    <a-col :xs="{ span: 24, offset: 0 }" :sm="{ span: 0, offset: 0 }" :xl="{ span: 0, offset: 0 }">
+      <a-flex class="h-100" align="center">
+        <a-popover placement="rightTop" trigger="focus" color="#e6e9ed">
+          <template #content>
+            <a-flex vertical>
+              <PanToHome class="mb-1"></PanToHome>
+              <ZoomTool></ZoomTool>
+
+              <MeasureTool class="mt-1"></MeasureTool>
+              <FeatureInfoPopup class="mt-1"></FeatureInfoPopup>
+              <MapPrinter class="mt-1"></MapPrinter>
+              <GeolocationTool class="mt-1"></GeolocationTool>
+            </a-flex>
+          </template>
+          <a-button size="small" class="white-border-ant-button" type="primary">
+            <i class="fa-solid fa-earth-americas"></i>
+          </a-button>
+        </a-popover>
+        <FeatureModifyTool class="ms-2" v-show="loginState"></FeatureModifyTool>
+      </a-flex>
+    </a-col>
   </a-row>
 </template>
 
