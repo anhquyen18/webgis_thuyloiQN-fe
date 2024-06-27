@@ -309,6 +309,8 @@ export default defineComponent({
   },
 
   setup() {
+    // Logic để có được tổ chức thì phải vào department add người vào
+    // Không trực tiếp thay đổi department trên page User Profile
     const pageLoading = inject('pageLoading');
     const loggedUserProfile = inject('userProfile');
     const profileLoading = ref(true);
@@ -414,8 +416,8 @@ export default defineComponent({
     if (userState().getLogin) {
       getUser(userId.value);
       if (allAccessOrgnizations()) {
-        getOrganizations();
-        getNoOrganizationDeparmtents();
+        // getOrganizations();
+        // getNoOrganizationDeparmtents();
       } else {
         if (loggedUserProfile.value.organization.id != null) {
           getDepartmentsInOrganization(loggedUserProfile.value.organization.id);
