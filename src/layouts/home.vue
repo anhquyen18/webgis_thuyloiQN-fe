@@ -3,18 +3,29 @@
     <a-layout style="height: 100vh">
       <a-layout-header class="home-header">
         <a-row style="height: 100%">
-          <a-col class="center-col" :span="2">
+          <a-col
+            class="center-col"
+            :xs="{ span: 4, offset: 0 }"
+            :sm="{ span: 2, offset: 0 }"
+            :xl="{ span: 2, offset: 0 }">
             <a href="/">
-              <img src="../assets/Logo_BoNongNghiep.png" alt="" style="height: 5rem; width: 5rem" />
+              <img v-if="!screens.xs" src="../assets/Logo_BoNongNghiep.png" alt="" style="height: 5rem; width: 5rem" />
+              <img v-else src="../assets/Logo_BoNongNghiep.png" alt="" style="height: 4rem; width: 4rem" />
             </a>
           </a-col>
-          <a-col class="center-col" :span="12" :offset="3">
-            <h1 style="font-size: 1.1rem">
+
+          <a-col
+            class="center-col"
+            :xs="{ span: 16, offset: 0 }"
+            :sm="{ span: 14, offset: 4 }"
+            :xl="{ span: 15, offset: 2 }">
+            <h1 :style="{ 'font-size': screens.xs ? '0.9rem' : '1.1rem' }">
               HỆ THỐNG QUẢN LÝ CÔNG TRÌNH THUỶ LỢI QUẢNG NAM <br />
-              QUANG NAM IRRIGATION MANAGEMENT SYSTEM
+              <span v-if="!screens.xs"> QUANG NAM IRRIGATION MANAGEMENT SYSTEM </span>
             </h1>
           </a-col>
-          <a-col :span="7">
+
+          <a-col :xs="{ span: 0, offset: 0 }" :sm="{ span: 0, offset: 0 }" :xl="{ span: 5, offset: 0 }">
             <a-row class="h-100 mt-2" justify="space-around" align="middle">
               <a-button class="header-link no-border-ant-button">
                 <a href="#"> Trang Chủ </a>
@@ -28,8 +39,16 @@
               <a-button class="header-link no-border-ant-button">
                 <a href="#">Tin Tức</a>
               </a-button>
-              <a-button class="header-link no-border-ant-button">
+              <!-- <a-button class="header-link no-border-ant-button">
                 <a href="#">Liên Hệ</a>
+              </a-button> -->
+            </a-row>
+          </a-col>
+
+          <a-col :xs="{ span: 4, offset: 0 }" :sm="{ span: 4, offset: 0 }" :xl="{ span: 0, offset: 0 }">
+            <a-row class="h-100 mt-2" justify="space-around" align="middle">
+              <a-button class="header-link no-border-ant-button">
+                <a href="#"> <i class="fa-solid fa-bars-staggered"></i> </a>
               </a-button>
             </a-row>
           </a-col>
@@ -43,10 +62,11 @@
               height: 5vh;
               padding: 0;
               line-height: normal !important;
+              border-bottom: 0.5px solid #fff;
               box-shadow: 1.95px 1.95px 2.6px rgba(0, 0, 0, 0.15);
             ">
             <a-row style="height: 100%">
-              <a-col :span="4">
+              <a-col :xs="{ span: 0, offset: 0 }" :sm="{ span: 0, offset: 0 }" :xl="{ span: 4, offset: 0 }">
                 <a-row class="h-100" justify="space-between" align="middle">
                   <a-button
                     class="white-border-ant-button ms-2"
@@ -67,11 +87,35 @@
                 </a-row>
               </a-col>
 
-              <a-col :span="6" class="h-100">
+              <a-col :xs="{ span: 8, offset: 0 }" :sm="{ span: 4, offset: 0 }" :xl="{ span: 0, offset: 0 }">
+                <a-flex class="h-100" align="center">
+                  <a-dropdown class="ms-2">
+                    <template #overlay>
+                      <a-menu>
+                        <a-menu-item key="1" @click="danhMucClick"> Danh mục </a-menu-item>
+                        <a-menu-item key="2" @click="truyVanClick"> Truy vấn </a-menu-item>
+                      </a-menu>
+                    </template>
+                    <a-button size="small" class="white-border-ant-button" type="primary">
+                      <p>
+                        <span v-if="siderLayerManagerState.activeSiderTab == 'layersTab'"> Danh mục </span>
+                        <span v-else-if="siderLayerManagerState.activeSiderTab == 'searchingTab'"> Truy vấn </span>
+                        <i class="fa-solid fa-caret-down"></i>
+                      </p>
+                    </a-button>
+                  </a-dropdown>
+                </a-flex>
+              </a-col>
+
+              <a-col :xs="{ span: 4, offset: 0 }" :sm="{ span: 9, offset: 0 }" :xl="{ span: 6, offset: 0 }">
                 <ToolContainer></ToolContainer>
               </a-col>
 
-              <a-col class="center-col" :span="4">
+              <a-col
+                class="center-col"
+                :xs="{ span: 10, offset: 0 }"
+                :sm="{ span: 6, offset: 0 }"
+                :xl="{ span: 4, offset: 0 }">
                 <SearchByNameTool></SearchByNameTool>
               </a-col>
             </a-row>
@@ -170,6 +214,8 @@ import LegendControl from '@/components/ol-tools/legend-control.vue';
 import Login from '@/components/login/login.vue';
 import IrrigationToolContainer from '@/components/irrigation-tools/tool-container.vue';
 
+import { Grid } from 'ant-design-vue';
+
 export default defineComponent({
   components: {
     ToolContainer,
@@ -264,15 +310,21 @@ export default defineComponent({
 
     if (window.innerWidth > 1600) buttonSize.value = 'medium';
 
+    const useBreakpoint = Grid.useBreakpoint;
+    const screens = useBreakpoint();
+    const siderCollapsed = ref();
+
     return {
       sliderValue,
       siderLayerManagerState,
       buttonSize,
+      screens,
+      siderCollapsed,
     };
   },
   data() {
     return {
-      siderCollapsed: false,
+      // siderCollapsed: false,
       homeSpinning: true,
     };
   },

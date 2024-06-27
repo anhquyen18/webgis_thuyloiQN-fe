@@ -37,6 +37,7 @@ import {
   Typography,
   Radio,
   DatePicker,
+  Dropdown,
 } from 'ant-design-vue';
 import App from './App.vue';
 import axios from 'axios';
@@ -93,6 +94,7 @@ app.use(Tabs);
 app.use(Typography);
 app.use(Radio);
 app.use(DatePicker);
+app.use(Dropdown);
 
 app.mount('#app');
 

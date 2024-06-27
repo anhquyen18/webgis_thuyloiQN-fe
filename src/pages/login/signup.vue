@@ -1,39 +1,67 @@
 <template>
-  <a-spin :spinning="false" size="large" tip="Xin vui lòng đợi...">
+  <a-spin :spinning="signupLoading" size="large" tip="Xin vui lòng đợi...">
     <a-layout
       style="
         overflow: auto;
         height: 100vh;
-        background: rgb(6, 0, 103);
-        background: linear-gradient(220deg, rgba(6, 0, 103, 1) 0%, rgba(4, 96, 174, 1) 65%, rgba(0, 141, 170, 1) 100%);
+        background: linear-gradient(220deg, rgba(6, 0, 103, 1) 0%, rgba(4, 96, 144, 1) 65%, rgba(0, 141, 170, 1) 100%);
       ">
       <a-layout-header style="background: transparent; height: 10vh; padding: 0; line-height: normal">
         <a-row style="height: 100%">
-          <a-col class="center-col mt-3" :span="2">
+          <a-col
+            class="center-col mt-3"
+            :xs="{ span: 5, offset: 0 }"
+            :sm="{ span: 3, offset: 0 }"
+            :xl="{ span: 2, offset: 0 }">
             <a href="/">
-              <img src="../../assets/Logo_BoNongNghiep.png" alt="" style="height: 5rem; width: 5rem" />
+              <img
+                v-if="!screens.xs"
+                src="../../assets/Logo_BoNongNghiep.png"
+                alt=""
+                style="height: 5rem; width: 5rem" />
+              <img
+                class="mb-4"
+                v-else
+                src="../../assets/Logo_BoNongNghiep.png"
+                alt=""
+                style="height: 4rem; width: 4rem" />
             </a>
           </a-col>
         </a-row>
       </a-layout-header>
       <a-layout-content style="height: 90vh">
-        <a-row style="height: 100%" justify="center">
+        <a-row v-if="!signupSuccess" style="height: 100%" justify="center">
           <!-- <a-col :span="15"> </a-col> -->
-          <a-col :span="5">
+          <a-col :xs="{ span: 18, offset: 0 }" :sm="{ span: 12, offset: 0 }" :xl="{ span: 5, offset: 0 }">
             <h1 class="mb-5" style="font-size: 2rem; color: white">
-              Đăng ký tài khoản <br /><span style="font-size: 1.5rem"
-                >Hệ thống quản lý công trình thuỷ lợi Quảng Nam</span
-              >
+              Đăng ký tài khoản <br />
+              <span style="font-size: 1.5rem"> Hệ thống quản lý công trình thuỷ lợi Quảng Nam </span>
             </h1>
-            <!-- <a-flex justify="center"> -->
+
+            <a-flex
+              v-if="signupErrorMessage"
+              class="mb-2"
+              justify="left"
+              align="center"
+              style="
+                background-color: var(--error-color);
+                min-height: 50px;
+                height: auto;
+                padding: 5px 10px;
+                color: #fff;
+                font-weight: 500;
+              ">
+              <InfoCircleOutlined class="fs-5 me-3" />
+              {{ signupErrorMessage }}
+            </a-flex>
+
             <a-form
               layout="vertical"
               :model="user"
               name="signupForm"
               :rules="signupFormRules"
               ref="signupFormRef"
-              hideRequiredMark
-              @submit="signup">
+              hideRequiredMark>
               <a-form-item name="username" hasFeedback>
                 <template #label>
                   <p class="form-item-title">Tên đăng nhập</p>
@@ -52,12 +80,26 @@
                 <template #label>
                   <p class="form-item-title">Mật khẩu</p>
                 </template>
-                <a-input-password
-                  v-model:value="user.password"
-                  size="large"
-                  placeholder="Mật khẩu"
-                  :visibility-toggle="false"></a-input-password>
+                <a-input-password v-model:value="user.password" size="large" placeholder="Mật khẩu"></a-input-password>
               </a-form-item>
+
+              <a-flex vertical v-if="user.password">
+                <a-typography-text :type="tenCharacters ? 'success' : 'danger'">
+                  <CheckCircleFilled v-if="tenCharacters" />
+                  <CloseCircleFilled v-else />
+                  Chứa ít nhất chứa 10 kí tự
+                </a-typography-text>
+                <a-typography-text :type="capitalCharacters ? 'success' : 'danger'">
+                  <CheckCircleFilled v-if="capitalCharacters" />
+                  <CloseCircleFilled v-else />
+                  Chứa kí tự in hoa
+                </a-typography-text>
+                <a-typography-text :type="numberOrSpecialCharacters ? 'success' : 'danger'">
+                  <CheckCircleFilled v-if="numberOrSpecialCharacters" />
+                  <CloseCircleFilled v-else />
+                  Chứa số hoặc kí tự đặc biệt (VD: % ? ! *)
+                </a-typography-text>
+              </a-flex>
 
               <a-form-item class="mt-2" name="confirmPassword" hasFeedback>
                 <template #label>
@@ -66,12 +108,18 @@
                 <a-input-password
                   v-model:value="user.confirmPassword"
                   size="large"
-                  placeholder="Nhập lại mật khẩu"
-                  :visibility-toggle="false"></a-input-password>
+                  placeholder="Nhập lại mật khẩu"></a-input-password>
               </a-form-item>
 
               <a-form-item class="mt-5">
-                <a-button class="fw-bold" type="primary" shape="round" size="large" html-type="submit" block>
+                <a-button
+                  class="fw-bold"
+                  type="primary"
+                  shape="round"
+                  size="large"
+                  block
+                  @click="signup"
+                  :loading="signupLoading">
                   Đăng kí
                 </a-button>
               </a-form-item>
@@ -95,15 +143,43 @@
             <!-- </a-flex> -->
           </a-col>
         </a-row>
+
+        <a-row v-else justify="center">
+          <a-col :xs="{ span: 18, offset: 0 }" :sm="{ span: 12, offset: 0 }" :xl="{ span: 5, offset: 0 }">
+            <h2 class="mb-4" style="font-size: 2rem; color: white">Đăng ký thành công <br /></h2>
+            <a-flex vertical>
+              <p class="text-white mb-2">
+                Bạn đã đăng kí thành công tài khoản <i>{{ user.username }}.</i>
+              </p>
+
+              <p class="text-white mb-2">Vui lòng đăng nhập tại đây:</p>
+
+              <router-link :to="{ name: 'login-page' }">
+                <a-button type="primary" size="large" shape="round" block @click="changeState">
+                  Đăng nhập tài khoản
+                </a-button>
+              </router-link>
+            </a-flex>
+          </a-col>
+        </a-row>
       </a-layout-content>
     </a-layout>
   </a-spin>
 </template>
 
 <script>
-import { defineComponent, ref } from 'vue';
+import { defineComponent, ref, reactive } from 'vue';
+import { Grid } from 'ant-design-vue';
+import { CheckCircleFilled, CloseCircleFilled, InfoCircleOutlined } from '@ant-design/icons-vue';
+import thuyLoiApi from '@/js/axios/thuyLoiApi';
 
 export default defineComponent({
+  components: {
+    CheckCircleFilled,
+    CloseCircleFilled,
+    InfoCircleOutlined,
+  },
+
   setup() {
     const user = ref({
       username: '',
@@ -111,16 +187,28 @@ export default defineComponent({
       email: '',
       confirmPassword: '',
     });
+
     const signupFormRef = ref();
+
+    const tenCharacters = ref(false);
+    const capitalCharacters = ref(false);
+    const numberOrSpecialCharacters = ref(false);
 
     const validatePass = async (_rule, value) => {
       if (value === '') {
         return Promise.reject('Vui lòng nhập mật khẩu');
-      } else {
+      }
+      tenCharacters.value = value.length > 10;
+      capitalCharacters.value = /[A-Z]/.test(value);
+      numberOrSpecialCharacters.value = /[0-9@$!%*?&]/.test(value);
+
+      if (tenCharacters.value == true && capitalCharacters.value == true && numberOrSpecialCharacters.value == true) {
         if (user.value.password !== '') {
           signupFormRef.value.validateFields('confirmPassword');
         }
         return Promise.resolve();
+      } else {
+        return Promise.reject('Mật khẩu không hợp lệ.');
       }
     };
 
@@ -149,12 +237,7 @@ export default defineComponent({
       password: [
         {
           validator: validatePass,
-          trigger: 'change',
-        },
-        {
-          min: 8,
-          message: 'Mật khẩu ít nhất chứa 8 kí tự.',
-          trigger: 'change',
+          trigger: ['change', 'blur'],
         },
       ],
       confirmPassword: [
@@ -176,23 +259,61 @@ export default defineComponent({
         },
       ],
     };
-
+    const useBreakpoint = Grid.useBreakpoint;
+    const screens = useBreakpoint();
     return {
       user,
       signupFormRules,
       signupFormRef,
+      screens,
+      tenCharacters,
+      capitalCharacters,
+      numberOrSpecialCharacters,
     };
   },
 
   data() {
-    return {};
+    return {
+      signupLoading: false,
+      signupErrorMessage: '',
+      signupSuccess: false,
+    };
   },
 
   computed: {},
 
   methods: {
     signup() {
-      this.signupFormRef.validateFields();
+      this.signupFormRef
+        .validate()
+        .then((response) => {
+          this.signupLoading = true;
+          thuyLoiApi
+            .post('/signup', this.user)
+            .then((response) => {
+              console.log(response);
+              this.signupLoading = false;
+              this.signupSuccess = true;
+
+              this.signupFormRef.resetFields();
+            })
+            .catch((error) => {
+              console.log(error);
+              if (error.response.data.message) {
+                this.signupErrorMessage = error.response.data.message;
+              }
+              this.signupLoading = false;
+            });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+
+    changeState() {
+      setTimeout(() => {
+        this.signupSuccess = false;
+      }, 1000);
     },
   },
 

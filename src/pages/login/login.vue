@@ -9,16 +9,30 @@
       ">
       <a-layout-header style="background: transparent; height: 10vh; padding: 0; line-height: normal">
         <a-row style="height: 100%">
-          <a-col class="center-col mt-3" :span="2">
+          <a-col
+            class="center-col mt-3"
+            :xs="{ span: 5, offset: 0 }"
+            :sm="{ span: 3, offset: 0 }"
+            :xl="{ span: 2, offset: 0 }">
             <a href="/">
-              <img src="../../assets/Logo_BoNongNghiep.png" alt="" style="height: 5rem; width: 5rem" />
+              <img
+                v-if="!screens.xs"
+                src="../../assets/Logo_BoNongNghiep.png"
+                alt=""
+                style="height: 5rem; width: 5rem" />
+              <img
+                class="mb-4"
+                v-else
+                src="../../assets/Logo_BoNongNghiep.png"
+                alt=""
+                style="height: 4rem; width: 4rem" />
             </a>
           </a-col>
         </a-row>
       </a-layout-header>
       <a-layout-content style="height: 90vh">
         <a-row style="height: 100%" justify="center">
-          <a-col :span="5">
+          <a-col :xs="{ span: 18, offset: 0 }" :sm="{ span: 12, offset: 0 }" :xl="{ span: 5, offset: 0 }">
             <h1 class="mb-5" style="font-size: 2rem; color: white">
               Đăng nhập <br /><span style="font-size: 1.5rem">Hệ thống quản lý công trình thuỷ lợi Quảng Nam</span>
             </h1>
@@ -149,6 +163,7 @@ import { useRoute } from 'vue-router';
 import thuyLoiApi from '@/js/axios/thuyLoiApi';
 import { getItem, setItem, removeItem } from '@/js/utils/localStorage.js';
 import { InfoCircleOutlined } from '@ant-design/icons-vue';
+import { Grid } from 'ant-design-vue';
 
 export default defineComponent({
   components: {
@@ -245,12 +260,14 @@ export default defineComponent({
       ],
     };
     const loginFormRef = ref();
-
+    const useBreakpoint = Grid.useBreakpoint;
+    const screens = useBreakpoint();
     return {
       user,
       rememberme,
       loginFormRules,
       loginFormRef,
+      screens,
     };
   },
 

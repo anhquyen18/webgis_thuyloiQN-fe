@@ -35,13 +35,20 @@
       </a-col> -->
     </a-row>
 
-    <a-row v-else class="sign-in-button-panel--logged" justify="space-between" style="width: 200px">
-      <a-col :span="10" :offset="2">
+    <a-row v-else class="sign-in-button-panel--logged" justify="space-between" style="padding: 0 5px">
+      <a-col :xs="{ span: 0, offset: 0 }" :sm="{ span: 10, offset: 2 }" :xl="{ span: 10, offset: 0 }">
         <router-link :to="{ name: 'login-page' }">
           <a-button class="no-border-ant-button fw-bold" size="small" ghost> Đăng nhập </a-button>
         </router-link>
       </a-col>
-      <a-col :span="10">
+      <a-col :xs="{ span: 24, offset: 0 }" :sm="{ span: 0, offset: 0 }" :xl="{ span: 0, offset: 0 }">
+        <router-link :to="{ name: 'login-page' }">
+          <a-button class="no-border-ant-button" size="small" ghost>
+            <i class="fa-solid fa-right-to-bracket"></i>
+          </a-button>
+        </router-link>
+      </a-col>
+      <a-col class="ms-2" :xs="{ span: 0, offset: 0 }" :sm="{ span: 9, offset: 0 }" :xl="{ span: 9, offset: 0 }">
         <router-link :to="{ name: 'signup-page' }">
           <a-button class="no-border-ant-button fw-bold" size="small" ghost>Đăng ký</a-button>
         </router-link>
@@ -54,10 +61,15 @@
 import { defineComponent } from 'vue';
 import { userState } from '@/stores/user-state';
 import { getItem, setItem, removeItem } from '@/js/utils/localStorage.js';
+import { Grid } from 'ant-design-vue';
 
 export default defineComponent({
   setup() {
-    return {};
+    const useBreakpoint = Grid.useBreakpoint;
+    const screens = useBreakpoint();
+    return {
+      screens,
+    };
   },
 
   data() {
@@ -85,12 +97,11 @@ export default defineComponent({
 
 <style lang="scss">
 .sign-in-button-panel {
-  width: auto;
-  height: 3vh;
+  // width: auto;
+  // height: 3vh;
   position: fixed;
   top: 0;
   right: 0;
-  // padding: 5px;
 
   &--logged {
     clip-path: polygon(0 0, 100% 0%, 100% 100%, 10% 100%);
