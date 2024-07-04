@@ -13,8 +13,17 @@
           rowKey="id"
           :row-selection="{ selectedRowKeys: tableState.selectedRowKeys, onChange: onSelectChange }"
           :columns="columns"
-          :data-source="dataSource"
+          :data-source="dataSource.data"
           :loading="tableLoading"
+          :pagination="{
+            total: dataSource.total,
+            current: defaultPage,
+            pageSize: defaultPageSize,
+            showSizeChanger: false,
+            onChange: (page, pageSize) => {
+              pageChange(page, pageSize);
+            },
+          }"
           :bordered="false"
           :showSorterTooltip="false"
           :scroll="{ x: 1400 }">
@@ -24,7 +33,7 @@
                 <p class="fs-4 fw-bold">
                   Báo cáo an toàn
                   <span class="fs-4 fw-bold" v-if="this.dataSource" style="color: lightgray">
-                    ({{ this.dataSource.length }})
+                    ({{ this.dataSource.total }})
                   </span>
                 </p>
               </a-col>
@@ -72,15 +81,18 @@
                 <p style="font-size: 0.8rem">Mổ tả về báo cáo an toàn đập, nghị định....</p>
               </a-col>
               <a-col :xs="24" :md="16">
-                <a-input
-                  v-model:value="departmentSearchValue"
+                <a-input-search
+                  v-model:value="searchValue"
                   class="mt-2"
-                  placeholder="Tìm kiếm phòng ban"
-                  @change="departmentSearchChange">
+                  placeholder="Tìm kiếm báo cáo"
+                  enter-button
+                  allow-clear
+                  :loading="searchLoading"
+                  @search="searchEnter">
                   <template #prefix>
                     <i class="fa-solid fa-magnifying-glass me-2"></i>
                   </template>
-                </a-input>
+                </a-input-search>
               </a-col>
             </a-row>
           </template>
@@ -183,6 +195,7 @@ import {
   FieldTimeOutlined,
   DownloadOutlined,
 } from '@ant-design/icons-vue';
+import { paginationConfig } from 'ant-design-vue/es/pagination';
 
 export default defineComponent({
   components: {
@@ -199,6 +212,7 @@ export default defineComponent({
   setup() {
     const router = useRouter();
     const pageLoading = inject('pageLoading');
+    const tableLoading = ref(false);
     const userProfile = inject('userProfile');
     const tableState = ref({
       selectedRowKeys: [],
@@ -210,34 +224,38 @@ export default defineComponent({
     };
 
     const originDataSource = ref();
-    const dataSource = ref();
-
-    const getReports = () => {
-      pageLoading.value = true;
+    const dataSource = ref([]);
+    const defaultPage = ref(1);
+    const defaultPageSize = ref(20);
+    const getReports = (page, pageSize) => {
+      tableLoading.value = true;
       thuyLoiApi
-        .get(`/reservoirs/safety-reports`, {
+        .get(`/reservoirs/safety-reports?page=${page}`, {
           headers: {
             Authorization: `Bearer ${getItem('accessToken')}`,
           },
+          params: {
+            pageSize: pageSize,
+          },
         })
         .then((response) => {
-          console.log(response.data);
+          // console.log(response.data);
           irrigationState().setSafetyReports(response.data.reports);
+          // irrigationState().setSafetyReports(response.data.reports);
           originDataSource.value = irrigationState().getSafetyReports;
           dataSource.value = irrigationState().getSafetyReports;
-
-          pageLoading.value = false;
+          tableLoading.value = false;
         })
         .catch((error) => {
           console.log(error);
           router.push({ name: 'account-manager-page' });
-          pageLoading.value = false;
+          tableLoading.value = false;
         });
     };
 
     if (userState().getLogin) {
       if (!irrigationState().getSafetyReports) {
-        getReports();
+        getReports(defaultPageSize);
       } else {
         originDataSource.value = irrigationState().getSafetyReports;
         dataSource.value = irrigationState().getSafetyReports;
@@ -245,8 +263,10 @@ export default defineComponent({
     }
 
     const myGetLastTime = getLastTime;
+
     return {
       pageLoading,
+      tableLoading,
       tableState,
       onSelectChange,
       userProfile,
@@ -254,6 +274,8 @@ export default defineComponent({
       dataSource,
       originDataSource,
       myGetLastTime,
+      defaultPageSize,
+      defaultPage,
     };
   },
 
@@ -324,9 +346,9 @@ export default defineComponent({
           sorter: (a, b) => a.id.length - b.id.length,
         },
       ],
-      tableLoading: false,
-      departmentSearchValue: '',
+      searchValue: '',
       downloadLoading: false,
+      searchLoading: false,
     };
   },
 
@@ -334,7 +356,7 @@ export default defineComponent({
     pageLoading: {
       handler() {
         if (!this.pageLoading && !irrigationState().getSafetyReports) {
-          this.getReports();
+          this.getReports(this.defaultPage, this.defaultPageSize);
           // this.dataSource.users[0];
         } else {
           // this.dataSource = [];
@@ -359,13 +381,16 @@ export default defineComponent({
     reloadTable() {
       this.tableLoading = true;
       thuyLoiApi
-        .get(`/reservoirs/safety-reports`, {
+        .get(`/reservoirs/safety-reports?page=${this.defaultPage}`, {
           headers: {
             Authorization: `Bearer ${getItem('accessToken')}`,
           },
+          params: {
+            pageSize: this.defaultPageSize,
+          },
         })
         .then((response) => {
-          // console.log(response.data);
+          console.log(response);
           irrigationState().setSafetyReports(response.data.reports);
           this.originDataSource = irrigationState().getSafetyReports;
           this.dataSource = irrigationState().getSafetyReports;
@@ -388,7 +413,7 @@ export default defineComponent({
           data: this.tableState.selectedRowKeys,
         })
         .then((response) => {
-          console.log(response.data);
+          // console.log(response.data);
           this.reloadTable();
           this.$message.success('Xoá báo cáo thành công.');
           // this.tableLoading = false;
@@ -401,13 +426,13 @@ export default defineComponent({
     },
 
     filterTable(text, dataSource) {
-      return dataSource.filter(function (item) {
-        return removeAccents(item.name.toLowerCase()).includes(removeAccents(text.toLowerCase()));
-      });
+      // return dataSource.filter(function (item) {
+      // return removeAccents(item.name.toLowerCase()).includes(removeAccents(text.toLowerCase()));
+      // });
     },
 
     departmentSearchChange() {
-      this.dataSource = this.filterTable(this.departmentSearchValue, this.originDataSource);
+      // this.dataSource = this.filterTable(this.searchValue, this.originDataSource);
     },
 
     hasPermissions(policies) {
@@ -430,7 +455,7 @@ export default defineComponent({
           responseType: 'arraybuffer',
         })
         .then((response) => {
-          console.log(response);
+          // console.log(response);
           downloadFile(response, name);
           this.downloadLoading = false;
         })
@@ -438,6 +463,63 @@ export default defineComponent({
           this.downloadLoading = false;
           console.log(error);
         });
+    },
+
+    searchEnter() {
+      if (this.searchValue) {
+        this.searchLoading = true;
+        thuyLoiApi
+          .get(`/reservoirs/safety-reports/search?page=${this.defaultPage}`, {
+            headers: {
+              Authorization: `Bearer ${getItem('accessToken')}`,
+            },
+            params: {
+              searchValue: this.searchValue,
+              pageSize: this.defaultPageSize,
+            },
+          })
+          .then((response) => {
+            // console.log(response);
+            this.searchLoading = false;
+            this.dataSource = response.data.reports;
+          })
+          .catch((error) => {
+            this.searchLoading = false;
+            console.log(error);
+          });
+      } else {
+        this.getReports(this.defaultPage, this.defaultPageSize);
+      }
+    },
+
+    getPage(url) {
+      this.tableLoading = true;
+      axios
+        .get(url, {
+          headers: {
+            Authorization: `Bearer ${getItem('accessToken')}`,
+          },
+          params: {
+            pageSize: this.defaultPageSize,
+            searchValue: this.searchValue,
+          },
+        })
+        .then((response) => {
+          // console.log(response);
+          this.tableLoading = false;
+
+          this.dataSource = response.data.reports;
+        })
+        .catch((error) => {
+          this.tableLoading = false;
+
+          console.log(error);
+        });
+    },
+
+    pageChange(page, pageSize) {
+      this.defaultPage = page;
+      this.getPage(this.dataSource.path + '?page=' + page);
     },
   },
 
