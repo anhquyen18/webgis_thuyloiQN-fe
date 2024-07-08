@@ -6,7 +6,7 @@
           <a-col
             class="center-col"
             :xs="{ span: 4, offset: 0 }"
-            :sm="{ span: 2, offset: 0 }"
+            :md="{ span: 2, offset: 0 }"
             :xl="{ span: 2, offset: 0 }">
             <a href="/">
               <img v-if="!screens.xs" src="../assets/Logo_BoNongNghiep.png" alt="" style="height: 5rem; width: 5rem" />
@@ -17,7 +17,7 @@
           <a-col
             class="center-col"
             :xs="{ span: 16, offset: 0 }"
-            :sm="{ span: 14, offset: 4 }"
+            :md="{ span: 14, offset: 4 }"
             :xl="{ span: 15, offset: 2 }">
             <h1 :style="{ 'font-size': screens.xs ? '0.9rem' : '1.1rem' }">
               HỆ THỐNG QUẢN LÝ CÔNG TRÌNH THUỶ LỢI QUẢNG NAM <br />
