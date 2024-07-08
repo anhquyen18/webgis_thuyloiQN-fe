@@ -10,9 +10,11 @@
         <a-row style="height: 80%">
           <a-col class="all-h-100" :xs="0" :sm="{ span: 0, offset: 0 }" :xl="{ span: 3, offset: 2 }">
             <a-flex justify="left" align="center">
-              <a href="/">
-                <img class="ms-4" src="../assets/Logo_BoNongNghiep.ico" alt="" style="width: auto" />
-              </a>
+              <router-link :to="{ name: 'home-page' }">
+                <a>
+                  <img class="ms-4" src="../assets/Logo_BoNongNghiep.ico" alt="" style="width: auto" />
+                </a>
+              </router-link>
             </a-flex>
           </a-col>
 
